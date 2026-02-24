@@ -29,9 +29,9 @@ class AppTheme {
   static InputDecorationTheme _getInputDecorationTheme() {
     return InputDecorationTheme(
       hintStyle: TextStyle(
-        fontWeight: .w300,
+        fontWeight: FontWeight.w300,
       ),
-      contentPadding: .symmetric(horizontal: 14),
+      contentPadding: EdgeInsets.symmetric(horizontal: 14),
       border: OutlineInputBorder(
         borderSide: BorderSide(color: AppColors.themeColor),
       ),
@@ -57,7 +57,7 @@ class AppTheme {
              ),
              backgroundColor: AppColors.themeColor,
              textStyle: TextStyle(
-                 fontWeight: .w700
+                 fontWeight: FontWeight.w700
              )
          ),
        );
