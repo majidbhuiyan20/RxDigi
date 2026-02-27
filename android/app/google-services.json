@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "597117821678",
+    "project_id": "rxdigi",
+    "storage_bucket": "rxdigi.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:597117821678:android:ccb5333d69fba0cb9689ff",
+        "android_client_info": {
+          "package_name": "com.example.rxdigi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtv9FYEblO1ZSLONVIrq_b1jMqtHPaz2g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

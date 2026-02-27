@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rxdigi/app/app_theme.dart';
 
 import 'app_routes.dart';
 class RxDigi extends StatefulWidget {
@@ -14,9 +15,10 @@ class _RxDigiState extends State<RxDigi> {
    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'RxDigi',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: AppTheme.lightTheme,
       onGenerateRoute: RouteGenerator.getRoute,
       initialRoute: AppRoutes.splashRoute,
+
     );
   }
 }
