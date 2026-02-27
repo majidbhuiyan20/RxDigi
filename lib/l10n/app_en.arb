@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "hello": "Hello",
+  "language": "Language",
+  "english": "English",
+  "bengali": "বাংলা",
+
+  "settings": "Setttings",
+  "home" : "Home Screen",
+  "majid": "Your Localization is Completed"
+}
