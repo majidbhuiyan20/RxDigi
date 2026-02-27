@@ -24,6 +24,7 @@ dependencies:
   riverpod: ^3.2.1
   flutter_riverpod: ^3.2.1
   shared_preferences: ^2.5.4
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:

@@ -19,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _moveToNextScreen() async{
     await Future.delayed(const Duration(seconds: 2));
-    Navigator.pushReplacementNamed(context, AppRoutes.homeScreenRoute);
+    Navigator.pushReplacementNamed(context, AppRoutes.onboardingFlow);
   }
   @override
   Widget build(BuildContext context) {
