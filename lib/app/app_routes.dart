@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rxdigi/features/doctor_info/view/onboarding_flow.dart';
-import 'package:rxdigi/features/doctor_info/view/personal_info_screen.dart';
+import 'package:rxdigi/features/doctor_info/view/step1_introduction.dart';
 import 'package:rxdigi/features/home/view/home_screen.dart';
 import 'package:rxdigi/features/settings/view/settings_screen.dart';
 import '../features/splash/splash_screen.dart';
@@ -25,8 +25,6 @@ class RouteGenerator{
         return MaterialPageRoute(builder: (_)=> HomeScreen());
       case AppRoutes.settingsScreenRoute:
         return MaterialPageRoute(builder: (_)=> SettingsScreen());
-      case AppRoutes.personalInfoScreen:
-        return MaterialPageRoute(builder: (_)=> PersonalInfoScreen());
       case AppRoutes.onboardingFlow:
         return MaterialPageRoute(builder: (_)=> OnboardingFlow());
 
