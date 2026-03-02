@@ -10,6 +10,12 @@ class AppColors {
   static Color errorColor = Color(0XFFF44336);
   static Color textDarkColor = Color(0XFF1E232C);
   static Color textLightColor = Color(0XFF757575);
+
+
+  static Color topHeaderColor = Color(0XFF0D3592);
+  static Color greenColor = Color(0XFF34BC46);
+  static Color rxPrimaryColor = Color(0XFF1F74E2);
+
 }
 
 // Background  →  #FFFFFF (সাদা)

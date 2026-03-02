@@ -136,6 +136,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Localization is Completed'**
   String get majid;
+
+  /// No description provided for @step.
+  ///
+  /// In en, this message translates to:
+  /// **'Step'**
+  String get step;
+
+  /// No description provided for @stepIntroduction.
+  ///
+  /// In en, this message translates to:
+  /// **'Introduction'**
+  String get stepIntroduction;
+
+  /// No description provided for @stepQualification.
+  ///
+  /// In en, this message translates to:
+  /// **'Qualification'**
+  String get stepQualification;
+
+  /// No description provided for @stepEffort.
+  ///
+  /// In en, this message translates to:
+  /// **'Experience'**
+  String get stepEffort;
+
+  /// No description provided for @stepProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get stepProfile;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

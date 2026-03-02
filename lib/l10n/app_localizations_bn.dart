@@ -28,4 +28,19 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get majid => 'মাজিদ, তোমার লোকালাইজেশন কমপ্লিট';
+
+  @override
+  String get step => 'ধাপ';
+
+  @override
+  String get stepIntroduction => 'পরিচয়';
+
+  @override
+  String get stepQualification => 'যোগ্যতা';
+
+  @override
+  String get stepEffort => 'অভিজ্ঞতা';
+
+  @override
+  String get stepProfile => 'প্রোফাইল';
 }

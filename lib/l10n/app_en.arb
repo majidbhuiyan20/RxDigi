@@ -7,5 +7,11 @@
 
   "settings": "Setttings",
   "home" : "Home Screen",
-  "majid": "Your Localization is Completed"
+  "majid": "Your Localization is Completed",
+
+  "step": "Step",
+  "stepIntroduction": "Introduction",
+  "stepQualification": "Qualification",
+  "stepEffort": "Experience",
+  "stepProfile": "Profile"
 }

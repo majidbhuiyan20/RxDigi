@@ -8,5 +8,12 @@
 
   "settings": "সেটিংস",
   "home" : "হোম স্ক্রিন",
-  "majid": "মাজিদ, তোমার লোকালাইজেশন কমপ্লিট"
+  "majid": "মাজিদ, তোমার লোকালাইজেশন কমপ্লিট",
+
+  "step": "ধাপ",
+  "stepIntroduction": "পরিচয়",
+  "stepQualification": "যোগ্যতা",
+  "stepEffort": "অভিজ্ঞতা",
+  "stepProfile": "প্রোফাইল"
+
 }

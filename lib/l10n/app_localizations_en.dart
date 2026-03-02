@@ -28,4 +28,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get majid => 'Your Localization is Completed';
+
+  @override
+  String get step => 'Step';
+
+  @override
+  String get stepIntroduction => 'Introduction';
+
+  @override
+  String get stepQualification => 'Qualification';
+
+  @override
+  String get stepEffort => 'Experience';
+
+  @override
+  String get stepProfile => 'Profile';
 }
