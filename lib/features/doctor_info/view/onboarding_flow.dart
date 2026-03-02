@@ -43,62 +43,51 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
      backgroundColor: const Color(0xFF0D3592),
       //backgroundColor: AppColors.rxPrimaryColor,
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            // ✅ desktop: max width 560, mobile: full width
-            constraints: BoxConstraints(
-              maxWidth: isDesktop ? 560 : double.infinity,
+        child: Column(
+          children: [
+            StepHeader(
+              currentStep: currentStep,
+              totalSteps: _totalSteps,
             ),
-            child: Column(
-              children: [
 
-                // ── Step Header — centered top ─────────────────────
-                StepHeader(
-                  currentStep: currentStep,
-                  totalSteps:  _totalSteps,
-                ),
-
-                // ── Pages ──────────────────────────────────────────
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    physics:    const NeverScrollableScrollPhysics(),
-                    children: [
-                      Step1Introduction(
-                        onNext: () => ref
-                            .read(onboardingStepProvider.notifier)
-                            .next(_totalSteps),
-                      ),
-                      Step2Qualification(
-                        onNext: () => ref
-                            .read(onboardingStepProvider.notifier)
-                            .next(_totalSteps),
-                        onBack: () => ref
-                            .read(onboardingStepProvider.notifier)
-                            .previous(),
-                      ),
-                      Step3Effort(
-                        onNext: () => ref
-                            .read(onboardingStepProvider.notifier)
-                            .next(_totalSteps),
-                        onBack: () => ref
-                            .read(onboardingStepProvider.notifier)
-                            .previous(),
-                      ),
-                      Step4Profile(
-                        onNext: () => ref
-                            .read(onboardingStepProvider.notifier)
-                            .next(_totalSteps),
-                        onBack: () => ref
-                            .read(onboardingStepProvider.notifier)
-                            .previous(),
-                      ),
-                    ],
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  Step1Introduction(
+                    onNext: () => ref
+                        .read(onboardingStepProvider.notifier)
+                        .next(_totalSteps),
                   ),
-                ),
-              ],
+                  Step2Qualification(
+                    onNext: () => ref
+                        .read(onboardingStepProvider.notifier)
+                        .next(_totalSteps),
+                    onBack: () => ref
+                        .read(onboardingStepProvider.notifier)
+                        .previous(),
+                  ),
+                  Step3Effort(
+                    onNext: () => ref
+                        .read(onboardingStepProvider.notifier)
+                        .next(_totalSteps),
+                    onBack: () => ref
+                        .read(onboardingStepProvider.notifier)
+                        .previous(),
+                  ),
+                  Step4Profile(
+                    onNext: () => ref
+                        .read(onboardingStepProvider.notifier)
+                        .next(_totalSteps),
+                    onBack: () => ref
+                        .read(onboardingStepProvider.notifier)
+                        .previous(),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
