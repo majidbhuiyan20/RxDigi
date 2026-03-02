@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rxdigi/app/app_colors.dart';
 import 'package:rxdigi/app/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -18,21 +19,52 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _moveToNextScreen() async{
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 5));
     Navigator.pushReplacementNamed(context, AppRoutes.onboardingFlow);
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(""),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Center(child: Text("RxDigi", style: TextStyle(color: Colors.blue, fontSize: 28, fontWeight: FontWeight.w700),)),
-        ],
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.rxPrimaryColor,
+              AppColors.rxSecondaryColor,
+            ],
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+
+            /// 🔹 RxDigi Styled Text
+            RichText(
+              text: TextSpan(
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w700,
+                ),
+                children: [
+                  TextSpan(
+                    text: "Rx",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  TextSpan(
+                    text: "Digi",
+                    style: TextStyle(color: AppColors.rxSecondaryColor),
+                  ),
+                ],
+              ),
+            ),
+
+          ],
+        ),
       ),
     );
   }

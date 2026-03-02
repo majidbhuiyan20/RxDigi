@@ -36,7 +36,8 @@ class StepHeader extends ConsumerWidget {
 
     return Container(
       width:  double.infinity,
-      color:  AppColors.rxPrimaryColor,//const Color(0xFF1A3A8F),
+     color: Color(0XFF0D3592),
+      // color:  AppColors.rxPrimaryColor,//const Color(0xFF1A3A8F),
       padding: EdgeInsets.fromLTRB(
         isDesktop ? 40 : 16.w,
         isDesktop ? 24 : 16.h,

@@ -15,6 +15,7 @@ class AppColors {
   static Color topHeaderColor = Color(0XFF0D3592);
   static Color greenColor = Color(0XFF34BC46);
   static Color rxPrimaryColor = Color(0XFF1F74E2);
+  static Color rxSecondaryColor = Color(0XFF58A3BA);
 
 }
 

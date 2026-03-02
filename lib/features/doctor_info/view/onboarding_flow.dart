@@ -40,8 +40,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     });
 
     return Scaffold(
-     // backgroundColor: const Color(0xFF1A3A8F),
-      backgroundColor: AppColors.rxPrimaryColor,
+     backgroundColor: const Color(0xFF0D3592),
+      //backgroundColor: AppColors.rxPrimaryColor,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
