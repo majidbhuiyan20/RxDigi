@@ -6,6 +6,7 @@ import 'package:rxdigi/app/app_text_style.dart';
 import 'package:rxdigi/l10n/app_localizations.dart';
 import 'package:rxdigi/l10n/app_localizations_bn.dart';
 
+import '../widgets/card_section_title.dart';
 import '../widgets/card_title_section.dart';
 import '../widgets/dotted_circular_border.dart';
 
@@ -22,17 +23,18 @@ class Step1Introduction extends StatelessWidget {
       child: Container(
         color:  AppColors.appBackgroundColor,
         child: Padding(
-          padding:  EdgeInsets.all(16.r),
+          padding:  EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.yourInformation, style: AppTextStyles.largeBlackTextStyle,),
-              Text(l10n.infoPrintedOnPrescription, style: AppTextStyles.smallGreyTextStyle,),
+              Text(l10n.yourInformation, style: AppTextStyles.largeBlackTextStyle(context),),
+              Text(l10n.infoPrintedOnPrescription, style: AppTextStyles.smallGreyTextStyle(context),),
               SizedBox(height: 8,),
+              ///-----------Profile Image upload information section-------------
               Container(
-                padding: EdgeInsets.all(16.r),
+                padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16.r),
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: AppColors.borderColor,
                     width: isDesktop ? 3 : 1.5,
@@ -41,7 +43,10 @@ class Step1Introduction extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    CardTitleSection(l10n: l10n),
+                    CardTitleSection(
+                      icon: Icons.camera_alt,
+                      title: l10n.profileImage,
+                    ),
                     SizedBox(height: 16,),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -65,43 +70,86 @@ class Step1Introduction extends StatelessWidget {
                           ),
                         ),
 
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 12),
 
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(l10n.addPhoto, style: AppTextStyles.primaryTextStyle.copyWith(color: AppColors.textBlackColor),),
-                            SizedBox(height: 4,),
-                            Text(l10n.uploadProfessionalPhoto, style: AppTextStyles.smallGreyTextStyle,),
-                            SizedBox(height: 4,),
-                            Text(l10n.shownInPrescription, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, fontFamily: "TiroBangla"),),
-                            SizedBox(height: 8,),
-                            GestureDetector(
-                              onTap: (){
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(l10n.addPhoto, style: AppTextStyles.primaryTextStyle(context).copyWith(color: AppColors.textBlackColor),),
+                              SizedBox(height: 4,),
+                              Text(l10n.uploadProfessionalPhoto, style: AppTextStyles.smallGreyTextStyle(context).copyWith(fontSize: 16),),
+                              SizedBox(height: 4,),
+                              Text(l10n.shownInPrescription, style: AppTextStyles.primaryTextStyle(context).copyWith(fontSize: 16),),
+                              SizedBox(height: 8,),
+                              GestureDetector(
+                                onTap: (){
 
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  color: Color(0XFFEBF4FF)
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.camera_alt_outlined, size: 24, color: AppColors.textBlackColor,),
-                                    SizedBox(width: 8,),
-                                    Text("আপলোড করুন", style: AppTextStyles.primaryTextStyle,),
-                                  ],
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    color: Color(0XFFEBF4FF)
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.camera_alt_outlined, size: 24, color: AppColors.textBlackColor,),
+                                      SizedBox(width: 8,),
+                                      Text(l10n.uploadNow, style: AppTextStyles.primaryTextStyle(context),),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         )
                       ],
                     )
                   ],
                 ),
               ),
+              SizedBox(height: 16,),
+              ///----------- End Profile Image upload information section---------
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.borderColor,
+                      width: isDesktop ? 3 : 1.5,
+                    ),
+                    color: Colors.white,
+                ),
+                child: Column(
+                  children: [
+                    CardTitleSection(icon: Icons.person, title: "Personal Information"),
+                    SizedBox(height: 8,),
+                    CardSectionTitle(title: 'Full Name',),
+                    SizedBox(height: 8,),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.person, // your icon here
+                          color: AppColors.textGreyColor,
+                        ),
+                        hintText: "🧑‍⚕Enter your name",
+                        hintStyle: TextStyle(
+                          color: AppColors.textGreyColor.withOpacity(0.7),
+                          fontSize: 16,
+                        ),
+
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.borderColor),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              )
             ],
           ),
         ),
@@ -109,4 +157,6 @@ class Step1Introduction extends StatelessWidget {
     );
   }
 }
+
+
 

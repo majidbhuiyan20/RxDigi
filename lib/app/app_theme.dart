@@ -28,21 +28,69 @@ class AppTheme {
   //Input Decoration Theme
   static InputDecorationTheme _getInputDecorationTheme() {
     return InputDecorationTheme(
+      isDense: true,
+
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 14,
+      ),
+
       hintStyle: TextStyle(
-        fontWeight: FontWeight.w300,
+        fontWeight: FontWeight.w400,
+        fontSize: 14,
+        color: AppColors.textGreyColor.withOpacity(0.7),
       ),
-      contentPadding: EdgeInsets.symmetric(horizontal: 14),
+
+      labelStyle: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 14,
+        color: AppColors.textGreyColor,
+      ),
+
+      floatingLabelStyle: TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 14,
+        color: AppColors.primaryTextColor,
+      ),
+
       border: OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.themeColor),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: AppColors.borderColor,
+          width: 1,
+        ),
       ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.themeColor, width: 2),
-      ),
+
       enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: AppColors.themeColor),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: AppColors.borderColor,
+          width: 1,
+        ),
       ),
+
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: AppColors.primaryColor, // your main brand color
+          width: 2,
+        ),
+      ),
+
       errorBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.red),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(
+          color: Colors.red,
+          width: 1.5,
+        ),
+      ),
+
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(
+          color: Colors.red,
+          width: 2,
+        ),
       ),
     );
   }

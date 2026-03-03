@@ -1,29 +1,28 @@
 import 'package:flutter/material.dart';
-
 import '../../../app/app_text_style.dart';
-import '../../../l10n/app_localizations.dart';
 
 class CardTitleSection extends StatelessWidget {
+  final IconData icon;
+  final String title;
+
   const CardTitleSection({
     super.key,
-    required this.l10n,
+    required this.icon,
+    required this.title,
   });
-
-  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.camera_alt, size: 24),
-        SizedBox(width: 12),
+        Icon(icon, size: 24),
+        const SizedBox(width: 12),
         Text(
-          l10n.profileImage,
-          style: AppTextStyles.primaryTextStyle,
+          title,
+          style: AppTextStyles.primaryTextStyle(context),
         ),
-        SizedBox(width: 12),
-
-        Expanded(
+        const SizedBox(width: 12),
+        const Expanded(
           child: Divider(
             thickness: 2,
             color: Color(0XFFDBE2ED),
