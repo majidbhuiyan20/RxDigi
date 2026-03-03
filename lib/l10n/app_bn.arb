@@ -14,6 +14,15 @@
   "stepIntroduction": "পরিচয়",
   "stepQualification": "যোগ্যতা",
   "stepEffort": "অভিজ্ঞতা",
-  "stepProfile": "প্রোফাইল"
+  "stepProfile": "প্রোফাইল",
+  "yourInformation": "আপনার তথ্য",
+  "infoPrintedOnPrescription": "এই তথ্য প্রতিটি প্রেসক্রিপশনের উপর ছাপা হবে।",
+
+  "profileImage": "প্রোফাইল ছবি",
+  "addPhoto": "ছবি যোগ করুন",
+  "uploadProfessionalPhoto": "আপনার পেশাদার ছবি আপলোড করুন",
+  "shownInPrescription": "প্রেসক্রিপশনে দেখাবে",
+  "uploadNow": "আপলোড করুন"
+
 
 }

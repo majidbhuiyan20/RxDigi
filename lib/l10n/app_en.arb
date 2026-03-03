@@ -13,5 +13,14 @@
   "stepIntroduction": "Introduction",
   "stepQualification": "Qualification",
   "stepEffort": "Experience",
-  "stepProfile": "Profile"
+  "stepProfile": "Profile",
+  "yourInformation": "Your Information",
+  "infoPrintedOnPrescription": "This information will be printed on every prescription.",
+
+  "profileImage": "Profile Image",
+  "addPhoto": "Add Photo",
+  "uploadProfessionalPhoto": "Upload Your Professional Photo",
+  "shownInPrescription": "Shown in prescription",
+  "uploadNow": "Upload"
+
 }

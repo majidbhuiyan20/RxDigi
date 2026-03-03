@@ -43,4 +43,25 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get stepProfile => 'প্রোফাইল';
+
+  @override
+  String get yourInformation => 'আপনার তথ্য';
+
+  @override
+  String get infoPrintedOnPrescription => 'এই তথ্য প্রতিটি প্রেসক্রিপশনের উপর ছাপা হবে।';
+
+  @override
+  String get profileImage => 'প্রোফাইল ছবি';
+
+  @override
+  String get addPhoto => 'ছবি যোগ করুন';
+
+  @override
+  String get uploadProfessionalPhoto => 'আপনার পেশাদার ছবি আপলোড করুন';
+
+  @override
+  String get shownInPrescription => 'প্রেসক্রিপশনে দেখাবে';
+
+  @override
+  String get uploadNow => 'আপলোড করুন';
 }

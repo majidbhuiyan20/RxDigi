@@ -166,6 +166,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile'**
   String get stepProfile;
+
+  /// No description provided for @yourInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Information'**
+  String get yourInformation;
+
+  /// No description provided for @infoPrintedOnPrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This information will be printed on every prescription.'**
+  String get infoPrintedOnPrescription;
+
+  /// No description provided for @profileImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Image'**
+  String get profileImage;
+
+  /// No description provided for @addPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Photo'**
+  String get addPhoto;
+
+  /// No description provided for @uploadProfessionalPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Your Professional Photo'**
+  String get uploadProfessionalPhoto;
+
+  /// No description provided for @shownInPrescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown in prescription'**
+  String get shownInPrescription;
+
+  /// No description provided for @uploadNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload'**
+  String get uploadNow;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

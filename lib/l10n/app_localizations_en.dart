@@ -43,4 +43,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stepProfile => 'Profile';
+
+  @override
+  String get yourInformation => 'Your Information';
+
+  @override
+  String get infoPrintedOnPrescription => 'This information will be printed on every prescription.';
+
+  @override
+  String get profileImage => 'Profile Image';
+
+  @override
+  String get addPhoto => 'Add Photo';
+
+  @override
+  String get uploadProfessionalPhoto => 'Upload Your Professional Photo';
+
+  @override
+  String get shownInPrescription => 'Shown in prescription';
+
+  @override
+  String get uploadNow => 'Upload';
 }

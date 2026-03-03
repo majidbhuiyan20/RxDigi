@@ -17,6 +17,12 @@ class AppColors {
   static Color rxPrimaryColor = Color(0XFF1F74E2);
   static Color rxSecondaryColor = Color(0XFF58A3BA);
 
+
+  static Color appBackgroundColor = Color(0XFFEEF2F8);
+  static Color textBlackColor = Color(0XFF0D1220);
+  static Color textGreyColor = Color(0XFF8392AA);
+  static Color borderColor = Color(0XFFDBE2ED);
+  static Color primaryTextColor = Color(0XFF1F74E2);
 }
 
 // Background  →  #FFFFFF (সাদা)
