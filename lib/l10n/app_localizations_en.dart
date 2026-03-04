@@ -88,4 +88,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fullName => 'Full Name';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get mobile => 'Mobile No.';
+
+  @override
+  String get contact => 'Contact';
 }

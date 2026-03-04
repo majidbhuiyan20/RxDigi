@@ -30,6 +30,9 @@
   "male": "Male",
   "female": "Female",
   "others": "Others",
-  "fullName": "Full Name"
+  "fullName": "Full Name",
+  "email": "Email",
+  "mobile": "Mobile No.",
+  "contact": "Contact"
 
 }

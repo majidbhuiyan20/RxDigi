@@ -88,4 +88,13 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get fullName => 'পুরো নাম';
+
+  @override
+  String get email => 'ইমেইল';
+
+  @override
+  String get mobile => 'মোবাইল নাম্বার';
+
+  @override
+  String get contact => 'যোগাযোগ';
 }
