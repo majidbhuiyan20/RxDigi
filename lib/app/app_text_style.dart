@@ -23,6 +23,12 @@ class AppTextStyles {
     fontSize: 56,
     color: const Color(0XFF74C1B7),
   );
+  static TextStyle primaryBlackBoldText = TextStyle(
+    fontFamily: oswald,
+    fontWeight: FontWeight.w600,
+    fontSize: 16,
+    color: const Color(0XFF384357),
+  );
 
   static TextStyle playfairFontLogo = TextStyle(
     fontFamily: playfair,

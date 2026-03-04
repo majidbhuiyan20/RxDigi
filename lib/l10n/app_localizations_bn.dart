@@ -64,4 +64,28 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get uploadNow => 'আপলোড করুন';
+
+  @override
+  String get personalInfo => 'ব্যাক্তিগত তথ্য';
+
+  @override
+  String get title => 'পদবী';
+
+  @override
+  String get gender => 'লিঙ্গ';
+
+  @override
+  String get nationalId => 'জাতীয় পরিচয়পত্র';
+
+  @override
+  String get male => 'পুরুষ';
+
+  @override
+  String get female => 'নারী';
+
+  @override
+  String get others => 'অন্যান্য';
+
+  @override
+  String get fullName => 'পুরো নাম';
 }

@@ -22,7 +22,16 @@
   "addPhoto": "ছবি যোগ করুন",
   "uploadProfessionalPhoto": "আপনার পেশাদার ছবি আপলোড করুন",
   "shownInPrescription": "প্রেসক্রিপশনে দেখাবে",
-  "uploadNow": "আপলোড করুন"
+  "uploadNow": "আপলোড করুন",
+
+  "personalInfo": "ব্যাক্তিগত তথ্য",
+  "title": "পদবী",
+  "gender": "লিঙ্গ",
+  "nationalId": "জাতীয় পরিচয়পত্র",
+  "male": "পুরুষ",
+  "female": "নারী",
+  "others": "অন্যান্য",
+  "fullName": "পুরো নাম"
 
 
 }

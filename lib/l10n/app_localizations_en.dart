@@ -64,4 +64,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get uploadNow => 'Upload';
+
+  @override
+  String get personalInfo => 'Personal Information';
+
+  @override
+  String get title => 'Title';
+
+  @override
+  String get gender => 'Gender';
+
+  @override
+  String get nationalId => 'National ID';
+
+  @override
+  String get male => 'Male';
+
+  @override
+  String get female => 'Female';
+
+  @override
+  String get others => 'Others';
+
+  @override
+  String get fullName => 'Full Name';
 }

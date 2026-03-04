@@ -21,6 +21,15 @@
   "addPhoto": "Add Photo",
   "uploadProfessionalPhoto": "Upload Your Professional Photo",
   "shownInPrescription": "Shown in prescription",
-  "uploadNow": "Upload"
+  "uploadNow": "Upload",
+
+  "personalInfo": "Personal Information",
+  "title": "Title",
+  "gender": "Gender",
+  "nationalId": "National ID",
+  "male": "Male",
+  "female": "Female",
+  "others": "Others",
+  "fullName": "Full Name"
 
 }
