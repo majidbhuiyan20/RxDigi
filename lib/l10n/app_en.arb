@@ -33,6 +33,8 @@
   "fullName": "Full Name",
   "email": "Email",
   "mobile": "Mobile No.",
-  "contact": "Contact"
+  "contact": "Contact",
+
+  "personalInfoSubmit": "Personal Information Submit"
 
 }

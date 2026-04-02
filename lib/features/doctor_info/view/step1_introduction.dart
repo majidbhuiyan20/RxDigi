@@ -6,6 +6,7 @@ import 'package:rxdigi/app/app_text_style.dart';
 import 'package:rxdigi/l10n/app_localizations.dart';
 import 'package:rxdigi/l10n/app_localizations_bn.dart';
 
+import '../../common_widgets/primary_button.dart';
 import '../widgets/card_section_title.dart';
 import '../widgets/card_title_section.dart';
 import '../widgets/contact_section.dart';
@@ -40,7 +41,14 @@ class Step1Introduction extends StatelessWidget {
                 PersonalInfoSection(isDesktop: isDesktop, l10n: l10n),
                 SizedBox(height: 16,),
 
-                ContactSection(isDesktop: isDesktop, l10n: l10n)
+                ContactSection(isDesktop: isDesktop, l10n: l10n),
+                SizedBox(height: 18,),
+
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: PrimaryButton(onTap: _onTapPersonalInfoSubmitButton, title: l10n.personalInfoSubmit)
+                ),
+                SizedBox(height: 60,),
 
               ],
             ),
@@ -49,7 +57,14 @@ class Step1Introduction extends StatelessWidget {
       ),
     );
   }
+
+  void _onTapPersonalInfoSubmitButton(){
+    print("On Tap Primary button is work");
+    onNext();
+  }
 }
+
+
 
 
 

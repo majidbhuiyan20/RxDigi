@@ -97,4 +97,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contact => 'Contact';
+
+  @override
+  String get personalInfoSubmit => 'Personal Information Submit';
 }

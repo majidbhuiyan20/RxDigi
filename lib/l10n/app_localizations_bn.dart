@@ -97,4 +97,7 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get contact => 'যোগাযোগ';
+
+  @override
+  String get personalInfoSubmit => 'ব্যক্তিগত তথ্য সম্পন্ন';
 }

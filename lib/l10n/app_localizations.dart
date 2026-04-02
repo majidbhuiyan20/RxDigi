@@ -274,6 +274,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Contact'**
   String get contact;
+
+  /// No description provided for @personalInfoSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Information Submit'**
+  String get personalInfoSubmit;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

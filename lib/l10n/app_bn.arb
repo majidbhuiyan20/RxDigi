@@ -34,7 +34,9 @@
   "fullName": "পুরো নাম",
   "email": "ইমেইল",
   "mobile": "মোবাইল নাম্বার",
-  "contact": "যোগাযোগ"
+  "contact": "যোগাযোগ",
+
+  "personalInfoSubmit": "ব্যক্তিগত তথ্য সম্পন্ন"
 
 
 }
