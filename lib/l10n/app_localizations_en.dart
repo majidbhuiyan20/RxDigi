@@ -100,4 +100,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get personalInfoSubmit => 'Personal Information Submit';
+
+  @override
+  String get educationAndSpecialization => 'Education and specialization';
+
+  @override
+  String get provideYourDegreeInfo => 'Provide your degree and specialization information.';
+
+  @override
+  String get degrees => 'Degrees';
 }

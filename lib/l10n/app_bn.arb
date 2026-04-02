@@ -36,7 +36,10 @@
   "mobile": "মোবাইল নাম্বার",
   "contact": "যোগাযোগ",
 
-  "personalInfoSubmit": "ব্যক্তিগত তথ্য সম্পন্ন"
+  "personalInfoSubmit": "ব্যক্তিগত তথ্য সম্পন্ন",
+  "educationAndSpecialization": "শিক্ষা ও বিশেষত্ব",
+  "provideYourDegreeInfo": "আপনার ডিগ্রি ও বিশেষজ্ঞতার তথ্য দিন",
+  "degrees": "ডিগ্রি সমূহ"
 
 
 }

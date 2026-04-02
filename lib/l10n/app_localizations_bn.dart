@@ -100,4 +100,13 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get personalInfoSubmit => 'ব্যক্তিগত তথ্য সম্পন্ন';
+
+  @override
+  String get educationAndSpecialization => 'শিক্ষা ও বিশেষত্ব';
+
+  @override
+  String get provideYourDegreeInfo => 'আপনার ডিগ্রি ও বিশেষজ্ঞতার তথ্য দিন';
+
+  @override
+  String get degrees => 'ডিগ্রি সমূহ';
 }

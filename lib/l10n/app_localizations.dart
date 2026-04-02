@@ -280,6 +280,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Personal Information Submit'**
   String get personalInfoSubmit;
+
+  /// No description provided for @educationAndSpecialization.
+  ///
+  /// In en, this message translates to:
+  /// **'Education and specialization'**
+  String get educationAndSpecialization;
+
+  /// No description provided for @provideYourDegreeInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Provide your degree and specialization information.'**
+  String get provideYourDegreeInfo;
+
+  /// No description provided for @degrees.
+  ///
+  /// In en, this message translates to:
+  /// **'Degrees'**
+  String get degrees;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

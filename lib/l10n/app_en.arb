@@ -35,6 +35,10 @@
   "mobile": "Mobile No.",
   "contact": "Contact",
 
-  "personalInfoSubmit": "Personal Information Submit"
+  "personalInfoSubmit": "Personal Information Submit",
+  "educationAndSpecialization": "Education and specialization",
+  "provideYourDegreeInfo": "Provide your degree and specialization information.",
+  "degrees": "Degrees"
+
 
 }
