@@ -38,7 +38,14 @@
   "personalInfoSubmit": "Personal Information Submit",
   "educationAndSpecialization": "Education and specialization",
   "provideYourDegreeInfo": "Provide your degree and specialization information.",
-  "degrees": "Degrees"
+  "degrees": "Degrees",
+  "selectPrimaryDegree": "Select Your Primary Degree",
+  "custom": "Custom",
+  "add": "Add",
+  "addCustomDegree": "Add Custom Degree",
+  "cancel" : "Cancel"
+
+
 
 
 }

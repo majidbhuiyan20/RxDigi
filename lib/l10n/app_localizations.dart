@@ -298,6 +298,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Degrees'**
   String get degrees;
+
+  /// No description provided for @selectPrimaryDegree.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Your Primary Degree'**
+  String get selectPrimaryDegree;
+
+  /// No description provided for @custom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get custom;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @addCustomDegree.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Custom Degree'**
+  String get addCustomDegree;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -39,7 +39,12 @@
   "personalInfoSubmit": "ব্যক্তিগত তথ্য সম্পন্ন",
   "educationAndSpecialization": "শিক্ষা ও বিশেষত্ব",
   "provideYourDegreeInfo": "আপনার ডিগ্রি ও বিশেষজ্ঞতার তথ্য দিন",
-  "degrees": "ডিগ্রি সমূহ"
+  "degrees": "ডিগ্রি সমূহ",
+  "selectPrimaryDegree": "প্রাথমিক ডিগ্রি বেছে নিন",
+  "custom": "কাস্টম",
+  "addCustomDegree": "কাস্টম ডিগ্রি যোগ করুন",
+  "add": "যোগ করুন",
+  "cancel": "বাদ দিন"
 
 
 }

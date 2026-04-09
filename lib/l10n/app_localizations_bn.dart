@@ -109,4 +109,19 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get degrees => 'ডিগ্রি সমূহ';
+
+  @override
+  String get selectPrimaryDegree => 'প্রাথমিক ডিগ্রি বেছে নিন';
+
+  @override
+  String get custom => 'কাস্টম';
+
+  @override
+  String get add => 'যোগ করুন';
+
+  @override
+  String get addCustomDegree => 'কাস্টম ডিগ্রি যোগ করুন';
+
+  @override
+  String get cancel => 'বাদ দিন';
 }

@@ -109,4 +109,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get degrees => 'Degrees';
+
+  @override
+  String get selectPrimaryDegree => 'Select Your Primary Degree';
+
+  @override
+  String get custom => 'Custom';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get addCustomDegree => 'Add Custom Degree';
+
+  @override
+  String get cancel => 'Cancel';
 }

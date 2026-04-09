@@ -62,10 +62,10 @@ class PersonalInfoSection extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              SelectableTitleChip(title: "Dr.", provider: selectedTitleProvider),
-              SelectableTitleChip(title: "Prof. Dr.", provider: selectedTitleProvider),
-              SelectableTitleChip(title: "Assoc. Prof. Dr.", provider: selectedTitleProvider),
-              SelectableTitleChip(title: "Asst. Prof. Dr.", provider: selectedTitleProvider),
+              SelectableTitleChip(title: "Dr.", singleProvider: selectedTitleProvider),
+              SelectableTitleChip(title: "Prof. Dr.",  singleProvider: selectedTitleProvider),
+              SelectableTitleChip(title: "Assoc. Prof. Dr.", singleProvider: selectedTitleProvider),
+              SelectableTitleChip(title: "Asst. Prof. Dr.",  singleProvider: selectedTitleProvider),
             ],
           ),
 
@@ -77,9 +77,9 @@ class PersonalInfoSection extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              SelectableTitleChip(title: l10n.male, provider: selectedGenderProvider),
-              SelectableTitleChip(title: l10n.female, provider: selectedGenderProvider),
-              SelectableTitleChip(title: l10n.others, provider: selectedGenderProvider),
+              SelectableTitleChip(title: l10n.male, singleProvider: selectedGenderProvider),
+              SelectableTitleChip(title: l10n.female, singleProvider: selectedGenderProvider),
+              SelectableTitleChip(title: l10n.others, singleProvider: selectedGenderProvider),
             ],
           ),
 
