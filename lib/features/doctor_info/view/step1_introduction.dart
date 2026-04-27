@@ -42,11 +42,58 @@ class Step1Introduction extends StatelessWidget {
                 SizedBox(height: 16,),
 
                 ContactSection(isDesktop: isDesktop, l10n: l10n),
-                SizedBox(height: 18,),
+                SizedBox(height: 20,),
 
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: PrimaryButton(onTap: _onTapPersonalInfoSubmitButton, title: l10n.personalInfoSubmit)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.borderColor,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Skip',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _onTapPersonalInfoSubmitButton,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Next',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 60,),
 

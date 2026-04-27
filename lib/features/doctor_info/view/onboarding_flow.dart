@@ -5,7 +5,7 @@ import 'package:rxdigi/app/app_colors.dart';
 import 'package:rxdigi/features/doctor_info/view/step1_introduction.dart';
 import 'package:rxdigi/features/doctor_info/view/step2_qualification.dart';
 import 'package:rxdigi/features/doctor_info/view/step3_effort.dart';
-import 'package:rxdigi/features/doctor_info/view/step4_profile.dart';
+import 'package:rxdigi/features/prescription/view/prescription_preview.dart';
 import '../view_model/onboarding_step_notifier.dart';
 import '../widgets/step_header.dart';
 
@@ -18,7 +18,7 @@ class OnboardingFlow extends ConsumerStatefulWidget {
 
 class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   final PageController _pageController = PageController();
-  final int _totalSteps = 4;
+  final int _totalSteps = 3;
 
   @override
   void dispose() {
@@ -69,17 +69,15 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                         .previous(),
                   ),
                   Step3Effort(
-                    onNext: () => ref
-                        .read(onboardingStepProvider.notifier)
-                        .next(_totalSteps),
-                    onBack: () => ref
-                        .read(onboardingStepProvider.notifier)
-                        .previous(),
-                  ),
-                  Step4Profile(
-                    onNext: () => ref
-                        .read(onboardingStepProvider.notifier)
-                        .next(_totalSteps),
+                    onNext: () {
+                      // Navigate to prescription preview instead of next step
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PrescriptionPreview(),
+                        ),
+                      );
+                    },
                     onBack: () => ref
                         .read(onboardingStepProvider.notifier)
                         .previous(),

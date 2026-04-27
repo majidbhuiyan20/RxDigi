@@ -26,6 +26,9 @@ dependencies:
   shared_preferences: ^2.5.4
   flutter_screenutil: ^5.9.3
   dotted_border: ^3.1.0
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  csv: ^6.0.0
 
 dev_dependencies:
   flutter_test:

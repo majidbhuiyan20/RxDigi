@@ -28,7 +28,6 @@ class StepHeader extends ConsumerWidget {
       l10n.stepIntroduction,
       l10n.stepQualification,
       l10n.stepEffort,
-      l10n.stepProfile,
     ];
 
     // ✅ fixed line width between circles
