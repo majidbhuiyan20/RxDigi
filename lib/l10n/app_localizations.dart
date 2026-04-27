@@ -179,6 +179,12 @@ abstract class AppLocalizations {
   /// **'Main Chamber/Hospital'**
   String get mainChamber;
 
+  /// No description provided for @clinicName.
+  ///
+  /// In en, this message translates to:
+  /// **'Hospital/Clinic Name'**
+  String get clinicName;
+
   /// No description provided for @stepProfile.
   ///
   /// In en, this message translates to:
@@ -346,6 +352,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel;
+
+  /// No description provided for @titlePosition.
+  ///
+  /// In en, this message translates to:
+  /// **'Title/Position'**
+  String get titlePosition;
+
+  /// No description provided for @optional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get optional;
+
+  /// No description provided for @department.
+  ///
+  /// In en, this message translates to:
+  /// **'Department'**
+  String get department;
+
+  /// No description provided for @address.
+  ///
+  /// In en, this message translates to:
+  /// **'Chamber Address'**
+  String get address;
+
+  /// No description provided for @phoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneNumber;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

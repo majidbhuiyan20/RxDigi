@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:rxdigi/features/doctor_info/widgets/cutom_textfield_widgets.dart';
 
 import '../../../app/app_colors.dart';
 import '../../../app/app_text_style.dart';
 import '../../../l10n/app_localizations.dart';
 import '../widgets/card_section_title.dart';
 import '../widgets/card_title_section.dart';
+import '../widgets/selectable_title_chip.dart';
 
 class Step3Effort extends StatelessWidget {
   final VoidCallback onNext;
@@ -34,8 +36,14 @@ class Step3Effort extends StatelessWidget {
                         style: AppTextStyles.largeBlackTextStyle(context)
                             .copyWith(color: AppColors.primaryColor),
                       ),
-                          Text(l10n.patientMeet, style: AppTextStyles.smallGreyTextStyle(context),),
-                    Container(
+                      Text(
+                        l10n.patientMeet,
+                        style: AppTextStyles.smallGreyTextStyle(context),
+                      ),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Container(
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                             color: Colors.white,
@@ -43,17 +51,126 @@ class Step3Effort extends StatelessWidget {
                             border: Border.all(
                               color: AppColors.borderColor,
                               width: isDesktop ? 3 : 1.5,
-                            )
-                        ),
-                      child: Column(
-                          children: [
-                          CardTitleSection(icon: Icons.school_rounded, title: l10n.degrees),
-                          SizedBox(height: 4,),
-                            CardSectionTitle(title: l10n.selectPrimaryDegree),
-                       SizedBox(height: 12),])
+                            )),
+                        child: Column(children: [
+                          CardTitleSection(
+                              icon: Icons.local_hospital,
+                              title: l10n.mainChamber),
+                          SizedBox(
+                            height: 4,
+                          ),
+                          CardSectionTitle(title: l10n.clinicName),
+                          SizedBox(height: 12),
+                          CustomTextFieldWidgets(
+                            hintText: "Ex: Dhaka Medical College",
+                            prefixIcon: Icons.local_hospital,
+                          ),
+                          SizedBox(
+                            height: 12,
+                          ),
+                          Row(
+                            children: [
+                              Text(l10n.titlePosition,
+                                  style: TextStyle(
+                                      color: AppColors.textBlackColor,
+                                      fontFamily: "PlayfairDisplay",
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16)),
+                              Spacer(),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Color(0XFFEEF2F8),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Text(
+                                  l10n.optional,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: "PlusJakartaSans",
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 12,),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              SelectableTitleChip(title: "Consultant", singleProvider: selectedPositionProvider),
+                              SelectableTitleChip(title: "Senior Consultant",  singleProvider: selectedPositionProvider),
+                              SelectableTitleChip(title: "Professor", singleProvider: selectedPositionProvider),
+                              SelectableTitleChip(title: "Registrar",  singleProvider: selectedPositionProvider),
+                              SelectableTitleChip(title: "Medical Officer",  singleProvider: selectedPositionProvider),
+                            ],
+                          ),
+                          SizedBox(height: 12,),
+                          Row(
+                            children: [
+                              Text(l10n.department,
+                                  style: TextStyle(
+                                      color: AppColors.textBlackColor,
+                                      fontFamily: "PlayfairDisplay",
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16)),
+                              Spacer(),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Color(0XFFEEF2F8),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Text(
+                                  l10n.optional,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: "PlusJakartaSans",
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+SizedBox(height: 12,),
+                          CustomTextFieldWidgets(hintText: "Ex: General Medicine",),
+                          SizedBox(height: 16,),
+                          CardSectionTitle(title: l10n.phoneNumber),
+                          SizedBox(height: 12),
+                          CustomTextFieldWidgets(
+                            hintText: "Enter Phone Number",
+                          ),
+                          SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CardSectionTitle(title: "Start Time"),
+                                    SizedBox(height: 8),
+                                    CustomTextFieldWidgets(hintText: "09:00 AM"),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CardSectionTitle(title: "End Time"),
+                                    SizedBox(height: 8),
+                                    CustomTextFieldWidgets(hintText: "05:00 PM"),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ]),
                       ),
-
-
-                        ])))));
+                    ])))));
   }
 }

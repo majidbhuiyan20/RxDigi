@@ -16,6 +16,7 @@
   "chamberInfo": "Chamber Information",
   "patientMeet": "Where is your workplace to meet patient and where to meet doctor",
   "mainChamber": "Main Chamber/Hospital",
+  "clinicName": "Hospital/Clinic Name",
   "stepProfile": "Profile",
   "yourInformation": "Your Information",
   "infoPrintedOnPrescription": "This information will be printed on every prescription.",
@@ -46,7 +47,13 @@
   "custom": "Custom",
   "add": "Add",
   "addCustomDegree": "Add Custom Degree",
-  "cancel" : "Cancel"
+  "cancel" : "Cancel",
+
+  "titlePosition": "Title/Position",
+  "optional": "Optional",
+  "department": "Department",
+  "address": "Chamber Address",
+  "phoneNumber": "Phone Number"
 
 
 

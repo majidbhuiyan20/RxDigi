@@ -17,6 +17,7 @@
   "chamberInfo": "চেম্বার তথ্য",
   "patientMeet":"কোথায় কাজ করেন এবং রুগী কোথায় আসবে",
   "mainChamber": "প্রধান চেম্বার/হাসপাতাল",
+  "clinicName": "হাসপাতাল/ক্লিনিকের নাম",
   "stepProfile": "প্রোফাইল",
   "yourInformation": "আপনার তথ্য",
   "infoPrintedOnPrescription": "এই তথ্য প্রতিটি প্রেসক্রিপশনের উপর ছাপা হবে।",
@@ -47,7 +48,13 @@
   "custom": "কাস্টম",
   "addCustomDegree": "কাস্টম ডিগ্রি যোগ করুন",
   "add": "যোগ করুন",
-  "cancel": "বাদ দিন"
+  "cancel": "বাদ দিন",
+  "titlePosition": "পদবী/পজিশন",
+  "optional": "ঐচ্ছিক",
+  "department": "বিভাগ",
+  "address": "চেম্বারের ঠিকানা",
+  "phoneNumber": "ফোন নাম্বার"
+
 
 
 }

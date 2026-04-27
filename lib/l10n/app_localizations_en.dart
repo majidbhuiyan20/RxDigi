@@ -51,6 +51,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mainChamber => 'Main Chamber/Hospital';
 
   @override
+  String get clinicName => 'Hospital/Clinic Name';
+
+  @override
   String get stepProfile => 'Profile';
 
   @override
@@ -133,4 +136,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancel => 'Cancel';
+
+  @override
+  String get titlePosition => 'Title/Position';
+
+  @override
+  String get optional => 'Optional';
+
+  @override
+  String get department => 'Department';
+
+  @override
+  String get address => 'Chamber Address';
+
+  @override
+  String get phoneNumber => 'Phone Number';
 }

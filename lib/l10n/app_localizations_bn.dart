@@ -51,6 +51,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get mainChamber => 'প্রধান চেম্বার/হাসপাতাল';
 
   @override
+  String get clinicName => 'হাসপাতাল/ক্লিনিকের নাম';
+
+  @override
   String get stepProfile => 'প্রোফাইল';
 
   @override
@@ -133,4 +136,19 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get cancel => 'বাদ দিন';
+
+  @override
+  String get titlePosition => 'পদবী/পজিশন';
+
+  @override
+  String get optional => 'ঐচ্ছিক';
+
+  @override
+  String get department => 'বিভাগ';
+
+  @override
+  String get address => 'চেম্বারের ঠিকানা';
+
+  @override
+  String get phoneNumber => 'ফোন নাম্বার';
 }

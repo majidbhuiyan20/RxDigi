@@ -8,6 +8,7 @@ final selectedTitleProvider = StateProvider<String?>((ref) => null);
 final selectedGenderProvider = StateProvider<String?>((ref) => null);
 final selectedTitlesProvider = StateProvider<List<String>>((ref) => []);
 final selectedExperienceProvider = StateProvider<String?>((ref) => null);
+final selectedPositionProvider = StateProvider<String?>((ref) => null);
 
 class SelectableTitleChip extends ConsumerWidget {
   const SelectableTitleChip({
