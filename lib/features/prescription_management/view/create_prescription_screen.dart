@@ -190,8 +190,6 @@ class _CreatePrescriptionScreenState
                       width: 1.5,
                     ),
                     borderRadius: BorderRadius.circular(8),
-                    filled: true,
-                    fillColor: Colors.grey[50],
                   ),
                   child: DropdownButton<PatientModel>(
                     value: _selectedPatient,
@@ -240,8 +238,6 @@ class _CreatePrescriptionScreenState
                     width: 1.5,
                   ),
                   borderRadius: BorderRadius.circular(8),
-                  filled: true,
-                  fillColor: Colors.grey[50],
                 ),
                 child: Row(
                   children: [
@@ -272,8 +268,6 @@ class _CreatePrescriptionScreenState
               maxLines: 3,
               decoration: InputDecoration(
                 hintText: 'Enter patient diagnosis',
-                filled: true,
-                fillColor: Colors.grey[50],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: AppColors.borderColor),
@@ -477,8 +471,6 @@ class _CreatePrescriptionScreenState
               maxLines: 3,
               decoration: InputDecoration(
                 hintText: 'Enter any additional notes',
-                filled: true,
-                fillColor: Colors.grey[50],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: AppColors.borderColor),

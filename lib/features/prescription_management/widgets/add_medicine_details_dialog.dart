@@ -150,7 +150,7 @@ class _AddMedicineDetailsDialogState extends State<AddMedicineDetailsDialog> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(
+                    borderSide: BorderSide(
                       color: AppColors.borderColor,
                       width: 1.5,
                     ),

@@ -175,7 +175,7 @@ SizedBox(height: 12,),
                             children: [
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: widget.onBack,
+                                  onTap: onBack,
                                   child: Container(
                                     padding: EdgeInsets.symmetric(vertical: 12),
                                     decoration: BoxDecoration(
@@ -202,7 +202,7 @@ SizedBox(height: 12,),
                               SizedBox(width: 12),
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: widget.onNext,
+                                  onTap: onNext,
                                   child: Container(
                                     padding: EdgeInsets.symmetric(vertical: 12),
                                     decoration: BoxDecoration(

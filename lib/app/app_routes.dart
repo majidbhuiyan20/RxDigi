@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:rxdigi/features/doctor_info/view/onboarding_flow.dart';
-import 'package:rxdigi/features/doctor_info/view/step1_introduction.dart';
 import 'package:rxdigi/features/home/view/home_screen.dart';
 import 'package:rxdigi/features/settings/view/settings_screen.dart';
 import '../features/splash/splash_screen.dart';

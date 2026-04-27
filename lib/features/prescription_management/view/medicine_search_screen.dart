@@ -265,7 +265,7 @@ class _MedicineSearchScreenState extends ConsumerState<MedicineSearchScreen> {
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
-                  side: const BorderSide(
+                  side: BorderSide(
                     color: AppColors.borderColor,
                     width: 1.5,
                   ),

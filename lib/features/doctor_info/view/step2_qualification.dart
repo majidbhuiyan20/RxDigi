@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rxdigi/features/doctor_info/widgets/card_section_title.dart';
 import 'package:rxdigi/features/doctor_info/widgets/card_title_section.dart';
 import 'package:rxdigi/features/doctor_info/widgets/cutom_textfield_widgets.dart';
-import 'package:rxdigi/features/doctor_info/widgets/personal_info_section.dart';
 import 'package:rxdigi/features/doctor_info/widgets/selectable_title_chip.dart';
 
 import '../../../app/app_colors.dart';
 import '../../../app/app_text_style.dart';
 import '../../../l10n/app_localizations.dart';
-import '../widgets/profile_image_section.dart';
 
 class _DottedBorderPainter extends CustomPainter {
   final Color color;
@@ -31,7 +28,6 @@ class _DottedBorderPainter extends CustomPainter {
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
 
-    final path = Path();
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     final rRect = RRect.fromRectAndRadius(rect, const Radius.circular(30));
 
@@ -39,7 +35,6 @@ class _DottedBorderPainter extends CustomPainter {
   }
 
   void _drawDottedBorder(Canvas canvas, Paint paint, RRect rRect) {
-    const radius = 30.0;
     final pathMetrics = _createDottedPath(rRect).computeMetrics();
 
     for (var metric in pathMetrics) {
@@ -154,172 +149,154 @@ class _Step2QualificationState extends State<Step2Qualification> {
 
   @override
   Widget build(BuildContext context) {
-
-    final isDesktop   = MediaQuery.of(context).size.width > 600;
+    final isDesktop = MediaQuery.of(context).size.width > 600;
+    
     return SizedBox.expand(
       child: Container(
-        color:  AppColors.appBackgroundColor,
+        color: AppColors.appBackgroundColor,
         child: Padding(
-          padding:  EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.educationAndSpecialization, style: AppTextStyles.largeBlackTextStyle(context),),
-                Text(l10n.provideYourDegreeInfo, style: AppTextStyles.smallGreyTextStyle(context),),
-                SizedBox(height: 16,),
-                 Container(
-                   padding: EdgeInsets.all(16),
-                   decoration: BoxDecoration(
-                     color: Colors.white,
-                     borderRadius: BorderRadius.circular(12),
-                     border: Border.all(
-                       color: AppColors.borderColor,
-                       width: isDesktop ? 3 : 1.5,
-                     )
-                   ),
-                   child: Column(
-                     children: [
-                       CardTitleSection(icon: Icons.school_rounded, title: l10n.degrees),
-                       SizedBox(height: 4,),
-                       CardSectionTitle(title: l10n.selectPrimaryDegree),
-                       SizedBox(height: 12),
-
-                       Wrap(
-                         spacing: 16,
-                         runSpacing: 16,
-                         children: [
-                           SelectableTitleChip(title: "MBBS", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "BCS", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "FCPS", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "BDS", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "BMMS", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "BHMS", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "MBChB", multiProvider: selectedTitlesProvider),
-                           // Custom degrees chips
-                           ...customPrimaryDegrees.map((degree) => SelectableTitleChip(title: degree, multiProvider: selectedTitlesProvider)),
-                           // Add custom degree button
-                           GestureDetector(
-                             onTap: () => _showAddCustomDegreeDialog(isPrimary: true),
-                             child: CustomPaint(
-                               painter: _DottedBorderPainter(
-                                 color: Colors.black87,
-                                 strokeWidth: 1.5,
-                               ),
-                               child: Container(
-                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                 decoration: BoxDecoration(
-                                   borderRadius: BorderRadius.circular(30),
-                                   color: Colors.white,
-                                 ),
-                                 child: Text(
-                                   "+ Others",
-                                   style: TextStyle(
-                                     color: Colors.black87,
-                                     fontSize: 14,
-                                     fontWeight: FontWeight.w500,
-                                   ),
-                                 ),
-                               ),
-                             ),
-                           ),
-                         ],
-                       ),
-
-                       SizedBox(height: 16,),
-                     Row(
-                       children: [
-                         Text("Higher Degree", style: TextStyle(color: AppColors.textBlackColor, fontFamily: "PlayfairDisplay", fontWeight: FontWeight.w700, fontSize: 16),),
-                         Spacer(),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Color(0XFFEEF2F8),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Text("Select Multiple", style: TextStyle(fontWeight: FontWeight.w500, fontFamily: AppTextStyles.playfair),),
-                        )
-
-                       ],
-                     ),
-                       SizedBox(height: 12),
-                       Wrap(
-                         spacing: 16,
-                         runSpacing: 16,
-                         children: [
-                           SelectableTitleChip(title: "MD", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "MS", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "MRCP", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "FRCP", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "PhD", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "MPH", multiProvider: selectedTitlesProvider),
-                           SelectableTitleChip(title: "DLO", multiProvider: selectedTitlesProvider),
-                           // Custom degrees chips
-                           ...customHigherDegrees.map((degree) => SelectableTitleChip(title: degree, multiProvider: selectedTitlesProvider)),
-                           // Add custom degree button
-                           GestureDetector(
-                             onTap: () => _showAddCustomDegreeDialog(isPrimary: false),
-                             child: CustomPaint(
-                               painter: _DottedBorderPainter(
-                                 color: Colors.black87,
-                                 strokeWidth: 1.5,
-                               ),
-                               child: Container(
-                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                 decoration: BoxDecoration(
-                                   borderRadius: BorderRadius.circular(30),
-                                   color: Colors.white,
-                                 ),
-                                 child: Text(
-                                   "+ Custom",
-                                   style: TextStyle(
-                                     color: Colors.black87,
-                                     fontSize: 14,
-                                     fontWeight: FontWeight.w500,
-                                   ),
-                                 ),
-                               ),
-                             ),
-                           ),
-                         ],
-                       ),
-
-
-
-
-                     ],
-                   ),
-                 ),
-                 SizedBox(height: 20,),
-
-                /// Specialization Section
-
+                Text(l10n.educationAndSpecialization, style: AppTextStyles.largeBlackTextStyle(context)),
+                Text(l10n.provideYourDegreeInfo, style: AppTextStyles.smallGreyTextStyle(context)),
+                const SizedBox(height: 16),
                 Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.borderColor,
-                        width: isDesktop ? 3 : 1.5,
-                      )
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.borderColor,
+                      width: isDesktop ? 3 : 1.5,
+                    ),
                   ),
                   child: Column(
                     children: [
-                      CardTitleSection(icon: Icons.local_hospital, title: "Specialization"),
-                      SizedBox(height: 4,),
-                      CardSectionTitle(title: "Specialization"),
-                      SizedBox(height: 12),
-                      
-                      // Specialization Dropdown
+                      CardTitleSection(icon: Icons.school_rounded, title: l10n.degrees),
+                      const SizedBox(height: 4),
+                      CardSectionTitle(title: l10n.selectPrimaryDegree),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: [
+                          SelectableTitleChip(title: "MBBS", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "BCS", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "FCPS", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "BDS", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "BMMS", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "BHMS", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "MBChB", multiProvider: selectedTitlesProvider),
+                          ...customPrimaryDegrees.map((degree) => SelectableTitleChip(title: degree, multiProvider: selectedTitlesProvider)),
+                          GestureDetector(
+                            onTap: () => _showAddCustomDegreeDialog(isPrimary: true),
+                            child: CustomPaint(
+                              painter: _DottedBorderPainter(
+                                color: Colors.black87,
+                                strokeWidth: 1.5,
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  color: Colors.white,
+                                ),
+                                child: const Text(
+                                  "+ Others",
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Text("Higher Degree", style: TextStyle(color: AppColors.textBlackColor, fontFamily: "PlayfairDisplay", fontWeight: FontWeight.w700, fontSize: 16)),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0XFFEEF2F8),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Text("Select Multiple", style: TextStyle(fontWeight: FontWeight.w500, fontFamily: AppTextStyles.playfair)),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: [
+                          SelectableTitleChip(title: "MD", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "MS", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "MRCP", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "FRCP", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "PhD", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "MPH", multiProvider: selectedTitlesProvider),
+                          SelectableTitleChip(title: "DLO", multiProvider: selectedTitlesProvider),
+                          ...customHigherDegrees.map((degree) => SelectableTitleChip(title: degree, multiProvider: selectedTitlesProvider)),
+                          GestureDetector(
+                            onTap: () => _showAddCustomDegreeDialog(isPrimary: false),
+                            child: CustomPaint(
+                              painter: _DottedBorderPainter(
+                                color: Colors.black87,
+                                strokeWidth: 1.5,
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  color: Colors.white,
+                                ),
+                                child: const Text(
+                                  "+ Custom",
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.borderColor,
+                      width: isDesktop ? 3 : 1.5,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      const CardTitleSection(icon: Icons.local_hospital, title: "Specialization"),
+                      const SizedBox(height: 4),
+                      const CardSectionTitle(title: "Specialization"),
+                      const SizedBox(height: 12),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: selectedSpecialization != null 
-                              ? AppColors.borderColor 
-                              : AppColors.borderColor,
+                            color: AppColors.borderColor,
                             width: 1.5,
                           ),
                           boxShadow: [
@@ -379,10 +356,7 @@ class _Step2QualificationState extends State<Step2Qualification> {
                               return specializations.map((String value) {
                                 return Row(
                                   children: [
-                                    Icon(Icons.local_hospital, 
-                                      color: AppColors.borderColor, 
-                                      size: 20,
-                                    ),
+                                    Icon(Icons.local_hospital, color: AppColors.borderColor, size: 20),
                                     const SizedBox(width: 10),
                                     Text(
                                       value,
@@ -399,24 +373,22 @@ class _Step2QualificationState extends State<Step2Qualification> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 16,),
+                      const SizedBox(height: 16),
                       Row(
                         children: [
                           Text("Sub-Speciality", style: TextStyle(color: AppColors.textBlackColor, fontFamily: "PlayfairDisplay", fontWeight: FontWeight.w700, fontSize: 16)),
-                          Spacer(),
+                          const Spacer(),
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Color(0XFFEEF2F8),
+                              color: const Color(0XFFEEF2F8),
                               borderRadius: BorderRadius.circular(30),
-                            
                             ),
-                            child: Text("Optional", style: TextStyle(fontWeight: FontWeight.w500, fontFamily: "PlusJakartaSans", fontSize: 16,),),
-
+                            child: const Text("Optional", style: TextStyle(fontWeight: FontWeight.w500, fontFamily: "PlusJakartaSans", fontSize: 16)),
                           )
                         ],
                       ),
-                      SizedBox(height: 16,),
+                      const SizedBox(height: 16),
                       TextFormField(
                         decoration: InputDecoration(
                           hintText: "EX: Interventional Cardiology",
@@ -424,7 +396,6 @@ class _Step2QualificationState extends State<Step2Qualification> {
                             color: AppColors.textGreyColor.withOpacity(0.7),
                             fontSize: 16,
                           ),
-
                           filled: true,
                           fillColor: Colors.grey.shade50,
                           border: OutlineInputBorder(
@@ -433,9 +404,9 @@ class _Step2QualificationState extends State<Step2Qualification> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 16,),
-                      CardSectionTitle(title: "Experience"),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
+                      const CardSectionTitle(title: "Experience"),
+                      const SizedBox(height: 16),
                       Wrap(
                         spacing: 16,
                         runSpacing: 16,
@@ -445,111 +416,103 @@ class _Step2QualificationState extends State<Step2Qualification> {
                           SelectableTitleChip(title: "5-10 Years", singleProvider: selectedExperienceProvider),
                           SelectableTitleChip(title: "10-20 Years", singleProvider: selectedExperienceProvider),
                           SelectableTitleChip(title: "20+ Years", singleProvider: selectedExperienceProvider),
-
-
                         ],
                       ),
-                      SizedBox(height: 16,)
-
-
-
+                      const SizedBox(height: 16),
                     ],
                   ),
-
                 ),
-                SizedBox(height: 16,),
-
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.borderColor,
-                    width: isDesktop ? 3 : 1.5,
-                  )
-              ),
-              child: Column(
-                children: [
-                  CardTitleSection(icon: Icons.speaker, title: "Educational Institution"),
-                  SizedBox(height: 4,),
-                  CardSectionTitle(title: "Enter College Name(MBBS)"),
-                  SizedBox(height: 12),
-                  CustomTextFieldWidgets(
-                    hintText: "Ex: Dhaka Medical College",
-                    prefixIcon: Icons.school,
-                  ),
-                  SizedBox(height: 16),
-                  CardSectionTitle(title: "Passing Year"),
-                  SizedBox(height: 12),
-                  CustomTextFieldWidgets(
-                    hintText: "Ex: 2015",
-                    prefixIcon: Icons.calendar_today,
-                  ),
-                  SizedBox(height: 12),]))
-
-
-
-              ],
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: widget.onBack,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColors.borderColor,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Back',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryColor,
-                          ),
-                        ),
-                      ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.borderColor,
+                      width: isDesktop ? 3 : 1.5,
                     ),
                   ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: widget.onNext,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor,
-                        borderRadius: BorderRadius.circular(12),
+                  child: Column(
+                    children: [
+                      const CardTitleSection(icon: Icons.speaker, title: "Educational Institution"),
+                      const SizedBox(height: 4),
+                      const CardSectionTitle(title: "Enter College Name(MBBS)"),
+                      const SizedBox(height: 12),
+                      const CustomTextFieldWidgets(
+                        hintText: "Ex: Dhaka Medical College",
+                        prefixIcon: Icons.school,
                       ),
-                      child: Center(
-                        child: Text(
-                          'Next',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                      const SizedBox(height: 16),
+                      const CardSectionTitle(title: "Passing Year"),
+                      const SizedBox(height: 12),
+                      const CustomTextFieldWidgets(
+                        hintText: "Ex: 2015",
+                        prefixIcon: Icons.calendar_today,
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: widget.onBack,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
                             color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColors.borderColor,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Back',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: widget.onNext,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Next',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 60),
               ],
             ),
-            SizedBox(height: 60),
-          ],
-        ),
+          ),
         ),
       ),
     );

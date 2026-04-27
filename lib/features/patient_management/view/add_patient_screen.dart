@@ -130,13 +130,12 @@ class _AddPatientScreenState extends ConsumerState<AddPatientScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
+                          color: Colors.grey[50],
                           border: Border.all(
                             color: AppColors.borderColor,
                             width: 1.5,
                           ),
                           borderRadius: BorderRadius.circular(8),
-                          filled: true,
-                          fillColor: Colors.grey[50],
                         ),
                         child: DropdownButton<String>(
                           value: _selectedGender,
@@ -191,7 +190,7 @@ class _AddPatientScreenState extends ConsumerState<AddPatientScreen> {
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      side: const BorderSide(
+                      side: BorderSide(
                         color: AppColors.borderColor,
                         width: 1.5,
                       ),
@@ -270,11 +269,11 @@ class _AddPatientScreenState extends ConsumerState<AddPatientScreen> {
             fillColor: Colors.grey[50],
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.borderColor),
+              borderSide: BorderSide(color: AppColors.borderColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(
+              borderSide: BorderSide(
                 color: AppColors.borderColor,
                 width: 1.5,
               ),
