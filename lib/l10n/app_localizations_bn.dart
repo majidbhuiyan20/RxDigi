@@ -39,7 +39,16 @@ class AppLocalizationsBn extends AppLocalizations {
   String get stepQualification => 'যোগ্যতা';
 
   @override
-  String get stepEffort => 'অভিজ্ঞতা';
+  String get stepEffort => 'চেম্বার';
+
+  @override
+  String get chamberInfo => 'চেম্বার তথ্য';
+
+  @override
+  String get patientMeet => 'কোথায় কাজ করেন এবং রুগী কোথায় আসবে';
+
+  @override
+  String get mainChamber => 'প্রধান চেম্বার/হাসপাতাল';
 
   @override
   String get stepProfile => 'প্রোফাইল';

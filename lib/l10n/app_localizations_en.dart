@@ -39,7 +39,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stepQualification => 'Qualification';
 
   @override
-  String get stepEffort => 'Experience';
+  String get stepEffort => 'Chamber';
+
+  @override
+  String get chamberInfo => 'Chamber Information';
+
+  @override
+  String get patientMeet => 'Where is your workplace to meet patient and where to meet doctor';
+
+  @override
+  String get mainChamber => 'Main Chamber/Hospital';
 
   @override
   String get stepProfile => 'Profile';

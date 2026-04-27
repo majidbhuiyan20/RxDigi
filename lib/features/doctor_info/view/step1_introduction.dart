@@ -31,7 +31,7 @@ class Step1Introduction extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.yourInformation, style: AppTextStyles.largeBlackTextStyle(context),),
+                Text(l10n.yourInformation, style: AppTextStyles.largeBlackTextStyle(context).copyWith(color: AppColors.primaryColor),),
                 Text(l10n.infoPrintedOnPrescription, style: AppTextStyles.smallGreyTextStyle(context),),
                 SizedBox(height: 8,),
                 ///-----------Profile Image upload information section-------------

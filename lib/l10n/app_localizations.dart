@@ -158,8 +158,26 @@ abstract class AppLocalizations {
   /// No description provided for @stepEffort.
   ///
   /// In en, this message translates to:
-  /// **'Experience'**
+  /// **'Chamber'**
   String get stepEffort;
+
+  /// No description provided for @chamberInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Chamber Information'**
+  String get chamberInfo;
+
+  /// No description provided for @patientMeet.
+  ///
+  /// In en, this message translates to:
+  /// **'Where is your workplace to meet patient and where to meet doctor'**
+  String get patientMeet;
+
+  /// No description provided for @mainChamber.
+  ///
+  /// In en, this message translates to:
+  /// **'Main Chamber/Hospital'**
+  String get mainChamber;
 
   /// No description provided for @stepProfile.
   ///

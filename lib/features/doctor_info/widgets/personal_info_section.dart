@@ -5,6 +5,7 @@ import '../../../app/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import 'card_section_title.dart';
 import 'card_title_section.dart';
+import 'cutom_textfield_widgets.dart';
 
 class PersonalInfoSection extends StatelessWidget {
   const PersonalInfoSection({
@@ -35,25 +36,9 @@ class PersonalInfoSection extends StatelessWidget {
           SizedBox(height: 8,),
           CardSectionTitle(title: l10n.fullName,),
           SizedBox(height: 8,),
-          TextFormField(
-            decoration: InputDecoration(
-              prefixIcon: Icon(
-                Icons.person, // your icon here
-                color: AppColors.textGreyColor,
-              ),
-              hintText: "Enter your name",
-              hintStyle: TextStyle(
-                color: AppColors.textGreyColor.withOpacity(0.7),
-                fontSize: 16,
-              ),
-
-              filled: true,
-              fillColor: Colors.grey.shade50,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.borderColor),
-              ),
-            ),
+          CustomTextFieldWidgets(
+            hintText: "Enter Your Full Name",
+            prefixIcon: Icons.person,
           ),
           SizedBox(height: 8,),
           CardSectionTitle(title: l10n.title,),
