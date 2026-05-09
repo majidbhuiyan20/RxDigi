@@ -8,6 +8,7 @@ import 'package:rxdigi/core/data/repositories/doctor_repository.dart';
 import 'package:rxdigi/core/data/repositories/patient_repository.dart';
 
 class PrescriptionState {
+  final int? id;
   final PatientModel? patient;
   final String? chiefComplaints;
   final String? diagnosis;
@@ -20,6 +21,7 @@ class PrescriptionState {
   final bool isLoading;
 
   PrescriptionState({
+    this.id,
     this.patient,
     this.chiefComplaints,
     this.diagnosis,
@@ -33,6 +35,7 @@ class PrescriptionState {
   });
 
   PrescriptionState copyWith({
+    int? id,
     PatientModel? patient,
     String? chiefComplaints,
     String? diagnosis,
@@ -45,6 +48,7 @@ class PrescriptionState {
     bool? isLoading,
   }) {
     return PrescriptionState(
+      id: id ?? this.id,
       patient: patient ?? this.patient,
       chiefComplaints: chiefComplaints ?? this.chiefComplaints,
       diagnosis: diagnosis ?? this.diagnosis,
@@ -120,6 +124,21 @@ class PrescriptionNotifier extends StateNotifier<PrescriptionState> {
     state = state.copyWith(labTests: tests);
   }
 
+  void setPrescription(PrescriptionModel prescription, PatientModel patient) {
+    state = PrescriptionState(
+      id: prescription.id,
+      patient: patient,
+      chiefComplaints: prescription.chiefComplaints,
+      diagnosis: prescription.diagnosis,
+      vitalSigns: prescription.vitalSigns,
+      pastHistory: prescription.pastHistory,
+      medicines: prescription.medicines,
+      advice: prescription.advice,
+      nextVisit: prescription.nextVisit,
+      labTests: prescription.labTests,
+    );
+  }
+
   Future<int> savePrescription() async {
     if (state.patient == null) return -1;
 
@@ -140,6 +159,7 @@ class PrescriptionNotifier extends StateNotifier<PrescriptionState> {
 
       // 3. Create PrescriptionModel
       final prescription = PrescriptionModel(
+        id: state.id,
         patientId: patientId,
         doctorId: doctor?.id,
         date: DateTime.now(),
@@ -153,8 +173,14 @@ class PrescriptionNotifier extends StateNotifier<PrescriptionState> {
         labTests: state.labTests,
       );
 
-      // 4. Save to DB
-      final id = await _prescriptionRepo.insert(prescription);
+      // 4. Save/Update to DB
+      int id;
+      if (state.id == null) {
+        id = await _prescriptionRepo.insert(prescription);
+      } else {
+        await _prescriptionRepo.update(prescription);
+        id = state.id!;
+      }
       
       state = state.copyWith(isLoading: false);
       return id;

@@ -13,7 +13,11 @@ import 'package:rxdigi/features/medicines/view/medicines_screen.dart';
 import 'package:rxdigi/features/patients/view/patient_details_screen.dart';
 import 'package:rxdigi/features/patients/view/patients_screen.dart';
 
+import '../../../core/data/providers/prescription_provider.dart' as core_providers;
+import '../../../core/utils/pdf_generator.dart';
+import '../../prescription/provider/prescription_provider.dart';
 import '../../prescription/view/new_prescription_screen.dart';
+import '../../reports/view/reports_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -26,7 +30,6 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.appBackgroundColor,
       body: SafeArea(
-
         child: latestDoctorAsync.when(
           data: (doctor) {
             if (doctor == null) {
@@ -177,7 +180,7 @@ class HomeScreen extends ConsumerWidget {
                               context,
                               title: "New Rx",
                               icon: Icons.add_rounded,
-                              color: AppColors.primaryColor,
+                              color: AppColors.actionBlue,
                               onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => const NewPrescriptionScreen()),
@@ -187,11 +190,8 @@ class HomeScreen extends ConsumerWidget {
                               context,
                               title: "Patients",
                               icon: Icons.people_rounded,
-                              color: Colors.orange,
+                              color: AppColors.actionOrange,
                               onTap: () {
-                                // Since we are inside MainNavigationScreen, we should ideally use the tab controller
-                                // but for simplicity now, we can just push or let the user navigate via bottom bar.
-                                // However, the requirement is "Quick Actions".
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => const PatientsScreen()),
@@ -202,7 +202,7 @@ class HomeScreen extends ConsumerWidget {
                               context,
                               title: "Medicines",
                               icon: Icons.medication_rounded,
-                              color: Colors.teal,
+                              color: AppColors.actionTeal,
                               onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => const MedicinesScreen()),
@@ -212,10 +212,11 @@ class HomeScreen extends ConsumerWidget {
                               context,
                               title: "Reports",
                               icon: Icons.analytics_rounded,
-                              color: Colors.purple,
+                              color: AppColors.actionPurple,
                               onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Reports feature coming soon!")),
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const ReportsScreen()),
                                 );
                               },
                             ),
@@ -237,7 +238,7 @@ class HomeScreen extends ConsumerWidget {
                               title: "Prescriptions",
                               count: todayCount.toString(),
                               icon: Icons.assignment_rounded,
-                              color: const Color(0XFF1F74E2),
+                              color: AppColors.infoColor,
                             ),
                             const SizedBox(width: 16),
                             _buildSummaryCard(
@@ -245,7 +246,7 @@ class HomeScreen extends ConsumerWidget {
                               title: "Patients",
                               count: todayCount.toString(),
                               icon: Icons.person_pin_rounded,
-                              color: const Color(0XFF34BC46),
+                              color: AppColors.successColor,
                             ),
                           ],
                         ),
@@ -453,21 +454,51 @@ class HomeScreen extends ConsumerWidget {
               ],
             ),
           ),
-          IconButton(
-            icon: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
-            onPressed: () {
-              // Navigate to details or PDF preview
-              patientAsync.whenData((patient) {
-                if (patient != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PatientDetailsScreen(patient: patient),
-                    ),
-                  );
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: Colors.grey.shade400),
+            onSelected: (value) async {
+              final patient = patientAsync.asData?.value;
+              if (patient == null) return;
+
+              if (value == 'edit') {
+                ref.read(prescriptionProvider.notifier).setPrescription(prescription, patient);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NewPrescriptionScreen()),
+                );
+              } else if (value == 'delete') {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Delete Prescription'),
+                    content: const Text('Are you sure you want to delete this prescription?'),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        style: TextButton.styleFrom(foregroundColor: Colors.red),
+                        child: const Text('Delete'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  await ref.read(core_providers.deletePrescriptionProvider(prescription.id!).future);
+                  ref.invalidate(core_providers.prescriptionListProvider);
                 }
-              });
+              } else if (value == 'print') {
+                final doctor = await ref.read(latestDoctorProvider.future);
+                if (doctor != null) {
+                  await PdfGenerator.printPrescription(prescription, patient, doctor);
+                }
+              }
             },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit, size: 20), SizedBox(width: 8), Text('Edit')])),
+              const PopupMenuItem(value: 'print', child: Row(children: [Icon(Icons.print, size: 20), SizedBox(width: 8), Text('Print')])),
+              const PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 20), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))])),
+            ],
           ),
         ],
       ),

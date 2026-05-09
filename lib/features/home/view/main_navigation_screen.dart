@@ -71,7 +71,7 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
                   const SizedBox(height: 20),
                   FloatingActionButton(
                     onPressed: _navigateToNewRx,
-                    backgroundColor: AppColors.rxPrimaryColor,
+                    backgroundColor: AppColors.primaryColor,
                     child: const Icon(Icons.add, color: Colors.white),
                   ),
                   const SizedBox(height: 20),
@@ -191,14 +191,14 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.rxPrimaryColor, AppColors.primaryColor],
+            colors: [AppColors.primaryColor, AppColors.topHeaderColor],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.rxPrimaryColor.withOpacity(0.4),
+              color: AppColors.primaryColor.withOpacity(0.4),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),

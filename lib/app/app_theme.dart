@@ -6,10 +6,22 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
-      colorSchemeSeed: AppColors.themeColor,
-      scaffoldBackgroundColor: Colors.white,
-      progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: AppColors.themeColor,
+      colorSchemeSeed: AppColors.primaryColor,
+      scaffoldBackgroundColor: AppColors.appBackgroundColor,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+        iconTheme: IconThemeData(color: Colors.white),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.primaryColor,
       ),
       inputDecorationTheme: _getInputDecorationTheme(),
       filledButtonTheme: _getFilledButtonThemeData()

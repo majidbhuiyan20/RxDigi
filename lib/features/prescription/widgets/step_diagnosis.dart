@@ -133,9 +133,9 @@ class StepDiagnosis extends ConsumerWidget {
                       final newList = selectedItems.where((e) => e != item).toList();
                       onChanged(newList.join(', '));
                     },
-                    backgroundColor: AppColors.rxPrimaryColor.withOpacity(0.1),
+                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
                     deleteIconColor: Colors.red,
-                    side: BorderSide(color: AppColors.rxPrimaryColor.withOpacity(0.2)),
+                    side: BorderSide(color: AppColors.primaryColor.withOpacity(0.2)),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   )).toList(),
                 ),
@@ -150,15 +150,15 @@ class StepDiagnosis extends ConsumerWidget {
             final isSelected = selectedItems.contains(item);
             return ActionChip(
               label: Text(item),
-              backgroundColor: isSelected ? AppColors.rxPrimaryColor.withOpacity(0.1) : Colors.white,
+              backgroundColor: isSelected ? AppColors.primaryColor.withOpacity(0.1) : Colors.white,
               labelStyle: TextStyle(
                 fontSize: 12,
-                color: isSelected ? AppColors.rxPrimaryColor : Colors.black87,
+                color: isSelected ? AppColors.primaryColor : Colors.black87,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: isSelected ? AppColors.rxPrimaryColor : Colors.grey.shade300),
+                side: BorderSide(color: isSelected ? AppColors.primaryColor : Colors.grey.shade300),
               ),
               onPressed: () {
                 if (!isSelected) {
@@ -196,7 +196,7 @@ class StepDiagnosis extends ConsumerWidget {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.rxPrimaryColor,
+              backgroundColor: AppColors.primaryColor,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),

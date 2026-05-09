@@ -22,8 +22,6 @@ class PatientDetailsScreen extends ConsumerWidget {
       backgroundColor: AppColors.appBackgroundColor,
       appBar: AppBar(
         title: const Text('Patient Details'),
-        backgroundColor: AppColors.topHeaderColor,
-        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: Column(

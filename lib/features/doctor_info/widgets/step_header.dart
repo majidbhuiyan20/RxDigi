@@ -74,7 +74,7 @@ class StepHeader extends ConsumerWidget {
                         width:  lineWidth,
                         height: lineHeight,
                         color: isCompleted
-                            ? AppColors.greenColor
+                            ? AppColors.successColor
                             : Colors.white.withOpacity(0.3),
                       ),
                   ],
@@ -109,7 +109,7 @@ class StepHeader extends ConsumerWidget {
                               ? FontWeight.w700
                               : FontWeight.w700,
                           color: isCompleted
-                              ? AppColors.greenColor
+                              ? AppColors.successColor
                               : Colors.white,
                         ),
                       ),
@@ -197,7 +197,7 @@ class _StepCircle extends StatelessWidget {
         color: isActive
             ? Colors.white
             : isCompleted
-            ? AppColors.greenColor
+            ? AppColors.successColor
             : Colors.white.withOpacity(0.2),
         boxShadow: isActive
             ? [

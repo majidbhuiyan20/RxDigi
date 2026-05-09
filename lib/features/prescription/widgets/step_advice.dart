@@ -50,7 +50,7 @@ class StepAdvice extends ConsumerWidget {
             onChanged: notifier.updateNextVisit,
             decoration: InputDecoration(
               hintText: 'e.g. After 7 days or 15/05/2026',
-              prefixIcon: const Icon(Icons.calendar_today, color: AppColors.rxPrimaryColor),
+              prefixIcon: const Icon(Icons.calendar_today, color: AppColors.primaryColor),
               filled: true,
               fillColor: Colors.white,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
@@ -117,7 +117,7 @@ class StepAdvice extends ConsumerWidget {
                       final newList = selectedItems.where((e) => e != item).toList();
                       onChanged(newList.join('. '));
                     },
-                    backgroundColor: AppColors.rxPrimaryColor.withOpacity(0.1),
+                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
                     deleteIconColor: Colors.red,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   )).toList(),
@@ -133,15 +133,15 @@ class StepAdvice extends ConsumerWidget {
             final isSelected = selectedItems.contains(item);
             return ActionChip(
               label: Text(item),
-              backgroundColor: isSelected ? AppColors.rxPrimaryColor.withOpacity(0.1) : Colors.white,
+              backgroundColor: isSelected ? AppColors.primaryColor.withOpacity(0.1) : Colors.white,
               labelStyle: TextStyle(
                 fontSize: 12,
-                color: isSelected ? AppColors.rxPrimaryColor : Colors.black87,
+                color: isSelected ? AppColors.primaryColor : Colors.black87,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: isSelected ? AppColors.rxPrimaryColor : Colors.grey.shade300),
+                side: BorderSide(color: isSelected ? AppColors.primaryColor : Colors.grey.shade300),
               ),
               onPressed: () {
                 if (!isSelected) {
@@ -196,7 +196,7 @@ class StepAdvice extends ConsumerWidget {
                   children: state.labTests.map((test) => InputChip(
                     label: Text(test),
                     onDeleted: () => notifier.removeLabTest(test),
-                    backgroundColor: AppColors.rxPrimaryColor.withOpacity(0.1),
+                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
                     deleteIconColor: Colors.red,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   )).toList(),
@@ -212,15 +212,15 @@ class StepAdvice extends ConsumerWidget {
             final isSelected = state.labTests.contains(test);
             return ActionChip(
               label: Text(test),
-              backgroundColor: isSelected ? AppColors.rxPrimaryColor.withOpacity(0.1) : Colors.white,
+              backgroundColor: isSelected ? AppColors.primaryColor.withOpacity(0.1) : Colors.white,
               labelStyle: TextStyle(
                 fontSize: 12,
-                color: isSelected ? AppColors.rxPrimaryColor : Colors.black87,
+                color: isSelected ? AppColors.primaryColor : Colors.black87,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: isSelected ? AppColors.rxPrimaryColor : Colors.grey.shade300),
+                side: BorderSide(color: isSelected ? AppColors.primaryColor : Colors.grey.shade300),
               ),
               onPressed: () {
                 if (isSelected) {
@@ -256,7 +256,7 @@ class StepAdvice extends ConsumerWidget {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.rxPrimaryColor,
+              backgroundColor: AppColors.primaryColor,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),

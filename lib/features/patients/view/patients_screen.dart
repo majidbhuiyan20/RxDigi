@@ -30,15 +30,18 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
       backgroundColor: AppColors.appBackgroundColor,
       appBar: AppBar(
         title: const Text('Patients'),
-        backgroundColor: AppColors.topHeaderColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
       ),
       body: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
-            color: AppColors.topHeaderColor,
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+            decoration: const BoxDecoration(
+              color: AppColors.primaryColor,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(24),
+                bottomRight: Radius.circular(24),
+              ),
+            ),
             child: TextField(
               controller: _searchController,
               onChanged: (value) {
@@ -47,18 +50,26 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
                 });
               },
               decoration: InputDecoration(
-                hintText: 'Search patients...',
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+                hintText: 'Search patients by name or phone...',
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
                 prefixIcon: const Icon(Icons.search, color: Colors.white),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.2),
+                fillColor: Colors.white.withOpacity(0.15),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.white.withOpacity(0.3), width: 1),
+                ),
               ),
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
           Expanded(

@@ -45,18 +45,16 @@ class _NewPrescriptionScreenState extends ConsumerState<NewPrescriptionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = ref.watch(prescriptionProvider).id != null;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
-        title: const Text('New Prescription', 
-          style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: AppColors.topHeaderColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
+        title: Text(isEditing ? 'Edit Prescription' : 'New Prescription'),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () {
-            // Show discard dialog or just pop
+            ref.read(prescriptionProvider.notifier).reset();
             Navigator.pop(context);
           },
         ),
@@ -76,7 +74,7 @@ class _NewPrescriptionScreenState extends ConsumerState<NewPrescriptionScreen> {
   Widget _buildStepIndicator() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-      color: AppColors.topHeaderColor,
+      color: Colors.white,
       child: Row(
         children: List.generate(_stepTitles.length, (index) {
           bool isActive = index <= _currentStep;
@@ -89,7 +87,7 @@ class _NewPrescriptionScreenState extends ConsumerState<NewPrescriptionScreen> {
                   height: 4,
                   margin: const EdgeInsets.symmetric(horizontal: 2),
                   decoration: BoxDecoration(
-                    color: isActive ? Colors.white : Colors.white.withOpacity(0.3),
+                    color: isActive ? AppColors.themeColor : Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -100,7 +98,7 @@ class _NewPrescriptionScreenState extends ConsumerState<NewPrescriptionScreen> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: isCurrent ? Colors.white : Colors.white.withOpacity(0.6),
+                    color: isCurrent ? AppColors.themeColor : Colors.grey.shade500,
                     fontSize: 10,
                     fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -160,23 +158,22 @@ class _NewPrescriptionScreenState extends ConsumerState<NewPrescriptionScreen> {
                 ),
               ),
             if (_currentStep > 0) const SizedBox(width: 16),
-            Expanded(
-              flex: 2,
-              child: ElevatedButton(
-                onPressed: _currentStep == _stepTitles.length - 1 
-                  ? _finishPrescription 
-                  : _nextStep,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.rxPrimaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            if (_currentStep < _stepTitles.length - 1)
+              Expanded(
+                flex: 2,
+                child: ElevatedButton(
+                  onPressed: _nextStep,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
+                  child: const Text('Next Step'),
                 ),
-                child: Text(_currentStep == _stepTitles.length - 1 ? 'Save & Print' : 'Next Step'),
               ),
-            ),
           ],
         ),
       ),

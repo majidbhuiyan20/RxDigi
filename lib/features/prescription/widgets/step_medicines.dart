@@ -142,7 +142,7 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.rxPrimaryColor,
+                      backgroundColor: AppColors.primaryColor,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
@@ -196,11 +196,11 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
           label: Text(item),
           selected: isSelected,
           onSelected: (_) => onSelect(item),
-          selectedColor: AppColors.rxPrimaryColor.withOpacity(0.1),
-          labelStyle: TextStyle(color: isSelected ? AppColors.rxPrimaryColor : Colors.black, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+          selectedColor: AppColors.primaryColor.withOpacity(0.1),
+          labelStyle: TextStyle(color: isSelected ? AppColors.primaryColor : Colors.black, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: isSelected ? AppColors.rxPrimaryColor : Colors.grey.shade300),
+            side: BorderSide(color: isSelected ? AppColors.primaryColor : Colors.grey.shade300),
           ),
         );
       }).toList(),
@@ -254,7 +254,7 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
                 return ListTile(
                   title: Text(med.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text('${med.genericName} • ${med.dosageForm}'),
-                  trailing: Icon(Icons.add_circle_outline, color: AppColors.rxPrimaryColor),
+                  trailing: Icon(Icons.add_circle_outline, color: AppColors.primaryColor),
                   onTap: () => _showAddMedicineDialog(med),
                 );
               },
@@ -304,7 +304,7 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 4),
-                        Text('${med.dose} · ${med.instruction} · ${med.duration}', style: TextStyle(color: AppColors.rxPrimaryColor, fontWeight: FontWeight.w500)),
+                        Text('${med.dose} · ${med.instruction} · ${med.duration}', style: TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.w500)),
                       ],
                     ),
                     trailing: IconButton(

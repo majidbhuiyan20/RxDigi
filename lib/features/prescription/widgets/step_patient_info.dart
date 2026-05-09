@@ -27,6 +27,23 @@ class _StepPatientInfoState extends ConsumerState<StepPatientInfo> {
   bool _isSearching = false;
   bool _isNewPatient = true;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final state = ref.read(prescriptionProvider);
+      if (state.patient != null) {
+        setState(() {
+          _isNewPatient = state.patient!.id == null;
+          _nameController.text = state.patient!.name;
+          _ageController.text = state.patient!.age?.toString() ?? '';
+          _phoneController.text = state.patient!.phone ?? '';
+          _selectedGender = state.patient!.gender ?? 'Male';
+        });
+      }
+    });
+  }
+
   void _onSearch(String query) async {
     if (query.isEmpty) {
       setState(() {

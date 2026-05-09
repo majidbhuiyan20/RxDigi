@@ -97,19 +97,14 @@ class _MedicinesScreenState extends ConsumerState<MedicinesScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
-        title: const Text('Medicines Directory', 
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-        backgroundColor: AppColors.topHeaderColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
+        title: const Text('Medicines Directory'),
       ),
       body: Column(
         children: [
           Container(
-            padding:  EdgeInsets.fromLTRB(16, 0, 16, 20),
-            decoration:  BoxDecoration(
-              color: AppColors.topHeaderColor,
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+            decoration: const BoxDecoration(
+              color: AppColors.primaryColor,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(24),
                 bottomRight: Radius.circular(24),
@@ -118,14 +113,14 @@ class _MedicinesScreenState extends ConsumerState<MedicinesScreen> {
             child: TextField(
               controller: _searchController,
               onChanged: _onSearchChanged,
-              style: const TextStyle(color: Colors.black87),
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'Search brand, generic or manufacturer...',
-                hintStyle: TextStyle(color: Colors.grey.shade500),
-                prefixIcon:  Icon(Icons.search, color: AppColors.primaryColor),
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                prefixIcon: const Icon(Icons.search, color: Colors.white),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, color: Colors.grey),
+                        icon: const Icon(Icons.clear, color: Colors.white),
                         onPressed: () {
                           _searchController.clear();
                           _onSearchChanged('');
@@ -133,7 +128,7 @@ class _MedicinesScreenState extends ConsumerState<MedicinesScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Colors.white.withOpacity(0.15),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -145,7 +140,7 @@ class _MedicinesScreenState extends ConsumerState<MedicinesScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide:  BorderSide(color: AppColors.primaryColor, width: 1.5),
+                  borderSide: BorderSide(color: Colors.white.withOpacity(0.3), width: 1),
                 ),
               ),
             ),
@@ -184,10 +179,11 @@ class _MedicinesScreenState extends ConsumerState<MedicinesScreen> {
                           return Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppColors.borderColor.withOpacity(0.5)),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
+                                  color: Colors.black.withOpacity(0.02),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -298,13 +294,12 @@ class _MedicinesScreenState extends ConsumerState<MedicinesScreen> {
   }
 
   Color _getFormColor(String? form) {
-    if (form == null) return Colors.blue;
+    if (form == null) return AppColors.textGreyColor;
     final f = form.toLowerCase();
-    if (f.contains('tablet')) return const Color(0xFF6C63FF);
-    if (f.contains('capsule')) return const Color(0xFFFF6584);
-    if (f.contains('syrup')) return const Color(0xFF4CAF50);
-    if (f.contains('injection')) return const Color(0xFFFF9800);
-    if (f.contains('drop')) return const Color(0xFF03A9F4);
+    if (f.contains('tab') || f.contains('cap')) return const Color(0xFF6366F1); // Indigo
+    if (f.contains('syp') || f.contains('susp')) return const Color(0xFF0EA5E9); // Sky
+    if (f.contains('inj')) return const Color(0xFFF43F5E); // Rose
+    if (f.contains('drop')) return const Color(0xFF10B981); // Emerald
     return AppColors.primaryColor;
   }
 }
