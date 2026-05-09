@@ -10,13 +10,10 @@ import 'package:rxdigi/core/data/providers/prescription_provider.dart';
 import 'package:rxdigi/core/data/models/prescription_model.dart';
 import 'package:rxdigi/core/data/providers/patient_provider.dart';
 import 'package:rxdigi/features/medicines/view/medicines_screen.dart';
-import 'package:rxdigi/features/patients/view/patient_details_screen.dart';
 import 'package:rxdigi/features/patients/view/patients_screen.dart';
 import 'package:rxdigi/features/prescription/view/prescription_details_screen.dart';
 
-import '../../../core/data/providers/prescription_provider.dart' as core_providers;
 import '../../../core/utils/pdf_generator.dart';
-import '../../prescription/provider/prescription_provider.dart';
 import '../../prescription/view/new_prescription_screen.dart';
 import '../../reports/view/reports_screen.dart';
 
