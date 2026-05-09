@@ -22,7 +22,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -34,6 +34,30 @@ class DatabaseHelper {
           await db.execute('ALTER TABLE doctors ADD COLUMN offDays TEXT');
           await db.execute('ALTER TABLE doctors ADD COLUMN position TEXT');
           await db.execute('ALTER TABLE doctors ADD COLUMN department TEXT');
+        }
+        if (oldVersion < 3) {
+          // Favorite Medicines Table
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS favorite_medicines (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              medicineId INTEGER,
+              name TEXT,
+              genericName TEXT,
+              dosageForm TEXT,
+              strength TEXT,
+              createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+          ''');
+
+          // Common Diagnosis Table
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS common_diagnosis (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT UNIQUE,
+              usageCount INTEGER DEFAULT 1,
+              lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+          ''');
         }
       },
     );
@@ -117,6 +141,29 @@ class DatabaseHelper {
         strength TEXT,
         dosageForm TEXT,
         price REAL
+      )
+    ''');
+
+    // Favorite Medicines Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS favorite_medicines (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        medicineId INTEGER,
+        name TEXT,
+        genericName TEXT,
+        dosageForm TEXT,
+        strength TEXT,
+        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    // Common Diagnosis Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS common_diagnosis (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE,
+        usageCount INTEGER DEFAULT 1,
+        lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     ''');
   }

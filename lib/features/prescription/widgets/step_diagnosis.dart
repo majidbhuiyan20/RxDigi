@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdigi/app/app_colors.dart';
+import 'package:rxdigi/core/data/repositories/common_diagnosis_repository.dart';
 import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
+
+final commonDiagnosisProvider = FutureProvider<List<String>>((ref) {
+  return CommonDiagnosisRepository().getCommonDiagnosis();
+});
 
 class StepDiagnosis extends ConsumerWidget {
   const StepDiagnosis({super.key});
@@ -10,6 +15,7 @@ class StepDiagnosis extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(prescriptionProvider);
     final notifier = ref.read(prescriptionProvider.notifier);
+    final commonDiagnosisAsync = ref.watch(commonDiagnosisProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -25,13 +31,26 @@ class StepDiagnosis extends ConsumerWidget {
             hint: 'Describe patient complaints...',
           ),
           const SizedBox(height: 24),
-          _buildSectionHeader(
-            context,
-            title: 'Diagnosis *',
-            initialValue: state.diagnosis,
-            onChanged: (val) => notifier.updateDiagnosis(val),
-            commonItems: ['Fever', 'Cold', 'UTI', 'Pneumonia', 'Gastritis', 'Anemia'],
-            hint: 'Enter diagnosis or ICD code...',
+          commonDiagnosisAsync.when(
+            data: (commonList) => _buildSectionHeader(
+              context,
+              title: 'Diagnosis *',
+              initialValue: state.diagnosis,
+              onChanged: (val) {
+                notifier.updateDiagnosis(val);
+                // Optionally add to common diagnosis on save or here
+              },
+              commonItems: commonList.isEmpty 
+                  ? ['Fever', 'Cold', 'UTI', 'Pneumonia', 'Gastritis', 'Anemia'] 
+                  : commonList,
+              hint: 'Enter diagnosis or ICD code...',
+              onCustomAdd: (val) async {
+                 await CommonDiagnosisRepository().addOrUpdateDiagnosis(val);
+                 ref.invalidate(commonDiagnosisProvider);
+              }
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, __) => const SizedBox(),
           ),
           const SizedBox(height: 24),
           _buildTextField(
@@ -60,6 +79,7 @@ class StepDiagnosis extends ConsumerWidget {
     required Function(String) onChanged,
     required List<String> commonItems,
     required String hint,
+    Function(String)? onCustomAdd,
   }) {
     final controller = TextEditingController(text: initialValue);
     controller.selection = TextSelection.fromPosition(TextPosition(offset: controller.text.length));
@@ -75,6 +95,7 @@ class StepDiagnosis extends ConsumerWidget {
               onPressed: () => _showCustomAddDialog(context, title, (val) {
                 final current = initialValue ?? '';
                 onChanged(current.isEmpty ? val : '$current, $val');
+                if (onCustomAdd != null) onCustomAdd(val);
               }),
               icon: const Icon(Icons.add_circle_outline, size: 18),
               label: const Text('Custom'),

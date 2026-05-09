@@ -116,27 +116,27 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
         children: _screens,
       ),
       bottomNavigationBar: Container(
-        height: 75,
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+        height: 70,
+        margin: const EdgeInsets.fromLTRB(24, 0, 24, 30),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(35),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
           ],
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildNavItem(0, Icons.home_outlined, Icons.home),
-            _buildNavItem(1, Icons.people_outlined, Icons.people),
+            _buildNavItem(0, Icons.grid_view_outlined, Icons.grid_view_rounded),
+            _buildNavItem(1, Icons.people_outline_rounded, Icons.people_rounded),
             _buildMiddleNavItem(),
-            _buildNavItem(3, Icons.medication_outlined, Icons.medication),
-            _buildNavItem(4, Icons.person_outline, Icons.person),
+            _buildNavItem(3, Icons.medication_outlined, Icons.medication_rounded),
+            _buildNavItem(4, Icons.person_outline_rounded, Icons.person_rounded),
           ],
         ),
       ),
@@ -144,17 +144,40 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
   }
 
   Widget _buildNavItem(int index, IconData icon, IconData activeIcon) {
-    bool isSelected = _selectedIndex == index;
-    return InkResponse(
+    final bool isSelected = _selectedIndex == index;
+    return GestureDetector(
       onTap: () => _onItemTapped(index),
+      behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            isSelected ? activeIcon : icon,
-            color: isSelected ? AppColors.primaryColor : Colors.grey.shade400,
-            size: 28,
+          AnimatedScale(
+            scale: isSelected ? 1.2 : 1.0,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOutBack,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primaryColor.withOpacity(0.1) : Colors.transparent,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isSelected ? activeIcon : icon,
+                color: isSelected ? AppColors.primaryColor : Colors.grey.shade400,
+                size: 26,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            height: 4,
+            width: isSelected ? 4 : 0,
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor,
+              shape: BoxShape.circle,
+            ),
           ),
         ],
       ),
@@ -162,22 +185,26 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
   }
 
   Widget _buildMiddleNavItem() {
-    return InkResponse(
+    return GestureDetector(
       onTap: () => _onItemTapped(2),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.rxPrimaryColor,
+          gradient: LinearGradient(
+            colors: [AppColors.rxPrimaryColor, AppColors.primaryColor],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.rxPrimaryColor.withOpacity(0.3),
-              blurRadius: 8,
+              color: AppColors.rxPrimaryColor.withOpacity(0.4),
+              blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: const Icon(Icons.add, color: Colors.white, size: 28),
+        child: const Icon(Icons.add, color: Colors.white, size: 30),
       ),
     );
   }

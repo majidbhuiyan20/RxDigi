@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:share_plus/share_plus.dart';
 import '../data/models/prescription_model.dart';
 import '../data/models/patient_model.dart';
 import '../data/models/doctor_model.dart';
@@ -197,9 +200,26 @@ class PdfGenerator {
     DoctorModel doctor,
   ) async {
     final pdfBytes = await generatePrescriptionPdf(prescription, patient, doctor);
-    await Printing.sharePdf(
-      bytes: pdfBytes,
-      filename: 'Prescription_${patient.name}.pdf',
+    
+    // Create a temporary file to share
+    final directory = await getTemporaryDirectory();
+    final file = File('${directory.path}/Prescription_${patient.name.replaceAll(' ', '_')}.pdf');
+    await file.writeAsBytes(pdfBytes);
+
+    await Share.shareXFiles(
+      [XFile(file.path)],
+      text: 'Prescription for ${patient.name}',
+      subject: 'Prescription - RxDigi',
     );
+  }
+
+  static Future<void> shareToWhatsApp(
+    PrescriptionModel prescription,
+    PatientModel patient,
+    DoctorModel doctor,
+  ) async {
+    // WhatsApp sharing typically uses the same mechanism as general sharing
+    // but we can customize the text message.
+    await sharePrescription(prescription, patient, doctor);
   }
 }

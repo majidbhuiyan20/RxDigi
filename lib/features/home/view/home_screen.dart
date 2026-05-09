@@ -7,6 +7,12 @@ import 'package:rxdigi/app/app_text_style.dart';
 import 'package:rxdigi/core/data/providers/doctor_provider.dart';
 import 'package:rxdigi/core/data/providers/prescription_provider.dart';
 
+import 'package:rxdigi/core/data/models/prescription_model.dart';
+import 'package:rxdigi/core/data/providers/patient_provider.dart';
+import 'package:rxdigi/features/medicines/view/medicines_screen.dart';
+import 'package:rxdigi/features/patients/view/patient_details_screen.dart';
+import 'package:rxdigi/features/patients/view/patients_screen.dart';
+
 import '../../prescription/view/new_prescription_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -153,65 +159,75 @@ class HomeScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // --- ২. সবচেয়ে বড় বাটন: New Prescription ---
-                        const SizedBox(height: 10),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
+                        // --- ২. Quick Actions Grid ---
+                        Text(
+                          "Quick Actions",
+                          style: AppTextStyles.largeBlackTextStyle(context).copyWith(fontSize: 18),
+                        ),
+                        const SizedBox(height: 16),
+                        GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 1.5,
+                          children: [
+                            _buildQuickAction(
                               context,
-                              MaterialPageRoute(builder: (context) => const NewPrescriptionScreen()),
-                            );
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 40),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [AppColors.rxPrimaryColor, AppColors.primaryColor],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                              title: "New Rx",
+                              icon: Icons.add_rounded,
+                              color: AppColors.primaryColor,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const NewPrescriptionScreen()),
                               ),
-                              borderRadius: BorderRadius.circular(24),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primaryColor.withOpacity(0.4),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
                             ),
-                            child: const Column(
-                              children: [
-                                Icon(Icons.add_circle_rounded, color: Colors.white, size: 60),
-                                SizedBox(height: 16),
-                                Text(
-                                  "New Prescription",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  "Start writing a new Rx",
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
+                            _buildQuickAction(
+                              context,
+                              title: "Patients",
+                              icon: Icons.people_rounded,
+                              color: Colors.orange,
+                              onTap: () {
+                                // Since we are inside MainNavigationScreen, we should ideally use the tab controller
+                                // but for simplicity now, we can just push or let the user navigate via bottom bar.
+                                // However, the requirement is "Quick Actions".
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const PatientsScreen()),
+                                );
+                              },
                             ),
-                          ),
+                            _buildQuickAction(
+                              context,
+                              title: "Medicines",
+                              icon: Icons.medication_rounded,
+                              color: Colors.teal,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const MedicinesScreen()),
+                              ),
+                            ),
+                            _buildQuickAction(
+                              context,
+                              title: "Reports",
+                              icon: Icons.analytics_rounded,
+                              color: Colors.purple,
+                              onTap: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Reports feature coming soon!")),
+                                );
+                              },
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: 32),
 
                         // --- ৩. আজকের Summary ---
                         Text(
-                          "Today's Activities",
-                          style: AppTextStyles.largeBlackTextStyle(context).copyWith(fontSize: 20),
+                          "Today's Overview",
+                          style: AppTextStyles.largeBlackTextStyle(context).copyWith(fontSize: 18),
                         ),
                         const SizedBox(height: 16),
                         Row(
@@ -220,18 +236,69 @@ class HomeScreen extends ConsumerWidget {
                               context,
                               title: "Prescriptions",
                               count: todayCount.toString(),
-                              icon: Icons.assignment,
+                              icon: Icons.assignment_rounded,
                               color: const Color(0XFF1F74E2),
                             ),
                             const SizedBox(width: 16),
                             _buildSummaryCard(
                               context,
-                              title: "Total Patients",
-                              count: todayCount.toString(), // আপাতত ১টি প্রেসক্রিপশন = ১জন রোগী
-                              icon: Icons.person_pin,
+                              title: "Patients",
+                              count: todayCount.toString(),
+                              icon: Icons.person_pin_rounded,
                               color: const Color(0XFF34BC46),
                             ),
                           ],
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // --- ৪. Recent Prescriptions ---
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Recent Prescriptions",
+                              style: AppTextStyles.largeBlackTextStyle(context).copyWith(fontSize: 18),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // Navigate to a full list or patients screen
+                              },
+                              child: Text("View All", style: TextStyle(color: AppColors.primaryColor)),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        prescriptionsAsync.when(
+                          data: (prescriptions) {
+                            if (prescriptions.isEmpty) {
+                              return Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: AppColors.borderColor),
+                                ),
+                                child: const Center(
+                                  child: Text("No prescriptions yet"),
+                                ),
+                              );
+                            }
+                            
+                            final recent = prescriptions.take(5).toList();
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: recent.length,
+                              separatorBuilder: (context, index) => const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                final p = recent[index];
+                                return _buildRecentPrescriptionCard(context, ref, p);
+                              },
+                            );
+                          },
+                          loading: () => const Center(child: CircularProgressIndicator()),
+                          error: (err, stack) => Text('Error: $err'),
                         ),
 
                         const SizedBox(height: 40),
@@ -298,6 +365,111 @@ class HomeScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildQuickAction(BuildContext context,
+      {required String title, required IconData icon, required Color color, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.borderColor),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecentPrescriptionCard(BuildContext context, WidgetRef ref, PrescriptionModel prescription) {
+    final patientAsync = ref.watch(getPatientProvider(prescription.patientId));
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderColor),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(Icons.description_outlined, color: AppColors.primaryColor),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                patientAsync.when(
+                  data: (patient) => Text(
+                    patient?.name ?? 'Unknown Patient',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  loading: () => const Text('Loading...'),
+                  error: (_, __) => const Text('Error loading patient'),
+                ),
+                Text(
+                  DateFormat('dd MMM, yyyy • hh:mm a').format(prescription.date),
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
+            onPressed: () {
+              // Navigate to details or PDF preview
+              patientAsync.whenData((patient) {
+                if (patient != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PatientDetailsScreen(patient: patient),
+                    ),
+                  );
+                }
+              });
+            },
+          ),
+        ],
       ),
     );
   }

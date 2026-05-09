@@ -4,7 +4,12 @@ import 'package:rxdigi/app/app_colors.dart';
 import 'package:rxdigi/core/data/models/medicine_model.dart';
 import 'package:rxdigi/core/data/models/medicine_in_prescription_model.dart';
 import 'package:rxdigi/core/data/repositories/medicine_repository.dart';
+import 'package:rxdigi/core/data/repositories/favorite_medicine_repository.dart';
 import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
+
+final favoriteMedicinesProvider = FutureProvider<List<MedicineModel>>((ref) {
+  return FavoriteMedicineRepository().getFavorites();
+});
 
 class StepMedicines extends ConsumerStatefulWidget {
   const StepMedicines({super.key});
@@ -40,6 +45,7 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
     String dose = '1+0+1';
     String duration = '5 days';
     String instruction = 'After meal';
+    bool isFavorite = false;
 
     showModalBottomSheet(
       context: context,
@@ -58,8 +64,26 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: medicine == null
+                          ? const Text('Add Custom Medicine', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
+                          : Text(medicine.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : Colors.grey,
+                      ),
+                      onPressed: () {
+                        setModalState(() => isFavorite = !isFavorite);
+                      },
+                    ),
+                  ],
+                ),
                 if (medicine == null) ...[
-                  const Text('Add Custom Medicine', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   TextField(
                     onChanged: (v) => name = v,
@@ -95,7 +119,6 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
                     decoration: const InputDecoration(labelText: 'Strength', hintText: '500mg / 5ml', border: OutlineInputBorder()),
                   ),
                 ] else ...[
-                  Text(medicine.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   Text('${medicine.genericName} • ${medicine.dosageForm} • ${medicine.strength}', style: TextStyle(color: Colors.grey.shade600)),
                 ],
                 const Divider(height: 24),
@@ -123,14 +146,26 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (name.isEmpty) return;
                       
-                      final medInRx = MedicineInPrescription(
-                        medicineName: name,
+                      final med = medicine ?? MedicineModel(
+                        name: name,
                         genericName: generic,
                         dosageForm: dosageForm,
                         strength: strength,
+                      );
+
+                      if (isFavorite) {
+                        await FavoriteMedicineRepository().addFavorite(med);
+                        ref.invalidate(favoriteMedicinesProvider);
+                      }
+
+                      final medInRx = MedicineInPrescription(
+                        medicineName: med.name,
+                        genericName: med.genericName ?? '',
+                        dosageForm: med.dosageForm ?? '',
+                        strength: med.strength ?? '',
                         dose: dose,
                         duration: duration,
                         instruction: instruction,
@@ -175,6 +210,7 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
   @override
   Widget build(BuildContext context) {
     final addedMedicines = ref.watch(prescriptionProvider).medicines;
+    final favoritesAsync = ref.watch(favoriteMedicinesProvider);
 
     return Column(
       children: [
@@ -224,7 +260,34 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
               },
             ),
           )
-        else
+        else ...[
+          favoritesAsync.when(
+            data: (favorites) {
+              if (favorites.isEmpty) return const SizedBox.shrink();
+              return SizedBox(
+                height: 50,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: favorites.length,
+                  itemBuilder: (context, index) {
+                    final med = favorites[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ActionChip(
+                        label: Text(med.name),
+                        backgroundColor: AppColors.primaryColor.withOpacity(0.05),
+                        onPressed: () => _showAddMedicineDialog(med),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+          const SizedBox(height: 8),
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -253,6 +316,7 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
               },
             ),
           ),
+        ],
       ],
     );
   }
