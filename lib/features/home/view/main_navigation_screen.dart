@@ -6,6 +6,8 @@ import 'package:rxdigi/features/patients/view/patients_screen.dart';
 import 'package:rxdigi/features/medicines/view/medicines_screen.dart';
 import 'package:rxdigi/features/profile/view/profile_screen.dart';
 
+import 'package:rxdigi/features/prescription/view/new_prescription_screen.dart';
+
 class MainNavigationScreen extends ConsumerStatefulWidget {
   const MainNavigationScreen({super.key});
 
@@ -26,7 +28,7 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
 
   void _onItemTapped(int index) {
     if (index == 2) {
-      _showNewRxOptions();
+      _navigateToNewRx();
       return;
     }
     setState(() {
@@ -34,12 +36,10 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
     });
   }
 
-  void _showNewRxOptions() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('New Prescription Flow Coming Soon!'),
-        behavior: SnackBarBehavior.floating,
-      ),
+  void _navigateToNewRx() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const NewPrescriptionScreen()),
     );
   }
 
@@ -70,7 +70,7 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
                 children: [
                   const SizedBox(height: 20),
                   FloatingActionButton(
-                    onPressed: _showNewRxOptions,
+                    onPressed: _navigateToNewRx,
                     backgroundColor: AppColors.rxPrimaryColor,
                     child: const Icon(Icons.add, color: Colors.white),
                   ),
