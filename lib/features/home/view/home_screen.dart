@@ -490,6 +490,15 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
+                    icon: Icon(Icons.print_outlined, color: AppColors.primaryColor, size: 20),
+                    onPressed: () async {
+                      final doctor = ref.read(latestDoctorProvider).value;
+                      if (doctor != null) {
+                        await PdfGenerator.printPrescription(prescription, patient, doctor);
+                      }
+                    },
+                  ),
+                  IconButton(
                     icon: Icon(Icons.delete_outline, color: Colors.red.shade300, size: 20),
                     onPressed: () => _confirmDeletePrescription(context, ref, prescription, patient.name),
                   ),
