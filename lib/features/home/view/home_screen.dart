@@ -1,127 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdigi/l10n/app_localizations.dart';
-import 'package:rxdigi/features/patient_management/view/patient_list_screen.dart';
-import 'package:rxdigi/features/prescription_management/view/prescription_list_screen.dart';
-import 'package:rxdigi/features/prescription_management/view/medicine_search_screen.dart';
-import 'package:rxdigi/core/data/models/medicine_model.dart';
+import 'package:rxdigi/core/data/providers/doctor_provider.dart';
 import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/features/dashboard/view/dashboard_screen.dart';
 
-import '../../../l10n/local_provider.dart';
-import '../../settings/view/settings_screen.dart';
-
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  int _selectedIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    final screens = [
-      const DashboardScreen(),
-      const PatientsTab(),
-      const PrescriptionTab(),
-      const MedicineTab(),
-    ];
+  Widget build(BuildContext context, WidgetRef ref) {
+    final latestDoctorAsync = ref.watch(latestDoctorProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Text(l10n.home),
-          ],
-        ),
-        backgroundColor: const Color(0xFF0D3592),
-        elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const SettingsScreen(),
+        title: const Text('Dashboard'),
+        backgroundColor: AppColors.primaryColor,
+      ),
+      body: latestDoctorAsync.when(
+        data: (doctor) {
+          if (doctor == null) {
+            return const Center(child: Text('No doctor profile found.'));
+          }
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Welcome, ${doctor.title ?? ''} ${doctor.fullName}',
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text('Specialization: ${doctor.specialization ?? 'N/A'}'),
+                const SizedBox(height: 8),
+                Text('Chamber: ${doctor.clinicName}'),
+                const SizedBox(height: 16),
+                Text('Number: ${doctor.phoneNumber ?? 'N/A'}'),
+                Text('Addresss: ${doctor.address ?? 'N/A'}'),
+                ElevatedButton(
+                  onPressed: () {
+                    // Navigate to Create Prescription
+                  },
+                  child: const Text('Create New Prescription'),
                 ),
-              );
-            },
-            icon: const Icon(Icons.settings, size: 28),
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
-      body: screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF0D3592),
-        unselectedItemColor: Colors.grey[500],
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
+              ],
+            ),
+          );
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Patients',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.description),
-            label: 'Prescriptions',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.medication),
-            label: 'Medicines',
-          ),
-        ],
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
       ),
     );
   }
 }
-
-// Patients Tab
-class PatientsTab extends StatelessWidget {
-  const PatientsTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const PatientListScreen();
-  }
-}
-
-// Prescription Tab
-class PrescriptionTab extends StatelessWidget {
-  const PrescriptionTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const PrescriptionListScreen();
-  }
-}
-
-// Medicine Tab
-class MedicineTab extends ConsumerWidget {
-  const MedicineTab({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: MedicineSearchScreen(
-        selectedMedicines: const <MedicineModel>[],
-      ),
-    );
-  }
-}
-

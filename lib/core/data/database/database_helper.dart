@@ -22,8 +22,20 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('ALTER TABLE doctors ADD COLUMN collegeName TEXT');
+          await db.execute('ALTER TABLE doctors ADD COLUMN passingYear TEXT');
+          await db.execute('ALTER TABLE doctors ADD COLUMN roomNumber TEXT');
+          await db.execute('ALTER TABLE doctors ADD COLUMN serialNumber1 TEXT');
+          await db.execute('ALTER TABLE doctors ADD COLUMN serialNumber2 TEXT');
+          await db.execute('ALTER TABLE doctors ADD COLUMN offDays TEXT');
+          await db.execute('ALTER TABLE doctors ADD COLUMN position TEXT');
+          await db.execute('ALTER TABLE doctors ADD COLUMN department TEXT');
+        }
+      },
     );
   }
 
@@ -43,11 +55,19 @@ class DatabaseHelper {
         specialization TEXT,
         subSpecialization TEXT,
         experience TEXT,
+        collegeName TEXT,
+        passingYear TEXT,
         clinicName TEXT,
         address TEXT,
+        roomNumber TEXT,
         phoneNumber TEXT,
+        serialNumber1 TEXT,
+        serialNumber2 TEXT,
         startTime TEXT,
         endTime TEXT,
+        offDays TEXT,
+        position TEXT,
+        department TEXT,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     ''');

@@ -5,7 +5,7 @@ import 'package:rxdigi/app/app_colors.dart';
 import 'package:rxdigi/features/doctor_info/view/step1_introduction.dart';
 import 'package:rxdigi/features/doctor_info/view/step2_qualification.dart';
 import 'package:rxdigi/features/doctor_info/view/step3_effort.dart';
-import 'package:rxdigi/features/prescription/view/prescription_preview.dart';
+import '../../../app/app_routes.dart';
 import '../view_model/onboarding_step_notifier.dart';
 import '../widgets/step_header.dart';
 
@@ -70,12 +70,9 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                   ),
                   Step3Effort(
                     onNext: () {
-                      // Navigate to prescription preview instead of next step
-                      Navigator.push(
+                      Navigator.pushReplacementNamed(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const PrescriptionPreview(),
-                        ),
+                        AppRoutes.homeScreenRoute,
                       );
                     },
                     onBack: () => ref

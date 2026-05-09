@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rxdigi/features/doctor_info/view_model/doctor_onboarding_notifier.dart';
 
 import '../../../app/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import 'card_section_title.dart';
 import 'card_title_section.dart';
-class ContactSection extends StatelessWidget {
+class ContactSection extends ConsumerWidget {
   const ContactSection({
     super.key,
     required this.isDesktop,
@@ -15,7 +17,9 @@ class ContactSection extends StatelessWidget {
   final AppLocalizations l10n;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(doctorOnboardingProvider.notifier);
+
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -34,6 +38,13 @@ class ContactSection extends StatelessWidget {
           CardSectionTitle(title: l10n.mobile,),
           SizedBox(height: 8,),
           TextFormField(
+            onChanged: (value) => notifier.updateField(mobile: value),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your mobile number';
+              }
+              return null;
+            },
             decoration: InputDecoration(
               prefixIcon: Icon(
                 Icons.phone,
@@ -60,6 +71,16 @@ class ContactSection extends StatelessWidget {
           CardSectionTitle(title:l10n.email,),
 
           TextFormField(
+            onChanged: (value) => notifier.updateField(email: value),
+            validator: (value) {
+              if (value != null && value.isNotEmpty) {
+                final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                if (!emailRegExp.hasMatch(value)) {
+                  return 'Please enter a valid email address';
+                }
+              }
+              return null;
+            },
             decoration: InputDecoration(
               prefixIcon: Icon(
                 Icons.email_outlined, // your icon here

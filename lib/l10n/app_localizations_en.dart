@@ -150,5 +150,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get address => 'Chamber Address';
 
   @override
+  String get roomNumber => 'Room Number';
+
+  @override
   String get phoneNumber => 'Phone Number';
+
+  @override
+  String get serialNumber1 => 'Number 1';
+
+  @override
+  String get serialNumber2 => 'Number 2';
+
+  @override
+  String get serialBooking => 'Serial Booking';
 }

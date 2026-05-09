@@ -53,8 +53,9 @@
   "optional": "ঐচ্ছিক",
   "department": "বিভাগ",
   "address": "চেম্বারের ঠিকানা",
-  "phoneNumber": "ফোন নাম্বার"
-
-
-
+  "roomNumber": "রুম নম্বর",
+  "phoneNumber": "ফোন নাম্বার",
+  "serialNumber1": "নম্বর ১",
+  "serialNumber2": "নম্বর ২",
+  "serialBooking": "সিরিয়াল বুকিং"
 }

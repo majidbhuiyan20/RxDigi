@@ -377,11 +377,35 @@ abstract class AppLocalizations {
   /// **'Chamber Address'**
   String get address;
 
+  /// No description provided for @roomNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Room Number'**
+  String get roomNumber;
+
   /// No description provided for @phoneNumber.
   ///
   /// In en, this message translates to:
   /// **'Phone Number'**
   String get phoneNumber;
+
+  /// No description provided for @serialNumber1.
+  ///
+  /// In en, this message translates to:
+  /// **'Number 1'**
+  String get serialNumber1;
+
+  /// No description provided for @serialNumber2.
+  ///
+  /// In en, this message translates to:
+  /// **'Number 2'**
+  String get serialNumber2;
+
+  /// No description provided for @serialBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial Booking'**
+  String get serialBooking;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

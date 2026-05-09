@@ -5,37 +5,42 @@ import 'package:rxdigi/features/settings/view/settings_screen.dart';
 import '../features/splash/splash_screen.dart';
 import 'app_string.dart';
 
-class AppRoutes{
-  static const String splashRoute="/";
-  static const String homeScreenRoute ="/homeScreen";
-  static const String settingsScreenRoute ="/settingsScreen";
-  static const String bottomNavBarRoute="/bottomNavbarRoute";
-  static const String loginRoute="/loginScreen";
-  static const String personalInfoScreen="/personalInfoScreen";
-  static const String onboardingFlow="/onboardingFlow";
-
+class AppRoutes {
+  static const String splashRoute = "/";
+  static const String homeScreenRoute = "/homeScreen";
+  static const String settingsScreenRoute = "/settingsScreen";
+  static const String bottomNavBarRoute = "/bottomNavbarRoute";
+  static const String loginRoute = "/loginScreen";
+  static const String personalInfoScreen = "/personalInfoScreen";
+  static const String onboardingFlow = "/onboardingFlow";
 }
-class RouteGenerator{
-  static Route<dynamic>getRoute(RouteSettings routeSettings){
+
+class RouteGenerator {
+  static Route<dynamic> getRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
       case AppRoutes.splashRoute:
-         return MaterialPageRoute(builder: (_)=> SplashScreen());
-      case AppRoutes.homeScreenRoute:
-        return MaterialPageRoute(builder: (_)=> HomeScreen());
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
       case AppRoutes.settingsScreenRoute:
-        return MaterialPageRoute(builder: (_)=> SettingsScreen());
+        return MaterialPageRoute(builder: (_) => const SettingsScreen());
       case AppRoutes.onboardingFlow:
-        return MaterialPageRoute(builder: (_)=> OnboardingFlow());
-
+        return MaterialPageRoute(builder: (_) => const OnboardingFlow());
+      case AppRoutes.homeScreenRoute:
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
       default:
-        return unDefineRoute();
+        return undefinedRoute();
     }
-
   }
-  static Route<dynamic>unDefineRoute(){
-    return MaterialPageRoute(builder: (_)=>Scaffold(
-      appBar: AppBar(title: Text(AppString.noRoute),),
-      body: Center(child: Text(AppString.noRoute),),
-    ));
+
+  static Route<dynamic> undefinedRoute() {
+    return MaterialPageRoute(
+      builder: (_) => Scaffold(
+        appBar: AppBar(
+          title: const Text(AppString.noRoute),
+        ),
+        body: const Center(
+          child: Text(AppString.noRoute),
+        ),
+      ),
+    );
   }
 }

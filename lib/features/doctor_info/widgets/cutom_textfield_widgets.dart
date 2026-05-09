@@ -5,14 +5,29 @@ class CustomTextFieldWidgets extends StatelessWidget {
   final String? hintText;
   final String? labelText;
   final IconData? prefixIcon;
+  final ValueChanged<String>? onChanged;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
 
   const CustomTextFieldWidgets({
-    super.key, this.hintText, this.labelText, this.prefixIcon,
+    super.key,
+    this.hintText,
+    this.labelText,
+    this.prefixIcon,
+    this.onChanged,
+    this.controller,
+    this.validator,
+    this.keyboardType,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
+      onChanged: onChanged,
+      validator: validator,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
         prefixIcon: Icon(
           prefixIcon, // your icon here

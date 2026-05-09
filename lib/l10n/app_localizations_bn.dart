@@ -150,5 +150,17 @@ class AppLocalizationsBn extends AppLocalizations {
   String get address => 'চেম্বারের ঠিকানা';
 
   @override
+  String get roomNumber => 'রুম নম্বর';
+
+  @override
   String get phoneNumber => 'ফোন নাম্বার';
+
+  @override
+  String get serialNumber1 => 'নম্বর ১';
+
+  @override
+  String get serialNumber2 => 'নম্বর ২';
+
+  @override
+  String get serialBooking => 'সিরিয়াল বুকিং';
 }

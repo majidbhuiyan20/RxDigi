@@ -23,9 +23,10 @@ final medicineStrengthProvider =
   return repository.getMedicinesByStrength(strength);
 });
 
-final loadMedicinesFromCsvProvider = FutureProvider<void>((ref) {
+final loadMedicinesFromCsvProvider = FutureProvider<void>((ref) async {
   final repository = ref.watch(medicineRepositoryProvider);
-  return repository.loadMedicinesFromCsv();
+  await repository.loadMedicinesFromCsv();
+  ref.invalidate(medicineListProvider);
 });
 
 final addMedicineProvider = FutureProvider.family<int, MedicineModel>((ref, medicine) {

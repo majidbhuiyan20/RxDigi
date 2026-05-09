@@ -1,28 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:rxdigi/app/app_colors.dart';
 import 'package:rxdigi/app/app_routes.dart';
 import 'package:rxdigi/app/app_text_style.dart';
+import 'package:rxdigi/core/data/providers/doctor_provider.dart';
+import 'package:rxdigi/core/data/providers/medicine_provider.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _moveToNextScreen();
+    _initializeApp();
   }
 
-  void _moveToNextScreen() async{
-    await Future.delayed(const Duration(seconds: 5));
-    Navigator.pushReplacementNamed(context, AppRoutes.onboardingFlow);
+  Future<void> _initializeApp() async {
+    // 1. Initialize Medicines (load from CSV if not already in DB)
+    await ref.read(loadMedicinesFromCsvProvider.future);
+
+    // 2. Short delay for branding
+    await Future.delayed(const Duration(seconds: 2));
+
+    // 3. Check if doctor profile exists
+    final latestDoctor = await ref.read(latestDoctorProvider.future);
+
+    if (mounted) {
+      if (latestDoctor != null) {
+        Navigator.pushReplacementNamed(context, AppRoutes.homeScreenRoute);
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.onboardingFlow);
+      }
+    }
   }
   @override
   Widget build(BuildContext context) {

@@ -53,7 +53,11 @@
   "optional": "Optional",
   "department": "Department",
   "address": "Chamber Address",
-  "phoneNumber": "Phone Number"
+  "roomNumber": "Room Number",
+  "phoneNumber": "Phone Number",
+  "serialNumber1": "Number 1",
+  "serialNumber2": "Number 2",
+  "serialBooking": "Serial Booking"
 
 
 

@@ -26,7 +26,7 @@ dependencies:
   shared_preferences: ^2.5.4
   flutter_screenutil: ^5.9.3
   dotted_border: ^3.1.0
-  sqflite: ^2.3.0
+  sqflite: ^2.4.2+1
   path: ^1.8.3
   csv: ^6.0.0
 
@@ -38,6 +38,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+
+  assets:
+    - assets/file/
+    - assets/fonts/
+    - assets/images/
 
   fonts:
     # Oswald Font Family
