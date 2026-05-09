@@ -12,6 +12,7 @@ import 'package:rxdigi/core/data/providers/patient_provider.dart';
 import 'package:rxdigi/features/medicines/view/medicines_screen.dart';
 import 'package:rxdigi/features/patients/view/patient_details_screen.dart';
 import 'package:rxdigi/features/patients/view/patients_screen.dart';
+import 'package:rxdigi/features/prescription/view/prescription_details_screen.dart';
 
 import '../../../core/data/providers/prescription_provider.dart' as core_providers;
 import '../../../core/utils/pdf_generator.dart';
@@ -36,35 +37,49 @@ class HomeScreen extends ConsumerWidget {
               return const Center(child: Text('No doctor profile found.'));
             }
 
-            // আজকের তারিখ
             final String todayDate = DateFormat('EEEE, d MMMM yyyy').format(DateTime.now());
 
-            // আজকের সামারি ক্যালকুলেশন
-            int todayCount = 0;
+            int todayPrescriptionCount = 0;
+            int todayUniquePatientsCount = 0;
+
             if (prescriptionsAsync.hasValue) {
               final now = DateTime.now();
-              todayCount = prescriptionsAsync.value!.where((p) {
-                if (p.createdAt == null) return false;
-                return p.createdAt!.year == now.year &&
-                    p.createdAt!.month == now.month &&
-                    p.createdAt!.day == now.day;
-              }).length;
+              final todayPrescriptions = prescriptionsAsync.value!.where((p) {
+                // Using prescription.date instead of createdAt for business logic
+                return p.date.year == now.year &&
+                    p.date.month == now.month &&
+                    p.date.day == now.day;
+              }).toList();
+              
+              todayPrescriptionCount = todayPrescriptions.length;
+              todayUniquePatientsCount = todayPrescriptions.map((p) => p.patientId).toSet().length;
             }
 
             return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- ১. ডক্টরের পরিচয় ও হেডার ---
+                  // --- 1. Enhanced Header ---
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
                     decoration: BoxDecoration(
-                      color: AppColors.topHeaderColor,
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(32),
-                        bottomRight: Radius.circular(32),
+                      gradient: LinearGradient(
+                        colors: [AppColors.topHeaderColor, AppColors.primaryColor],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(40),
+                        bottomRight: Radius.circular(40),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryColor.withOpacity(0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,18 +92,21 @@ class HomeScreen extends ConsumerWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Good Day,',
+                                    todayDate.toUpperCase(),
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.7),
-                                      fontSize: 16,
+                                      color: Colors.white.withOpacity(0.6),
+                                      fontSize: 12,
+                                      letterSpacing: 1.2,
+                                      fontWeight: FontWeight.bold,
                                       fontFamily: 'PlusJakartaSans',
                                     ),
                                   ),
+                                  const SizedBox(height: 4),
                                   Text(
-                                    '${doctor.title ?? ''} ${doctor.fullName}',
+                                    'Welcome, ${doctor.title ?? ''} ${doctor.fullName.split(' ').first}',
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 24,
+                                      fontSize: 26,
                                       fontWeight: FontWeight.bold,
                                       fontFamily: 'PlayfairDisplay',
                                     ),
@@ -96,37 +114,31 @@ class HomeScreen extends ConsumerWidget {
                                 ],
                               ),
                             ),
-                            // সেটিংস আইকন
                             GestureDetector(
                               onTap: () => Navigator.pushNamed(context, AppRoutes.settingsScreenRoute),
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  shape: BoxShape.circle,
+                              child: Hero(
+                                tag: 'settings_icon',
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                  ),
+                                  child: const Icon(Icons.settings_outlined, color: Colors.white, size: 24),
                                 ),
-                                child: const Icon(Icons.settings, color: Colors.white, size: 24),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          doctor.degrees ?? '',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 14,
-                            fontFamily: 'PlusJakartaSans',
-                          ),
-                        ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 24),
                         Row(
                           children: [
-                            const Icon(Icons.local_hospital, color: Colors.white70, size: 14),
-                            const SizedBox(width: 6),
+                            const Icon(Icons.location_on, color: Colors.white70, size: 16),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                doctor.clinicName ?? '',
+                                doctor.clinicName,
                                 style: const TextStyle(
                                   color: Colors.white70,
                                   fontSize: 14,
@@ -136,33 +148,43 @@ class HomeScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
-                        // আজকের তারিখ
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            todayDate,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Transform.translate(
+                      offset: const Offset(0, -20),
+                      child: Row(
+                        children: [
+                          _buildSummaryCard(
+                            context,
+                            title: "Prescriptions",
+                            count: todayPrescriptionCount.toString(),
+                            icon: Icons.assignment_outlined,
+                            color: AppColors.actionBlue,
+                          ),
+                          const SizedBox(width: 16),
+                          _buildSummaryCard(
+                            context,
+                            title: "Today's Patients",
+                            count: todayUniquePatientsCount.toString(),
+                            icon: Icons.groups_outlined,
+                            color: AppColors.successColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // --- ২. Quick Actions Grid ---
+                        // --- 2. Quick Actions ---
+                        const SizedBox(height: 12),
                         Text(
                           "Quick Actions",
                           style: AppTextStyles.largeBlackTextStyle(context).copyWith(fontSize: 18),
@@ -174,12 +196,12 @@ class HomeScreen extends ConsumerWidget {
                           crossAxisCount: 2,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
-                          childAspectRatio: 1.5,
+                          childAspectRatio: 2.2,
                           children: [
                             _buildQuickAction(
                               context,
                               title: "New Rx",
-                              icon: Icons.add_rounded,
+                              icon: Icons.add_circle_outline,
                               color: AppColors.actionBlue,
                               onTap: () => Navigator.push(
                                 context,
@@ -189,19 +211,17 @@ class HomeScreen extends ConsumerWidget {
                             _buildQuickAction(
                               context,
                               title: "Patients",
-                              icon: Icons.people_rounded,
+                              icon: Icons.person_search_outlined,
                               color: AppColors.actionOrange,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const PatientsScreen()),
-                                );
-                              },
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const PatientsScreen()),
+                              ),
                             ),
                             _buildQuickAction(
                               context,
                               title: "Medicines",
-                              icon: Icons.medication_rounded,
+                              icon: Icons.inventory_2_outlined,
                               color: AppColors.actionTeal,
                               onTap: () => Navigator.push(
                                 context,
@@ -211,61 +231,34 @@ class HomeScreen extends ConsumerWidget {
                             _buildQuickAction(
                               context,
                               title: "Reports",
-                              icon: Icons.analytics_rounded,
+                              icon: Icons.bar_chart_outlined,
                               color: AppColors.actionPurple,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const ReportsScreen()),
-                                );
-                              },
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ReportsScreen()),
+                              ),
                             ),
                           ],
                         ),
 
                         const SizedBox(height: 32),
 
-                        // --- ৩. আজকের Summary ---
-                        Text(
-                          "Today's Overview",
-                          style: AppTextStyles.largeBlackTextStyle(context).copyWith(fontSize: 18),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            _buildSummaryCard(
-                              context,
-                              title: "Prescriptions",
-                              count: todayCount.toString(),
-                              icon: Icons.assignment_rounded,
-                              color: AppColors.infoColor,
-                            ),
-                            const SizedBox(width: 16),
-                            _buildSummaryCard(
-                              context,
-                              title: "Patients",
-                              count: todayCount.toString(),
-                              icon: Icons.person_pin_rounded,
-                              color: AppColors.successColor,
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 32),
-
-                        // --- ৪. Recent Prescriptions ---
+                        // --- 3. Recent Prescriptions ---
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Recent Prescriptions",
+                              "Recent Activity",
                               style: AppTextStyles.largeBlackTextStyle(context).copyWith(fontSize: 18),
                             ),
                             TextButton(
                               onPressed: () {
-                                // Navigate to a full list or patients screen
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const PatientsScreen()),
+                                );
                               },
-                              child: Text("View All", style: TextStyle(color: AppColors.primaryColor)),
+                              child: Text("View All", style: TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
@@ -273,20 +266,10 @@ class HomeScreen extends ConsumerWidget {
                         prescriptionsAsync.when(
                           data: (prescriptions) {
                             if (prescriptions.isEmpty) {
-                              return Container(
-                                padding: const EdgeInsets.all(24),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: AppColors.borderColor),
-                                ),
-                                child: const Center(
-                                  child: Text("No prescriptions yet"),
-                                ),
-                              );
+                              return _buildEmptyState();
                             }
                             
-                            final recent = prescriptions.take(5).toList();
+                            final recent = prescriptions.take(10).toList();
                             return ListView.separated(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
@@ -298,7 +281,10 @@ class HomeScreen extends ConsumerWidget {
                               },
                             );
                           },
-                          loading: () => const Center(child: CircularProgressIndicator()),
+                          loading: () => const Center(child: Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: CircularProgressIndicator(),
+                          )),
                           error: (err, stack) => Text('Error: $err'),
                         ),
 
@@ -317,20 +303,47 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildEmptyState() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.borderColor.withOpacity(0.5)),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.description_outlined, size: 64, color: AppColors.textGreyColor.withOpacity(0.2)),
+          const SizedBox(height: 16),
+          Text(
+            "No prescriptions yet",
+            style: TextStyle(color: AppColors.textGreyColor, fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            "Start by creating your first prescription",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: AppColors.textGreyColor, fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSummaryCard(BuildContext context,
       {required String title, required String count, required IconData icon, required Color color}) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.borderColor, width: 1),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -338,27 +351,27 @@ class HomeScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: color, size: 24),
+              child: Icon(icon, color: color, size: 22),
             ),
             const SizedBox(height: 16),
             Text(
               count,
               style: const TextStyle(
-                fontSize: 28,
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               title,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 color: AppColors.textGreyColor,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'PlusJakartaSans',
@@ -372,43 +385,39 @@ class HomeScreen extends ConsumerWidget {
 
   Widget _buildQuickAction(BuildContext context,
       {required String title, required IconData icon, required Color color, required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
+    return Material(
+      color: Colors.white,
       borderRadius: BorderRadius.circular(20),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.borderColor),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.borderColor.withOpacity(0.5)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 20),
               ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.black87,
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: Colors.black87,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -417,91 +426,78 @@ class HomeScreen extends ConsumerWidget {
   Widget _buildRecentPrescriptionCard(BuildContext context, WidgetRef ref, PrescriptionModel prescription) {
     final patientAsync = ref.watch(getPatientProvider(prescription.patientId));
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderColor),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(Icons.description_outlined, color: AppColors.primaryColor),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                patientAsync.when(
-                  data: (patient) => Text(
-                    patient?.name ?? 'Unknown Patient',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    return patientAsync.when(
+      data: (patient) {
+        if (patient == null) return const SizedBox.shrink();
+        
+        return Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PrescriptionDetailsScreen(
+                    prescription: prescription,
+                    patient: patient,
                   ),
-                  loading: () => const Text('Loading...'),
-                  error: (_, __) => const Text('Error loading patient'),
                 ),
-                Text(
-                  DateFormat('dd MMM, yyyy • hh:mm a').format(prescription.date),
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-                ),
-              ],
-            ),
-          ),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: Colors.grey.shade400),
-            onSelected: (value) async {
-              final patient = patientAsync.asData?.value;
-              if (patient == null) return;
-
-              if (value == 'edit') {
-                ref.read(prescriptionProvider.notifier).setPrescription(prescription, patient);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const NewPrescriptionScreen()),
-                );
-              } else if (value == 'delete') {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Delete Prescription'),
-                    content: const Text('Are you sure you want to delete this prescription?'),
-                    actions: [
-                      TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        style: TextButton.styleFrom(foregroundColor: Colors.red),
-                        child: const Text('Delete'),
-                      ),
-                    ],
-                  ),
-                );
-
-                if (confirm == true) {
-                  await ref.read(core_providers.deletePrescriptionProvider(prescription.id!).future);
-                  ref.invalidate(core_providers.prescriptionListProvider);
-                }
-              } else if (value == 'print') {
-                final doctor = await ref.read(latestDoctorProvider.future);
-                if (doctor != null) {
-                  await PdfGenerator.printPrescription(prescription, patient, doctor);
-                }
-              }
+              );
             },
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit, size: 20), SizedBox(width: 8), Text('Edit')])),
-              const PopupMenuItem(value: 'print', child: Row(children: [Icon(Icons.print, size: 20), SizedBox(width: 8), Text('Print')])),
-              const PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 20), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))])),
-            ],
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.borderColor.withOpacity(0.5)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    height: 48,
+                    width: 48,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        patient.name.substring(0, 1).toUpperCase(),
+                        style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          patient.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          DateFormat('dd MMM, yyyy • hh:mm a').format(prescription.date),
+                          style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.chevron_right, color: Colors.grey.shade400),
+                ],
+              ),
+            ),
           ),
-        ],
-      ),
+        );
+      },
+      loading: () => const SizedBox(height: 80, child: Center(child: CircularProgressIndicator())),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

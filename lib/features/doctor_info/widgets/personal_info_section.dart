@@ -9,7 +9,7 @@ import 'card_section_title.dart';
 import 'card_title_section.dart';
 import 'cutom_textfield_widgets.dart';
 
-class PersonalInfoSection extends ConsumerWidget {
+class PersonalInfoSection extends ConsumerStatefulWidget {
   const PersonalInfoSection({
     super.key,
     required this.isDesktop,
@@ -20,28 +20,52 @@ class PersonalInfoSection extends ConsumerWidget {
   final AppLocalizations l10n;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PersonalInfoSection> createState() => _PersonalInfoSectionState();
+}
+
+class _PersonalInfoSectionState extends ConsumerState<PersonalInfoSection> {
+  late TextEditingController _nameController;
+  late TextEditingController _regController;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = ref.read(doctorOnboardingProvider);
+    _nameController = TextEditingController(text: state.fullName);
+    _regController = TextEditingController(text: state.bmdcRegNo);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _regController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final onboardingState = ref.watch(doctorOnboardingProvider);
     final notifier = ref.read(doctorOnboardingProvider.notifier);
 
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: AppColors.borderColor,
-          width: isDesktop ? 3 : 1.5,
+          width: widget.isDesktop ? 3 : 1.5,
         ),
         color: Colors.white,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CardTitleSection(icon: Icons.person, title: l10n.personalInfo,),
-          SizedBox(height: 8,),
-          CardSectionTitle(title: l10n.fullName,),
-          SizedBox(height: 8,),
+          CardTitleSection(icon: Icons.person, title: widget.l10n.personalInfo,),
+          const SizedBox(height: 8,),
+          CardSectionTitle(title: widget.l10n.fullName,),
+          const SizedBox(height: 8,),
           CustomTextFieldWidgets(
+            controller: _nameController,
             hintText: "Enter Your Full Name",
             prefixIcon: Icons.person,
             onChanged: (value) => notifier.updateField(fullName: value),
@@ -52,9 +76,9 @@ class PersonalInfoSection extends ConsumerWidget {
               return null;
             },
           ),
-          SizedBox(height: 8,),
-          CardSectionTitle(title: l10n.title,),
-          SizedBox(height: 8,),
+          const SizedBox(height: 8,),
+          CardSectionTitle(title: widget.l10n.title,),
+          const SizedBox(height: 8,),
           FormField<String>(
             initialValue: onboardingState.title,
             validator: (value) {
@@ -117,9 +141,9 @@ class PersonalInfoSection extends ConsumerWidget {
               );
             },
           ),
-          SizedBox(height: 8,),
-          CardSectionTitle(title: l10n.gender,),
-          SizedBox(height: 8,),
+          const SizedBox(height: 8,),
+          CardSectionTitle(title: widget.l10n.gender,),
+          const SizedBox(height: 8,),
           FormField<String>(
             initialValue: onboardingState.gender,
             validator: (value) {
@@ -137,27 +161,27 @@ class PersonalInfoSection extends ConsumerWidget {
                     runSpacing: 8,
                     children: [
                       SelectableTitleChip(
-                        title: l10n.male,
-                        isSelected: onboardingState.gender == l10n.male,
+                        title: widget.l10n.male,
+                        isSelected: onboardingState.gender == widget.l10n.male,
                         onTap: () {
-                          notifier.updateField(gender: l10n.male);
-                          state.didChange(l10n.male);
+                          notifier.updateField(gender: widget.l10n.male);
+                          state.didChange(widget.l10n.male);
                         },
                       ),
                       SelectableTitleChip(
-                        title: l10n.female,
-                        isSelected: onboardingState.gender == l10n.female,
+                        title: widget.l10n.female,
+                        isSelected: onboardingState.gender == widget.l10n.female,
                         onTap: () {
-                          notifier.updateField(gender: l10n.female);
-                          state.didChange(l10n.female);
+                          notifier.updateField(gender: widget.l10n.female);
+                          state.didChange(widget.l10n.female);
                         },
                       ),
                       SelectableTitleChip(
-                        title: l10n.others,
-                        isSelected: onboardingState.gender == l10n.others,
+                        title: widget.l10n.others,
+                        isSelected: onboardingState.gender == widget.l10n.others,
                         onTap: () {
-                          notifier.updateField(gender: l10n.others);
-                          state.didChange(l10n.others);
+                          notifier.updateField(gender: widget.l10n.others);
+                          state.didChange(widget.l10n.others);
                         },
                       ),
                     ],
@@ -174,9 +198,10 @@ class PersonalInfoSection extends ConsumerWidget {
               );
             },
           ),
-          SizedBox(height: 8,),
-          CardSectionTitle(title: 'BMDC Reg No.',),
+          const SizedBox(height: 8,),
+          const CardSectionTitle(title: 'BMDC Reg No.',),
           CustomTextFieldWidgets(
+            controller: _regController,
             hintText: "Ex: A-4434",
             prefixIcon: Icons.confirmation_num,
             onChanged: (value) => notifier.updateField(bmdcRegNo: value),
@@ -187,10 +212,7 @@ class PersonalInfoSection extends ConsumerWidget {
               return null;
             },
           ),
-          SizedBox(height: 8,),
-
-
-
+          const SizedBox(height: 8,),
         ],
       ),
     );
