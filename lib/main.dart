@@ -8,33 +8,33 @@ import 'firebase_options.dart';
 import 'l10n/local_provider.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // ✅ load saved locale code BEFORE runApp
-  final savedCode = await loadSavedLocaleCode();
-  debugPrint("🌍 Starting with locale: $savedCode");
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  FlutterError.onError =
-      FirebaseCrashlytics.instance.recordFlutterFatalError;
-
   runZonedGuarded(
-        () {
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+
+      // ✅ load saved locale code BEFORE runApp
+      final savedCode = await loadSavedLocaleCode();
+      debugPrint("🌍 Starting with locale: $savedCode");
+
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
+
       runApp(
         ProviderScope(
           overrides: [
             localeProvider.overrideWith(
-                  () => LocaleNotifier(savedCode),
+              () => LocaleNotifier(savedCode),
             ),
           ],
           child: const RxDigi(),
         ),
       );
     },
-        (error, stack) {
+    (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack);
     },
   );

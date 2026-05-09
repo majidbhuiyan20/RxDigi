@@ -94,23 +94,62 @@ class MedicineRepository extends BaseRepository<MedicineModel> {
         return;
       }
 
+      print('Loading medicines from CSV...');
       // Load CSV file
       final csvString = await rootBundle.loadString(_csvPath);
-      final List<List<dynamic>> rows = CsvToListConverter().convert(csvString);
+      final List<List<dynamic>> rows = const CsvToListConverter().convert(csvString);
 
-      // Skip header row and insert medicines
-      for (var i = 1; i < rows.length; i++) {
-        final row = rows[i];
-        if (row.isNotEmpty) {
-          final medicine = MedicineModel.fromCsv(
-            row.map((e) => e.toString()).toList(),
-          );
-          await insert(medicine);
+      // Use a transaction for much faster batch inserts
+      await db.transaction((txn) async {
+        final batch = txn.batch();
+        // Skip header row
+        for (var i = 1; i < rows.length; i++) {
+          final row = rows[i];
+          if (row.length >= 8) {
+            final medicine = MedicineModel.fromCsv(
+              row.map((e) => e.toString()).toList(),
+            );
+            batch.insert('medicines', medicine.toMap());
+          }
         }
-      }
-      print('Medicines loaded from CSV successfully');
+        await batch.commit(noResult: true);
+      });
+      
+      print('Medicines loaded from CSV successfully. Total: ${rows.length - 1}');
     } catch (e) {
       print('Error loading medicines from CSV: $e');
+    }
+  }
+
+  Future<List<MedicineModel>> getMedicinesPaged({
+    required int limit,
+    required int offset,
+    String? query,
+  }) async {
+    try {
+      final db = await _databaseHelper.database;
+      
+      String? where;
+      List<dynamic>? whereArgs;
+      
+      if (query != null && query.isNotEmpty) {
+        where = 'name LIKE ? OR genericName LIKE ? OR manufacturer LIKE ?';
+        whereArgs = ['%$query%', '%$query%', '%$query%'];
+      }
+      
+      final result = await db.query(
+        'medicines',
+        where: where,
+        whereArgs: whereArgs,
+        limit: limit,
+        offset: offset,
+        orderBy: 'name ASC',
+      );
+      
+      return result.map((map) => MedicineModel.fromMap(map)).toList();
+    } catch (e) {
+      print('Error fetching paged medicines: $e');
+      return [];
     }
   }
 
@@ -121,6 +160,7 @@ class MedicineRepository extends BaseRepository<MedicineModel> {
         'medicines',
         where: 'name LIKE ? OR genericName LIKE ? OR manufacturer LIKE ?',
         whereArgs: ['%$query%', '%$query%', '%$query%'],
+        limit: 50, // Limit search results for performance
       );
       return result.map((map) => MedicineModel.fromMap(map)).toList();
     } catch (e) {

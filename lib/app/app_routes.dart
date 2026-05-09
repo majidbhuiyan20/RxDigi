@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rxdigi/features/doctor_info/view/onboarding_flow.dart';
 import 'package:rxdigi/features/home/view/home_screen.dart';
+import 'package:rxdigi/features/home/view/main_navigation_screen.dart';
 import 'package:rxdigi/features/settings/view/settings_screen.dart';
 import '../features/splash/splash_screen.dart';
 import 'app_string.dart';
@@ -9,7 +10,7 @@ class AppRoutes {
   static const String splashRoute = "/";
   static const String homeScreenRoute = "/homeScreen";
   static const String settingsScreenRoute = "/settingsScreen";
-  static const String bottomNavBarRoute = "/bottomNavbarRoute";
+  static const String mainNavigationRoute = "/mainNavigation";
   static const String loginRoute = "/loginScreen";
   static const String personalInfoScreen = "/personalInfoScreen";
   static const String onboardingFlow = "/onboardingFlow";
@@ -25,7 +26,8 @@ class RouteGenerator {
       case AppRoutes.onboardingFlow:
         return MaterialPageRoute(builder: (_) => const OnboardingFlow());
       case AppRoutes.homeScreenRoute:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case AppRoutes.mainNavigationRoute:
+        return MaterialPageRoute(builder: (_) => const MainNavigationScreen());
       default:
         return undefinedRoute();
     }
