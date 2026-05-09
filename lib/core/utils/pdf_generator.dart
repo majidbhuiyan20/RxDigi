@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -19,10 +20,18 @@ class PdfGenerator {
 
     final oswaldBold = await PdfGoogleFonts.oswaldBold();
     final oswaldRegular = await PdfGoogleFonts.oswaldRegular();
+    
+    // Load Bengali font for Unicode support
+    final bengaliFont = await PdfGoogleFonts.notoSansBengaliRegular();
 
     pdf.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
+        theme: pw.ThemeData.withFont(
+          base: oswaldRegular,
+          bold: oswaldBold,
+          fontFallback: [bengaliFont], // Crucial: ensures Bengali/Unicode works everywhere
+        ),
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,

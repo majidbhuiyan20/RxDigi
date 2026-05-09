@@ -22,7 +22,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -58,6 +58,22 @@ class DatabaseHelper {
               lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
           ''');
+        }
+        if (oldVersion < 4) {
+          // Add missing columns to prescriptions table if they don't exist
+          final List<String> columnsToAdd = [
+            'chiefComplaints', 'diagnosis', 'vitalSigns', 'pastHistory', 
+            'medicines', 'advice', 'nextVisit', 'labTests'
+          ];
+          
+          for (var column in columnsToAdd) {
+            try {
+              await db.execute('ALTER TABLE prescriptions ADD COLUMN $column TEXT');
+            } catch (e) {
+              // Column might already exist
+              print('Error adding column $column: $e');
+            }
+          }
         }
       },
     );

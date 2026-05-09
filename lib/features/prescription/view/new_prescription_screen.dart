@@ -4,6 +4,8 @@ import 'package:rxdigi/app/app_colors.dart';
 import 'package:rxdigi/core/data/repositories/doctor_repository.dart';
 import 'package:rxdigi/core/utils/pdf_generator.dart';
 import 'package:rxdigi/core/data/models/prescription_model.dart';
+import 'package:rxdigi/core/data/providers/patient_provider.dart';
+import 'package:rxdigi/core/data/providers/prescription_provider.dart' as core_providers;
 import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
 import 'package:rxdigi/features/prescription/widgets/step_patient_info.dart';
 import 'package:rxdigi/features/prescription/widgets/step_diagnosis.dart';
@@ -95,6 +97,8 @@ class _NewPrescriptionScreenState extends ConsumerState<NewPrescriptionScreen> {
                 Text(
                   _stepTitles[index],
                   textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: isCurrent ? Colors.white : Colors.white.withOpacity(0.6),
                     fontSize: 10,
@@ -214,6 +218,10 @@ class _NewPrescriptionScreenState extends ConsumerState<NewPrescriptionScreen> {
         await PdfGenerator.printPrescription(prescription, state.patient!, doctor);
         
         if (mounted) {
+          // Refresh the prescription and patient lists to show the new entry on the Home Screen
+          ref.invalidate(core_providers.prescriptionListProvider);
+          ref.invalidate(patientListProvider);
+
           notifier.reset();
           Navigator.pop(context);
         }

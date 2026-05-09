@@ -105,7 +105,19 @@ class PrescriptionNotifier extends StateNotifier<PrescriptionState> {
   }
 
   void addLabTest(String test) {
-    state = state.copyWith(labTests: [...state.labTests, test]);
+    if (!state.labTests.contains(test)) {
+      state = state.copyWith(labTests: [...state.labTests, test]);
+    }
+  }
+
+  void removeLabTest(String test) {
+    state = state.copyWith(
+      labTests: state.labTests.where((t) => t != test).toList(),
+    );
+  }
+
+  void updateLabTests(List<String> tests) {
+    state = state.copyWith(labTests: tests);
   }
 
   Future<int> savePrescription() async {

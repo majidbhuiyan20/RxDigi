@@ -253,24 +253,29 @@ class _MedicinesScreenState extends ConsumerState<MedicinesScreen> {
                                               children: [
                                                 Icon(Icons.straighten, size: 14, color: Colors.grey.shade400),
                                                 const SizedBox(width: 4),
-                                                Text(
-                                                  med.strength ?? "N/A",
-                                                  style: TextStyle(
-                                                    color: Colors.grey.shade700,
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w500,
+                                                Flexible(
+                                                  child: Text(
+                                                    med.strength ?? "N/A",
+                                                    style: TextStyle(
+                                                      color: Colors.grey.shade700,
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
                                                   ),
                                                 ),
-                                                const Spacer(),
+                                                const SizedBox(width: 8),
                                                 Icon(Icons.business, size: 14, color: Colors.grey.shade400),
                                                 const SizedBox(width: 4),
-                                                Text(
-                                                  med.manufacturer != null && med.manufacturer!.length > 20 
-                                                    ? "${med.manufacturer!.substring(0, 18)}..." 
-                                                    : med.manufacturer ?? "Unknown",
-                                                  style: TextStyle(
-                                                    color: Colors.grey.shade500,
-                                                    fontSize: 12,
+                                                Expanded(
+                                                  child: Text(
+                                                    med.manufacturer ?? "Unknown",
+                                                    style: TextStyle(
+                                                      color: Colors.grey.shade500,
+                                                      fontSize: 12,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                    maxLines: 1,
                                                   ),
                                                 ),
                                               ],
