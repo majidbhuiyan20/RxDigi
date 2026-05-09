@@ -230,7 +230,7 @@ class _StepPreviewState extends ConsumerState<StepPreview> {
         const SnackBar(content: Text('Prescription saved successfully')),
       );
       
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.of(context).pop();
     } else if (mounted) {
       setState(() => _isSaving = false);
       ScaffoldMessenger.of(context).showSnackBar(

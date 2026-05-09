@@ -489,6 +489,10 @@ class HomeScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, color: Colors.red.shade300, size: 20),
+                    onPressed: () => _confirmDeletePrescription(context, ref, prescription, patient.name),
+                  ),
                   Icon(Icons.chevron_right, color: Colors.grey.shade400),
                 ],
               ),
@@ -498,6 +502,38 @@ class HomeScreen extends ConsumerWidget {
       },
       loading: () => const SizedBox(height: 80, child: Center(child: CircularProgressIndicator())),
       error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  void _confirmDeletePrescription(BuildContext context, WidgetRef ref, PrescriptionModel prescription, String patientName) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Prescription?'),
+        content: Text('Are you sure you want to delete the prescription for $patientName?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (prescription.id != null) {
+                await ref.read(prescriptionRepositoryProvider).delete(prescription.id!);
+                ref.invalidate(prescriptionListProvider);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Prescription deleted')),
+                  );
+                }
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
     );
   }
 }

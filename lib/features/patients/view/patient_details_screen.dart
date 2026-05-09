@@ -7,6 +7,10 @@ import 'package:rxdigi/core/data/models/prescription_model.dart';
 import 'package:rxdigi/core/data/providers/prescription_provider.dart';
 import 'package:rxdigi/core/data/providers/doctor_provider.dart';
 import 'package:rxdigi/core/utils/pdf_generator.dart';
+import 'package:rxdigi/core/data/providers/patient_provider.dart';
+import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
+import 'package:rxdigi/features/prescription/view/new_prescription_screen.dart';
+import 'package:rxdigi/features/prescription/view/prescription_details_screen.dart';
 
 class PatientDetailsScreen extends ConsumerWidget {
   final PatientModel patient;
@@ -22,6 +26,12 @@ class PatientDetailsScreen extends ConsumerWidget {
       backgroundColor: AppColors.appBackgroundColor,
       appBar: AppBar(
         title: const Text('Patient Details'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            onPressed: () => _confirmDeletePatient(context, ref),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -33,16 +43,28 @@ class PatientDetailsScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Prescription History',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Prescription History',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      TextButton.icon(
+                        onPressed: () => _addNewPrescription(context, ref),
+                        icon: const Icon(Icons.add),
+                        label: const Text('New Rx'),
+                        style: TextButton.styleFrom(foregroundColor: AppColors.primaryColor),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   prescriptionsAsync.when(
                     data: (prescriptions) {
                       final patientPrescriptions = prescriptions
                           .where((p) => p.patientId == patient.id)
-                          .toList();
+                          .toList()
+                        ..sort((a, b) => b.date.compareTo(a.date));
 
                       if (patientPrescriptions.isEmpty) {
                         return const Center(
@@ -155,6 +177,66 @@ class PatientDetailsScreen extends ConsumerWidget {
       ],
     );
   }
+
+  void _addNewPrescription(BuildContext context, WidgetRef ref) {
+    // Reset and set the current patient
+    ref.read(prescriptionProvider.notifier).reset();
+    ref.read(prescriptionProvider.notifier).setPatient(patient);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NewPrescriptionScreen(),
+      ),
+    );
+  }
+
+  void _confirmDeletePatient(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Patient?'),
+        content: Text('Are you sure you want to delete ${patient.name}? This will also delete all their prescription history.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (patient.id != null) {
+                // First delete all prescriptions for this patient
+                final repository = ref.read(prescriptionRepositoryProvider);
+                final prescriptions = await repository.getPrescriptionsByPatient(patient.id!);
+                for (var p in prescriptions) {
+                  if (p.id != null) {
+                    await ref.read(prescriptionRepositoryProvider).delete(p.id!);
+                  }
+                }
+                
+                // Then delete the patient
+                await ref.read(patientRepositoryProvider).delete(patient.id!);
+                
+                // Invalidate providers
+                ref.invalidate(patientListProvider);
+                ref.invalidate(prescriptionListProvider);
+                
+                if (context.mounted) {
+                  Navigator.pop(context); // Close dialog
+                  Navigator.pop(context); // Go back to patient list
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Patient deleted successfully')),
+                  );
+                }
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _PrescriptionHistoryCard extends ConsumerWidget {
@@ -168,80 +250,101 @@ class _PrescriptionHistoryCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final doctorAsync = ref.watch(latestDoctorProvider);
     final dateStr = DateFormat('dd MMM yyyy').format(prescription.date);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ExpansionTile(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.withOpacity(0.2)),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Icon(Icons.description_outlined, color: AppColors.primaryColor),
+        ),
         title: Text(
           'Prescription - $dateStr',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text(
-          prescription.diagnosis?.isNotEmpty == true
-              ? 'Diagnosis: ${prescription.diagnosis}'
-              : 'No diagnosis recorded',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (prescription.chiefComplaints?.isNotEmpty == true) ...[
-                  const Text('Complaints:', style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text(prescription.chiefComplaints!),
-                  const SizedBox(height: 8),
-                ],
-                const Text('Medicines:', style: TextStyle(fontWeight: FontWeight.bold)),
-                ...prescription.medicines.map((m) => Padding(
-                      padding: const EdgeInsets.only(left: 8, top: 2),
-                      child: Text('• ${m.dosageForm} ${m.medicineName} (${m.dose})'),
-                    )),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton.icon(
-                      onPressed: () => _printPrescription(context, ref),
-                      icon: const Icon(Icons.print),
-                      label: const Text('Print'),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton.icon(
-                      onPressed: () => _sharePrescription(context, ref),
-                      icon: const Icon(Icons.share),
-                      label: const Text('Share'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryColor,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text(
+              prescription.diagnosis?.isNotEmpty == true
+                  ? 'Diagnosis: ${prescription.diagnosis}'
+                  : 'No diagnosis recorded',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Colors.grey[600]),
             ),
-          ),
-        ],
+            Text(
+              '${prescription.medicines.length} Medicines',
+              style: TextStyle(color: AppColors.primaryColor, fontSize: 12, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(Icons.delete_outline, color: Colors.red.shade300, size: 20),
+              onPressed: () => _confirmDeletePrescription(context, ref),
+            ),
+            const Icon(Icons.chevron_right),
+          ],
+        ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PrescriptionDetailsScreen(
+                prescription: prescription,
+                patient: patient,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  void _printPrescription(BuildContext context, WidgetRef ref) async {
-    final doctor = ref.read(latestDoctorProvider).value;
-    if (doctor == null) return;
-
-    await PdfGenerator.printPrescription(prescription, patient, doctor);
-  }
-
-  void _sharePrescription(BuildContext context, WidgetRef ref) async {
-    final doctor = ref.read(latestDoctorProvider).value;
-    if (doctor == null) return;
-
-    await PdfGenerator.sharePrescription(prescription, patient, doctor);
+  void _confirmDeletePrescription(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Prescription?'),
+        content: const Text('Are you sure you want to delete this prescription?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (prescription.id != null) {
+                await ref.read(prescriptionRepositoryProvider).delete(prescription.id!);
+                ref.invalidate(prescriptionListProvider);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Prescription deleted')),
+                  );
+                }
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
   }
 }

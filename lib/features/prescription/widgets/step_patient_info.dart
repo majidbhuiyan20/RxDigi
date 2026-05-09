@@ -74,16 +74,17 @@ class _StepPatientInfoState extends ConsumerState<StepPatientInfo> {
     });
   }
 
-  void _createNewPatient() {
+  void _updatePatientState() {
     if (_formKey.currentState!.validate()) {
+      final currentPatient = ref.read(prescriptionProvider).patient;
       final patient = PatientModel(
+        id: currentPatient?.id, // CRITICAL: Preserve the ID so it links to existing patient
         name: _nameController.text,
         age: int.tryParse(_ageController.text),
         gender: _selectedGender,
         phone: _phoneController.text,
       );
       ref.read(prescriptionProvider.notifier).setPatient(patient);
-      // We don't save to DB yet, we'll save the whole prescription at the end
     }
   }
 
@@ -96,49 +97,51 @@ class _StepPatientInfoState extends ConsumerState<StepPatientInfo> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Search Patient',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.topHeaderColor),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _searchController,
-            onChanged: _onSearch,
-            decoration: InputDecoration(
-              hintText: 'Search by phone or name...',
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade200),
+          if (_isNewPatient) ...[
+            Text(
+              'Search Patient',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.topHeaderColor),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _searchController,
+              onChanged: _onSearch,
+              decoration: InputDecoration(
+                hintText: 'Search by phone or name...',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade200),
+                ),
               ),
             ),
-          ),
-          if (_searchResults.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+            if (_searchResults.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(top: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                ),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _searchResults.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final p = _searchResults[index];
+                    return ListTile(
+                      title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text('${p.phone ?? "No phone"} • ${p.age ?? "?"}y • ${p.gender}'),
+                      onTap: () => _selectPatient(p),
+                    );
+                  },
+                ),
               ),
-              child: ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _searchResults.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final p = _searchResults[index];
-                  return ListTile(
-                    title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('${p.phone ?? "No phone"} • ${p.age ?? "?"}y • ${p.gender}'),
-                    onTap: () => _selectPatient(p),
-                  );
-                },
-              ),
-            ),
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
+          ],
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -157,14 +160,14 @@ class _StepPatientInfoState extends ConsumerState<StepPatientInfo> {
                       ref.read(prescriptionProvider.notifier).reset();
                     });
                   },
-                  child: const Text('Clear'),
+                  child: const Text('Change Patient'),
                 ),
             ],
           ),
           const SizedBox(height: 12),
           Form(
             key: _formKey,
-            onChanged: _createNewPatient,
+            onChanged: _updatePatientState,
             child: Column(
               children: [
                 _buildTextField(
@@ -210,7 +213,7 @@ class _StepPatientInfoState extends ConsumerState<StepPatientInfo> {
                                     .toList(),
                                 onChanged: (v) {
                                   setState(() => _selectedGender = v!);
-                                  _createNewPatient();
+                                  _updatePatientState();
                                 },
                               ),
                             ),

@@ -29,6 +29,10 @@ class PrescriptionDetailsScreen extends ConsumerWidget {
         title: const Text('Prescription Details'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.download),
+            onPressed: () => _downloadPrescription(ref),
+          ),
+          IconButton(
             icon: const Icon(Icons.print),
             onPressed: () => _printPrescription(ref),
           ),
@@ -187,6 +191,13 @@ class PrescriptionDetailsScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _downloadPrescription(WidgetRef ref) async {
+    final doctor = ref.read(latestDoctorProvider).value;
+    if (doctor != null) {
+      await PdfGenerator.downloadPrescription(prescription, patient, doctor);
+    }
   }
 
   void _printPrescription(WidgetRef ref) async {
