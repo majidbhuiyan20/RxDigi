@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:rxdigi/core/data/models/prescription_model.dart';
 import 'package:rxdigi/core/data/models/patient_model.dart';
 import 'package:rxdigi/core/data/models/doctor_model.dart';
@@ -9,7 +10,8 @@ class PdfExportService {
     PatientModel patient,
     DoctorModel doctor,
   ) {
-    final medicines = prescription.medicinesDetails ?? [];
+    final medicines = prescription.medicines;
+    final dateStr = DateFormat('dd/MM/yyyy').format(prescription.date);
     
     final buffer = StringBuffer();
     
@@ -20,33 +22,33 @@ class PdfExportService {
     
     // Doctor Information
     buffer.writeln('┌─ DOCTOR INFORMATION ─────────────────────────────────────────┐');
-    buffer.writeln('│ Name: ${doctor.fullName}');
-    buffer.writeln('│ Title: ${doctor.title}');
-    buffer.writeln('│ Registration No: ${doctor.bmdcRegNo}');
-    buffer.writeln('│ Specialization: ${doctor.specialization}');
-    buffer.writeln('│ Chamber: ${doctor.clinicName}');
-    buffer.writeln('│ Phone: ${doctor.phoneNumber}');
-    buffer.writeln('│ Hours: ${doctor.startTime} - ${doctor.endTime}');
+    buffer.writeln('│ Name: ${doctor.fullName.padRight(54)} │');
+    buffer.writeln('│ Title: ${(doctor.title ?? "").padRight(53)} │');
+    buffer.writeln('│ Registration No: ${(doctor.bmdcRegNo ?? "").padRight(42)} │');
+    buffer.writeln('│ Specialization: ${(doctor.specialization ?? "").padRight(43)} │');
+    buffer.writeln('│ Chamber: ${doctor.clinicName.padRight(50)} │');
+    buffer.writeln('│ Phone: ${(doctor.phoneNumber ?? "").padRight(52)} │');
+    buffer.writeln('│ Hours: ${((doctor.startTime ?? "") + " - " + (doctor.endTime ?? "")).padRight(52)} │');
     buffer.writeln('└──────────────────────────────────────────────────────────────┘');
     buffer.writeln('');
     
     // Patient Information
     buffer.writeln('┌─ PATIENT INFORMATION ────────────────────────────────────────┐');
-    buffer.writeln('│ Name: ${patient.name}');
-    buffer.writeln('│ Age: ${patient.age}');
-    buffer.writeln('│ Gender: ${patient.gender}');
-    buffer.writeln('│ Phone: ${patient.phone}');
-    buffer.writeln('│ Address: ${patient.address}');
+    buffer.writeln('│ Name: ${patient.name.padRight(54)} │');
+    buffer.writeln('│ Age: ${(patient.age?.toString() ?? "").padRight(55)} │');
+    buffer.writeln('│ Gender: ${(patient.gender ?? "").padRight(52)} │');
+    buffer.writeln('│ Phone: ${(patient.phone ?? "").padRight(53)} │');
+    buffer.writeln('│ Address: ${(patient.address ?? "").padRight(51)} │');
     buffer.writeln('└──────────────────────────────────────────────────────────────┘');
     buffer.writeln('');
     
     // Prescription Date
-    buffer.writeln('Date: ${prescription.date}');
+    buffer.writeln('Date: $dateStr');
     buffer.writeln('');
     
     // Diagnosis
     buffer.writeln('┌─ DIAGNOSIS ──────────────────────────────────────────────────┐');
-    buffer.writeln('│ ${prescription.diagnosis}');
+    buffer.writeln('│ ${(prescription.diagnosis ?? "").padRight(60)} │');
     buffer.writeln('└──────────────────────────────────────────────────────────────┘');
     buffer.writeln('');
     
@@ -56,23 +58,23 @@ class PdfExportService {
     
     for (var i = 0; i < medicines.length; i++) {
       final medicine = medicines[i];
-      buffer.writeln('│ ${i + 1}. ${medicine.medicineName}');
-      buffer.writeln('│    Strength: ${medicine.strength}');
-      buffer.writeln('│    Generic: ${medicine.genericName}');
-      buffer.writeln('│    Manufacturer: ${medicine.manufacturer}');
-      buffer.writeln('│    Dose: ${medicine.dose}');
-      buffer.writeln('│    Duration: ${medicine.duration}');
-      buffer.writeln('│    Instructions: ${medicine.instruction}');
+      buffer.writeln('│ ${i + 1}. ${(medicine.medicineName ?? "").padRight(57)} │');
+      buffer.writeln('│    Strength: ${(medicine.strength ?? "").padRight(48)} │');
+      buffer.writeln('│    Generic: ${(medicine.genericName ?? "").padRight(49)} │');
+      buffer.writeln('│    Manufacturer: ${(medicine.manufacturer ?? "").padRight(44)} │');
+      buffer.writeln('│    Dose: ${(medicine.dose ?? "").padRight(52)} │');
+      buffer.writeln('│    Duration: ${(medicine.duration ?? "").padRight(48)} │');
+      buffer.writeln('│    Instructions: ${(medicine.instruction ?? "").padRight(44)} │');
       buffer.writeln('│');
     }
     
     buffer.writeln('└──────────────────────────────────────────────────────────────┘');
     buffer.writeln('');
     
-    // Notes
-    if (prescription.notes != null && prescription.notes!.isNotEmpty) {
-      buffer.writeln('┌─ ADDITIONAL NOTES ───────────────────────────────────────────┐');
-      buffer.writeln('│ ${prescription.notes}');
+    // Advice
+    if (prescription.advice != null && prescription.advice!.isNotEmpty) {
+      buffer.writeln('┌─ ADVICE ─────────────────────────────────────────────────────┐');
+      buffer.writeln('│ ${prescription.advice!.padRight(60)} │');
       buffer.writeln('└──────────────────────────────────────────────────────────────┘');
       buffer.writeln('');
     }
@@ -99,16 +101,17 @@ class PdfExportService {
     PatientModel patient,
     DoctorModel doctor,
   ) {
-    final medicines = prescription.medicinesDetails ?? [];
+    final medicines = prescription.medicines;
+    final dateStr = DateFormat('yyyy-MM-dd').format(prescription.date);
     
     final buffer = StringBuffer();
     buffer.writeln('Doctor Name,Specialization,Patient Name,Patient Age,Prescription Date,Diagnosis,Medicine,Strength,Dose,Duration,Instructions');
     
     if (medicines.isEmpty) {
-      buffer.writeln('${doctor.fullName},${doctor.specialization},${patient.name},${patient.age},${prescription.date},${prescription.diagnosis},N/A,N/A,N/A,N/A,N/A');
+      buffer.writeln('${doctor.fullName},${doctor.specialization ?? ""},${patient.name},${patient.age ?? ""},$dateStr,${prescription.diagnosis ?? ""},N/A,N/A,N/A,N/A,N/A');
     } else {
       for (final medicine in medicines) {
-        buffer.writeln('${doctor.fullName},${doctor.specialization},${patient.name},${patient.age},${prescription.date},${prescription.diagnosis},${medicine.medicineName},${medicine.strength},${medicine.dose},${medicine.duration},${medicine.instruction}');
+        buffer.writeln('${doctor.fullName},${doctor.specialization ?? ""},${patient.name},${patient.age ?? ""},$dateStr,${prescription.diagnosis ?? ""},${medicine.medicineName ?? ""},${medicine.strength ?? ""},${medicine.dose ?? ""},${medicine.duration ?? ""},${medicine.instruction ?? ""}');
       }
     }
     
@@ -121,15 +124,13 @@ class PdfExportService {
     PatientModel patient,
     DoctorModel doctor,
   ) {
-    final medicines = prescription.medicinesDetails ?? [];
-    
     return {
       'doctorName': doctor.fullName,
       'patientName': patient.name,
-      'date': prescription.date ?? 'N/A',
-      'totalMedicines': medicines.length.toString(),
+      'date': DateFormat('dd MMM yyyy').format(prescription.date),
+      'totalMedicines': prescription.medicines.length.toString(),
       'diagnosis': prescription.diagnosis ?? 'N/A',
-      'notes': prescription.notes ?? 'N/A',
+      'advice': prescription.advice ?? 'N/A',
     };
   }
 }

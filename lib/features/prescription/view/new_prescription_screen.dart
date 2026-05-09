@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdigi/app/app_colors.dart';
+import 'package:rxdigi/core/data/repositories/doctor_repository.dart';
+import 'package:rxdigi/core/utils/pdf_generator.dart';
+import 'package:rxdigi/core/data/models/prescription_model.dart';
 import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
 import 'package:rxdigi/features/prescription/widgets/step_patient_info.dart';
 import 'package:rxdigi/features/prescription/widgets/step_diagnosis.dart';
@@ -176,7 +179,49 @@ class _NewPrescriptionScreenState extends ConsumerState<NewPrescriptionScreen> {
     );
   }
 
-  void _finishPrescription() {
-    // Logic to save to database and navigate to sharing/printing
+  void _finishPrescription() async {
+    final notifier = ref.read(prescriptionProvider.notifier);
+    final state = ref.read(prescriptionProvider);
+
+    if (state.patient == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please add patient information first')),
+      );
+      setState(() => _currentStep = 0);
+      return;
+    }
+
+    final id = await notifier.savePrescription();
+
+    if (id != -1 && mounted) {
+      final doctor = await DoctorRepository().getLatestDoctor();
+      if (doctor != null) {
+        final prescription = PrescriptionModel(
+          id: id,
+          patientId: state.patient!.id ?? -1,
+          doctorId: doctor.id,
+          date: DateTime.now(),
+          chiefComplaints: state.chiefComplaints,
+          diagnosis: state.diagnosis,
+          vitalSigns: state.vitalSigns,
+          pastHistory: state.pastHistory,
+          medicines: state.medicines,
+          advice: state.advice,
+          nextVisit: state.nextVisit,
+          labTests: state.labTests,
+        );
+
+        await PdfGenerator.printPrescription(prescription, state.patient!, doctor);
+        
+        if (mounted) {
+          notifier.reset();
+          Navigator.pop(context);
+        }
+      }
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to save prescription')),
+      );
+    }
   }
 }

@@ -61,6 +61,12 @@ class StepPreview extends ConsumerWidget {
               Text(state.diagnosis!, style: const TextStyle(fontWeight: FontWeight.w500)),
               const SizedBox(height: 12),
             ],
+
+            if (state.pastHistory != null && state.pastHistory!.isNotEmpty) ...[
+              const Text('Past History:', style: TextStyle(fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+              Text(state.pastHistory!),
+              const SizedBox(height: 12),
+            ],
             
             if (state.vitalSigns != null && state.vitalSigns!.isNotEmpty) ...[
               Text('Vitals: ${state.vitalSigns!}', style: const TextStyle(fontSize: 12, color: Colors.grey)),

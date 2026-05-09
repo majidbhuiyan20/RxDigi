@@ -7,6 +7,8 @@ import 'package:rxdigi/app/app_text_style.dart';
 import 'package:rxdigi/core/data/providers/doctor_provider.dart';
 import 'package:rxdigi/core/data/providers/prescription_provider.dart';
 
+import '../../prescription/view/new_prescription_screen.dart';
+
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -155,7 +157,10 @@ class HomeScreen extends ConsumerWidget {
                         const SizedBox(height: 10),
                         GestureDetector(
                           onTap: () {
-                            // TODO: প্রেসক্রিপশন তৈরির পেজে নেভিগেট করুন
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const NewPrescriptionScreen()),
+                            );
                           },
                           child: Container(
                             width: double.infinity,

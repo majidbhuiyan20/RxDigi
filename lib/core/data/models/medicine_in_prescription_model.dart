@@ -10,6 +10,7 @@ class MedicineInPrescription {
   final String? duration; // e.g., "5 days"
   final String? instruction; // e.g., "After meal"
   final String? genericName;
+  final String? dosageForm;
   final String? manufacturer;
 
   MedicineInPrescription({
@@ -21,10 +22,11 @@ class MedicineInPrescription {
     required this.duration,
     required this.instruction,
     this.genericName,
+    this.dosageForm,
     this.manufacturer,
   });
 
-  // Convert to JSON for storage in prescriptions.medicines column
+  // Convert to JSON for storage
   Map<String, dynamic> toMap() {
     return {
       'medicineId': medicineId,
@@ -34,6 +36,7 @@ class MedicineInPrescription {
       'duration': duration,
       'instruction': instruction,
       'genericName': genericName,
+      'dosageForm': dosageForm,
       'manufacturer': manufacturer,
     };
   }
@@ -49,19 +52,17 @@ class MedicineInPrescription {
       duration: map['duration'],
       instruction: map['instruction'],
       genericName: map['genericName'],
+      dosageForm: map['dosageForm'],
       manufacturer: map['manufacturer'],
     );
   }
 
-  // Convert to JSON string for storage
   String toJson() => jsonEncode(toMap());
 
-  // Create from JSON string
   factory MedicineInPrescription.fromJson(String json) {
     return MedicineInPrescription.fromMap(jsonDecode(json));
   }
 
-  // Create from MedicineModel
   factory MedicineInPrescription.fromMedicineModel(
     MedicineModel medicine, {
     required String dose,
@@ -76,6 +77,7 @@ class MedicineInPrescription {
       duration: duration,
       instruction: instruction,
       genericName: medicine.genericName,
+      dosageForm: medicine.dosageForm,
       manufacturer: medicine.manufacturer,
     );
   }
@@ -89,6 +91,7 @@ class MedicineInPrescription {
     String? duration,
     String? instruction,
     String? genericName,
+    String? dosageForm,
     String? manufacturer,
   }) {
     return MedicineInPrescription(
@@ -100,6 +103,7 @@ class MedicineInPrescription {
       duration: duration ?? this.duration,
       instruction: instruction ?? this.instruction,
       genericName: genericName ?? this.genericName,
+      dosageForm: dosageForm ?? this.dosageForm,
       manufacturer: manufacturer ?? this.manufacturer,
     );
   }

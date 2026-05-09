@@ -32,7 +32,11 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
     });
   }
 
-  void _showAddMedicineDialog(MedicineModel medicine) {
+  void _showAddMedicineDialog(MedicineModel? medicine) {
+    String name = medicine?.name ?? '';
+    String generic = medicine?.genericName ?? '';
+    String dosageForm = medicine?.dosageForm ?? '';
+    String strength = medicine?.strength ?? '';
     String dose = '1+0+1';
     String duration = '5 days';
     String instruction = 'After meal';
@@ -49,54 +53,99 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
             right: 16,
             top: 16,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(medicine.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              Text('${medicine.genericName} • ${medicine.dosageForm}', style: TextStyle(color: Colors.grey.shade600)),
-              const Divider(height: 24),
-              
-              const Text('Dose (Frequency)', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              _buildChips(['1+0+0', '1+0+1', '1+1+1', '0+0+1', 'Every 8 hours'], dose, (val) => setModalState(() => dose = val)),
-              
-              const SizedBox(height: 16),
-              const Text('Duration', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              _buildChips(['3 days', '5 days', '7 days', '14 days', '1 month'], duration, (val) => setModalState(() => duration = val)),
-
-              const SizedBox(height: 16),
-              const Text('Instruction', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              _buildChips(['After meal', 'Before meal', 'With meal', 'Empty stomach'], instruction, (val) => setModalState(() => instruction = val)),
-
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.rxPrimaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (medicine == null) ...[
+                  const Text('Add Custom Medicine', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  TextField(
+                    onChanged: (v) => name = v,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: const InputDecoration(
+                      labelText: 'Medicine Name *',
+                      hintText: 'e.g. Napa',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                  onPressed: () {
-                    final medInRx = MedicineInPrescription.fromMedicineModel(
-                      medicine,
-                      dose: dose,
-                      duration: duration,
-                      instruction: instruction,
-                    );
-                    ref.read(prescriptionProvider.notifier).addMedicine(medInRx);
-                    Navigator.pop(context);
-                    _searchController.clear();
-                    setState(() => _searchResults = []);
-                  },
-                  child: const Text('Add to Prescription', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          onChanged: (v) => generic = v,
+                          textCapitalization: TextCapitalization.words,
+                          decoration: const InputDecoration(labelText: 'Generic', hintText: 'Paracetamol', border: OutlineInputBorder()),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          onChanged: (v) => dosageForm = v,
+                          decoration: const InputDecoration(labelText: 'Form', hintText: 'Tab/Cap/Syr', border: OutlineInputBorder()),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    onChanged: (v) => strength = v,
+                    decoration: const InputDecoration(labelText: 'Strength', hintText: '500mg / 5ml', border: OutlineInputBorder()),
+                  ),
+                ] else ...[
+                  Text(medicine.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text('${medicine.genericName} • ${medicine.dosageForm} • ${medicine.strength}', style: TextStyle(color: Colors.grey.shade600)),
+                ],
+                const Divider(height: 24),
+                
+                const Text('Dose (Frequency)', style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                _buildChips(['1+0+0', '1+0+1', '1+1+1', '0+0+1', 'Every 8 hours'], dose, (val) => setModalState(() => dose = val)),
+                
+                const SizedBox(height: 16),
+                const Text('Duration', style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                _buildChips(['3 days', '5 days', '7 days', '14 days', '1 month'], duration, (val) => setModalState(() => duration = val)),
+
+                const SizedBox(height: 16),
+                const Text('Instruction', style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                _buildChips(['After meal', 'Before meal', 'With meal', 'Empty stomach'], instruction, (val) => setModalState(() => instruction = val)),
+
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.rxPrimaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () {
+                      if (name.isEmpty) return;
+                      
+                      final medInRx = MedicineInPrescription(
+                        medicineName: name,
+                        genericName: generic,
+                        dosageForm: dosageForm,
+                        strength: strength,
+                        dose: dose,
+                        duration: duration,
+                        instruction: instruction,
+                      );
+                      ref.read(prescriptionProvider.notifier).addMedicine(medInRx);
+                      Navigator.pop(context);
+                      _searchController.clear();
+                      setState(() => _searchResults = []);
+                    },
+                    child: const Text('Add to Prescription', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-            ],
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
@@ -131,16 +180,33 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
-          child: TextField(
-            controller: _searchController,
-            onChanged: _onSearch,
-            decoration: InputDecoration(
-              hintText: 'Search Medicine (Napa, Azithro...)',
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-            ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: _onSearch,
+                  decoration: InputDecoration(
+                    hintText: 'Search Medicine (Napa, Azithro...)',
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: () => _showAddMedicineDialog(null),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange.shade800,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Custom'),
+              ),
+            ],
           ),
         ),
         if (_searchResults.isNotEmpty)

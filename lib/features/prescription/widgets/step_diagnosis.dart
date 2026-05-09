@@ -11,103 +11,155 @@ class StepDiagnosis extends ConsumerWidget {
     final state = ref.watch(prescriptionProvider);
     final notifier = ref.read(prescriptionProvider.notifier);
 
-    final List<String> commonComplaints = ['Fever', 'Cough', 'Cold', 'Headache', 'Abdominal Pain', 'Weakness'];
-    final List<String> commonDiagnosis = ['Viral Fever', 'Acute Pharyngitis', 'UTI', 'Hypertension', 'Diabetes Mellitus'];
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('Chief Complaints'),
-          const SizedBox(height: 8),
-          _buildQuickChips(commonComplaints, (val) {
-             final current = state.chiefComplaints ?? '';
-             notifier.updateChiefComplaints(current.isEmpty ? val : '$current, $val');
-          }),
-          const SizedBox(height: 12),
-          _buildTextField(
+          _buildSectionHeader(
+            context,
+            title: 'Chief Complaints *',
             initialValue: state.chiefComplaints,
-            hint: 'Describe patient problems...',
-            onChanged: notifier.updateChiefComplaints,
-            maxLines: 3,
+            onChanged: (val) => notifier.updateChiefComplaints(val),
+            commonItems: ['Fever', 'Cough', 'Body Ache', 'Headache', 'Vomiting', 'Loose Motion'],
+            hint: 'Describe patient complaints...',
           ),
-          
           const SizedBox(height: 24),
-          _buildSectionTitle('Diagnosis'),
-          const SizedBox(height: 8),
-          _buildQuickChips(commonDiagnosis, (val) {
-             final current = state.diagnosis ?? '';
-             notifier.updateDiagnosis(current.isEmpty ? val : '$current, $val');
-          }),
-          const SizedBox(height: 12),
-          _buildTextField(
+          _buildSectionHeader(
+            context,
+            title: 'Diagnosis *',
             initialValue: state.diagnosis,
+            onChanged: (val) => notifier.updateDiagnosis(val),
+            commonItems: ['Fever', 'Cold', 'UTI', 'Pneumonia', 'Gastritis', 'Anemia'],
             hint: 'Enter diagnosis or ICD code...',
-            onChanged: notifier.updateDiagnosis,
-            maxLines: 2,
           ),
-
           const SizedBox(height: 24),
-          _buildSectionTitle('Vital Signs (Optional)'),
-          const SizedBox(height: 12),
           _buildTextField(
+            label: 'Vital Signs',
+            hint: 'BP, Pulse, Temp, SpO2...',
             initialValue: state.vitalSigns,
-            hint: 'BP: 120/80, Pulse: 72, Temp: 98.6...',
-            onChanged: notifier.updateVitals,
+            onChanged: (val) => notifier.updateVitals(val),
           ),
-          
+          const SizedBox(height: 16),
+          _buildTextField(
+            label: 'Past History',
+            hint: 'DM, HTN, Allergy, Surgery history...',
+            initialValue: state.pastHistory,
+            onChanged: (val) => notifier.updatePastHistory(val),
+          ),
           const SizedBox(height: 100),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.topHeaderColor),
-    );
-  }
-
-  Widget _buildQuickChips(List<String> items, Function(String) onSelect) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: items.map((item) => ActionChip(
-        label: Text(item),
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: AppColors.rxPrimaryColor.withOpacity(0.3)),
-        ),
-        onPressed: () => onSelect(item),
-      )).toList(),
-    );
-  }
-
-  Widget _buildTextField({
-    String? initialValue,
-    required String hint,
+  Widget _buildSectionHeader(
+    BuildContext context, {
+    required String title,
+    required String? initialValue,
     required Function(String) onChanged,
-    int maxLines = 1,
+    required List<String> commonItems,
+    required String hint,
   }) {
-    return TextFormField(
-      initialValue: initialValue,
-      maxLines: maxLines,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+    final controller = TextEditingController(text: initialValue);
+    controller.selection = TextSelection.fromPosition(TextPosition(offset: controller.text.length));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.topHeaderColor)),
+            TextButton.icon(
+              onPressed: () => _showCustomAddDialog(context, title, (val) {
+                final current = initialValue ?? '';
+                onChanged(current.isEmpty ? val : '$current, $val');
+              }),
+              icon: const Icon(Icons.add_circle_outline, size: 18),
+              label: const Text('Custom'),
+            ),
+          ],
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: commonItems.map((item) => ActionChip(
+            label: Text(item),
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(color: AppColors.rxPrimaryColor.withOpacity(0.3)),
+            ),
+            onPressed: () {
+              final current = initialValue ?? '';
+              onChanged(current.isEmpty ? item : '$current, $item');
+            },
+          )).toList(),
         ),
+        const SizedBox(height: 12),
+        TextFormField(
+          key: Key(title),
+          initialValue: initialValue,
+          maxLines: 2,
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField({required String label, required String hint, String? initialValue, required Function(String) onChanged}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        TextFormField(
+          initialValue: initialValue,
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showCustomAddDialog(BuildContext context, String title, Function(String) onAdd) {
+    final customController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Add Custom $title'),
+        content: TextField(
+          controller: customController,
+          decoration: InputDecoration(hintText: 'Type here...'),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              if (customController.text.isNotEmpty) {
+                onAdd(customController.text);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Add'),
+          ),
+        ],
       ),
     );
   }
