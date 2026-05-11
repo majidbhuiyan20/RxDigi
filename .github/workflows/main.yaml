@@ -2,54 +2,70 @@ name: Flutter CI/CD
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main
+      - master
   pull_request:
-    branches: [main, master]
+    branches:
+      - main
+      - master
 
 jobs:
   build:
-    runs-on: ubuntu-latest   # Faster and cheaper unless you need iOS builds
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # Checkout source code
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
+      # Set up Java (required for Android builds)
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: zulu
           java-version: '17'
 
+      # Set up Flutter SDK
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
+          flutter-version: '3.41.2'
           channel: stable
           cache: true
 
+      # Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
+      # Check formatting
       - name: Verify formatting
         run: flutter format --set-exit-if-changed lib test
 
+      # Static analysis
       - name: Analyze source
         run: flutter analyze
 
+      # Run tests with coverage
       - name: Run tests
         run: flutter test --coverage
 
+      # Build release APK
       - name: Build Release APK
         run: flutter build apk --release
 
+      # Build Android App Bundle (for Play Store)
       - name: Build App Bundle
         run: flutter build appbundle --release
 
+      # Upload APK artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
+      # Upload AAB artifact
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
