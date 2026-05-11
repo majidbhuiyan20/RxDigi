@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout source code
+      # Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v5
 
@@ -30,17 +30,21 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.2'
+          flutter-version: '3.29.3'
           channel: stable
           cache: true
+
+      # Verify Flutter installation
+      - name: Flutter doctor
+        run: flutter doctor -v
 
       # Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      # Check formatting
+      # Verify Dart formatting
       - name: Verify formatting
-        run: flutter format --set-exit-if-changed lib test
+        run: dart format --output=none --set-exit-if-changed lib test
 
       # Static analysis
       - name: Analyze source
@@ -50,22 +54,36 @@ jobs:
       - name: Run tests
         run: flutter test --coverage
 
-      # Build release APK
+      # Build universal release APK
       - name: Build Release APK
         run: flutter build apk --release
 
-      # Build Android App Bundle (for Play Store)
+      # Build split APKs by ABI (smaller APKs for each architecture)
+      - name: Build Split APKs by ABI
+        run: flutter build apk --release --split-per-abi
+
+      # Build Android App Bundle (recommended for Play Store)
       - name: Build App Bundle
         run: flutter build appbundle --release
 
-      # Upload APK artifact
-      - name: Upload APK
+      # Upload universal APK
+      - name: Upload Universal APK
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-      # Upload AAB artifact
+      # Upload split APKs (armeabi-v7a, arm64-v8a, x86_64)
+      - name: Upload Split APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: split-apks
+          path: |
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-release.apk
+
+      # Upload Android App Bundle
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
