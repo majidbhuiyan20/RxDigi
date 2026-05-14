@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdigi/app/app_colors.dart';
+import 'package:rxdigi/core/data/repositories/common_advice_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_lab_test_repository.dart';
 import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
+
+final commonAdviceProvider = FutureProvider<List<String>>((ref) {
+  return CommonAdviceRepository().getCommonAdvice();
+});
+
+final commonLabTestProvider = FutureProvider<List<String>>((ref) {
+  return CommonLabTestRepository().getCommonLabTests();
+});
 
 class StepAdvice extends ConsumerWidget {
   const StepAdvice({super.key});
@@ -10,8 +20,10 @@ class StepAdvice extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(prescriptionProvider);
     final notifier = ref.read(prescriptionProvider.notifier);
+    final commonAdviceAsync = ref.watch(commonAdviceProvider);
+    final commonLabTestsAsync = ref.watch(commonLabTestProvider);
 
-    final List<String> commonAdvice = [
+    final List<String> defaultAdvice = [
       'Drink plenty of water',
       'Take complete rest',
       'Avoid cold food/drinks',
@@ -22,7 +34,7 @@ class StepAdvice extends ConsumerWidget {
       'Maintain personal hygiene'
     ];
 
-    final List<String> commonTests = [
+    final List<String> defaultTests = [
       'CBC', 'CRP', 'Blood Sugar (F/PP)', 'Urine R/M/E', 'X-ray Chest P/A View', 'ECG', 'USG of W/A', 'Lipid Profile'
     ];
 
@@ -31,16 +43,37 @@ class StepAdvice extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMultiChipSection(
-            context,
-            title: 'Advice',
-            currentValue: state.advice,
-            onChanged: (val) => notifier.updateAdvice(val),
-            commonItems: commonAdvice,
-            hint: 'Add custom advice...',
+          commonAdviceAsync.when(
+            data: (commonList) => _buildMultiChipSection(
+              context,
+              title: 'Advice',
+              currentValue: state.advice,
+              onChanged: (val) => notifier.updateAdvice(val),
+              commonItems: commonList.isEmpty ? defaultAdvice : commonList,
+              hint: 'Add custom advice...',
+              onCustomAdd: (val) async {
+                await CommonAdviceRepository().addOrUpdateAdvice(val);
+                ref.invalidate(commonAdviceProvider);
+              },
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, __) => const SizedBox(),
           ),
           const SizedBox(height: 32),
-          _buildLabTestSection(context, state, notifier, commonTests),
+          commonLabTestsAsync.when(
+            data: (commonList) => _buildLabTestSection(
+              context,
+              state,
+              notifier,
+              commonList.isEmpty ? defaultTests : commonList,
+              onCustomAdd: (val) async {
+                await CommonLabTestRepository().addOrUpdateLabTest(val);
+                ref.invalidate(commonLabTestProvider);
+              },
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, __) => const SizedBox(),
+          ),
           const SizedBox(height: 32),
           const Text('Follow-up / Next Visit', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.topHeaderColor)),
           const SizedBox(height: 12),
@@ -70,6 +103,7 @@ class StepAdvice extends ConsumerWidget {
     required Function(String) onChanged,
     required List<String> commonItems,
     required String hint,
+    Function(String)? onCustomAdd,
   }) {
     final List<String> selectedItems = currentValue != null && currentValue.trim().isNotEmpty
         ? currentValue.split('. ').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
@@ -85,8 +119,9 @@ class StepAdvice extends ConsumerWidget {
             TextButton.icon(
               onPressed: () => _showCustomAddDialog(context, title, hint, (val) {
                 if (!selectedItems.contains(val)) {
-                  final newList = [...selectedItems, val];
+                  final newList = [val, ...selectedItems];
                   onChanged(newList.join('. '));
+                  if (onCustomAdd != null) onCustomAdd(val);
                 }
               }),
               icon: const Icon(Icons.add_circle_outline, size: 18),
@@ -116,8 +151,9 @@ class StepAdvice extends ConsumerWidget {
               ),
               onPressed: () {
                 if (!isSelected) {
-                  final newList = [...selectedItems, item];
+                  final newList = [item, ...selectedItems];
                   onChanged(newList.join('. '));
+                  if (onCustomAdd != null) onCustomAdd(item);
                 } else {
                   final newList = selectedItems.where((e) => e != item).toList();
                   onChanged(newList.join('. '));
@@ -158,7 +194,13 @@ class StepAdvice extends ConsumerWidget {
     );
   }
 
-  Widget _buildLabTestSection(BuildContext context, PrescriptionState state, PrescriptionNotifier notifier, List<String> commonItems) {
+  Widget _buildLabTestSection(
+    BuildContext context,
+    PrescriptionState state,
+    PrescriptionNotifier notifier,
+    List<String> commonItems, {
+    Function(String)? onCustomAdd,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -169,6 +211,7 @@ class StepAdvice extends ConsumerWidget {
             TextButton.icon(
               onPressed: () => _showCustomAddDialog(context, 'Lab Test', 'e.g. MRI Brain', (val) {
                 notifier.addLabTest(val);
+                if (onCustomAdd != null) onCustomAdd(val);
               }),
               icon: const Icon(Icons.add_circle_outline, size: 18),
               label: const Text('Custom'),
@@ -176,7 +219,7 @@ class StepAdvice extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 8),
-        
+
         // Suggestions
         Wrap(
           spacing: 8,
@@ -200,6 +243,7 @@ class StepAdvice extends ConsumerWidget {
                   notifier.removeLabTest(test);
                 } else {
                   notifier.addLabTest(test);
+                  if (onCustomAdd != null) onCustomAdd(test);
                 }
               },
             );

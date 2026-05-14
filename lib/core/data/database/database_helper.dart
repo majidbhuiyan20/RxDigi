@@ -28,7 +28,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -88,6 +88,40 @@ class DatabaseHelper {
           } catch (e) {
             print('Error adding signature/logo columns: $e');
           }
+        }
+        if (oldVersion < 6) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS common_advice (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT UNIQUE,
+              usageCount INTEGER DEFAULT 1,
+              lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+          ''');
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS common_lab_tests (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT UNIQUE,
+              usageCount INTEGER DEFAULT 1,
+              lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+          ''');
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS common_complaints (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT UNIQUE,
+              usageCount INTEGER DEFAULT 1,
+              lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+          ''');
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS common_past_history (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT UNIQUE,
+              usageCount INTEGER DEFAULT 1,
+              lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+          ''');
         }
       },
     );
@@ -192,6 +226,46 @@ class DatabaseHelper {
     // Common Diagnosis Table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS common_diagnosis (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE,
+        usageCount INTEGER DEFAULT 1,
+        lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    // Common Advice Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS common_advice (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE,
+        usageCount INTEGER DEFAULT 1,
+        lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    // Common Lab Tests Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS common_lab_tests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE,
+        usageCount INTEGER DEFAULT 1,
+        lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    // Common Complaints Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS common_complaints (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE,
+        usageCount INTEGER DEFAULT 1,
+        lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    // Common Past History Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS common_past_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE,
         usageCount INTEGER DEFAULT 1,

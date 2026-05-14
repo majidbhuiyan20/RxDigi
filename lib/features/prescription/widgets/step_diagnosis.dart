@@ -2,10 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdigi/app/app_colors.dart';
 import 'package:rxdigi/core/data/repositories/common_diagnosis_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_complaint_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_past_history_repository.dart';
 import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
 
 final commonDiagnosisProvider = FutureProvider<List<String>>((ref) {
   return CommonDiagnosisRepository().getCommonDiagnosis();
+});
+
+final commonComplaintsProvider = FutureProvider<List<String>>((ref) {
+  return CommonComplaintRepository().getCommonComplaints();
+});
+
+final commonPastHistoryProvider = FutureProvider<List<String>>((ref) {
+  return CommonPastHistoryRepository().getCommonPastHistory();
 });
 
 class StepDiagnosis extends ConsumerWidget {
@@ -16,22 +26,31 @@ class StepDiagnosis extends ConsumerWidget {
     final state = ref.watch(prescriptionProvider);
     final notifier = ref.read(prescriptionProvider.notifier);
     final commonDiagnosisAsync = ref.watch(commonDiagnosisProvider);
+    final commonComplaintsAsync = ref.watch(commonComplaintsProvider);
+    final commonPastHistoryAsync = ref.watch(commonPastHistoryProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMultiChipSection(
-            context,
-            title: 'Chief Complaints *',
-            currentValue: state.chiefComplaints,
-            onChanged: (val) => notifier.updateChiefComplaints(val),
-            commonItems: const [
-              'Fever', 'Cough', 'Body Ache', 'Headache', 'Vomiting',
-              'Loose Motion', 'Cold', 'Weakness', 'Chest Pain', 'Abdominal Pain'
-            ],
-            hint: 'Add custom complaint...',
+          commonComplaintsAsync.when(
+            data: (commonList) => _buildMultiChipSection(
+              context,
+              title: 'Chief Complaints *',
+              currentValue: state.chiefComplaints,
+              onChanged: (val) => notifier.updateChiefComplaints(val),
+              commonItems: commonList.isEmpty 
+                  ? const ['Fever', 'Cough', 'Body Ache', 'Headache', 'Vomiting', 'Loose Motion', 'Cold', 'Weakness', 'Chest Pain', 'Abdominal Pain']
+                  : commonList,
+              hint: 'Add custom complaint...',
+              onCustomAdd: (val) async {
+                 await CommonComplaintRepository().addOrUpdateComplaint(val);
+                 ref.invalidate(commonComplaintsProvider);
+              }
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, __) => const SizedBox(),
           ),
           const SizedBox(height: 32),
           commonDiagnosisAsync.when(
@@ -62,13 +81,23 @@ class StepDiagnosis extends ConsumerWidget {
             hint: 'Add vital sign (e.g. BP: 120/80)...',
           ),
           const SizedBox(height: 32),
-          _buildMultiChipSection(
-            context,
-            title: 'Past History',
-            currentValue: state.pastHistory,
-            onChanged: (val) => notifier.updatePastHistory(val),
-            commonItems: const ['DM', 'HTN', 'BA', 'CKD', 'IHD', 'Surgery', 'Allergy', 'Asthma'],
-            hint: 'Add past history...',
+          commonPastHistoryAsync.when(
+            data: (commonList) => _buildMultiChipSection(
+              context,
+              title: 'Past History',
+              currentValue: state.pastHistory,
+              onChanged: (val) => notifier.updatePastHistory(val),
+              commonItems: commonList.isEmpty 
+                  ? const ['DM', 'HTN', 'BA', 'CKD', 'IHD', 'Surgery', 'Allergy', 'Asthma']
+                  : commonList,
+              hint: 'Add past history...',
+              onCustomAdd: (val) async {
+                 await CommonPastHistoryRepository().addOrUpdatePastHistory(val);
+                 ref.invalidate(commonPastHistoryProvider);
+              }
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, __) => const SizedBox(),
           ),
           const SizedBox(height: 100),
         ],
