@@ -1,4 +1,4 @@
-name: Build & Release
+name: Build APK Fast
 
 on:
   workflow_dispatch:
@@ -8,9 +8,9 @@ on:
       - master
 
 jobs:
-  build_android:
-    name: Build Android
+  build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -30,71 +30,18 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
-      - name: Build APK (Release)
+      - name: Build APKs
         run: flutter build apk --release --split-per-abi
 
-      - name: Build APK (Profile)
-        run: flutter build apk --profile
-
-      - name: Upload Release APK
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-release
-          path: build/app/outputs/flutter-apk/*-release.apk
-
-      - name: Upload Profile APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-profile
-          path: build/app/outputs/flutter-apk/*-profile.apk
-
-  build_ios:
-    name: Build iOS
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.41.9'
-          channel: stable
-          cache: true
-
-      - name: Get Dependencies
-        run: flutter pub get
-
-      - name: Build iOS (No Codesign)
-        run: flutter build ios --release --no-codesign
-
-      - name: Zip iOS App
-        run: |
-          cd build/ios/iphoneos
-          zip -r Runner.app.zip Runner.app
-
-      - name: Upload iOS Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-build
-          path: build/ios/iphoneos/Runner.app.zip
-
-  release:
-    name: Create Release
-    needs: [build_android, build_ios]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download All Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
+          name: app-release
+          path: build/app/outputs/flutter-apk/*.apk
 
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "artifacts/android-release/*.apk,artifacts/android-profile/*.apk,artifacts/ios-build/*.zip"
-          tag: v1.1.${{ github.run_number }}
-          token: ${{ secrets.TOKEN || secrets.GITHUB_TOKEN }}
-          generateReleaseNotes: true
+          artifacts: build/app/outputs/flutter-apk/*.apk
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.TOKEN }}
