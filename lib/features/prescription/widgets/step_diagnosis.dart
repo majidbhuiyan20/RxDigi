@@ -4,6 +4,7 @@ import 'package:rxdigi/app/app_colors.dart';
 import 'package:rxdigi/core/data/repositories/common_diagnosis_repository.dart';
 import 'package:rxdigi/core/data/repositories/common_complaint_repository.dart';
 import 'package:rxdigi/core/data/repositories/common_past_history_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_vital_sign_repository.dart';
 import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
 
 final commonDiagnosisProvider = FutureProvider<List<String>>((ref) {
@@ -18,6 +19,10 @@ final commonPastHistoryProvider = FutureProvider<List<String>>((ref) {
   return CommonPastHistoryRepository().getCommonPastHistory();
 });
 
+final commonVitalSignsProvider = FutureProvider<List<String>>((ref) {
+  return CommonVitalSignRepository().getCommonVitalSigns();
+});
+
 class StepDiagnosis extends ConsumerWidget {
   const StepDiagnosis({super.key});
 
@@ -28,6 +33,7 @@ class StepDiagnosis extends ConsumerWidget {
     final commonDiagnosisAsync = ref.watch(commonDiagnosisProvider);
     final commonComplaintsAsync = ref.watch(commonComplaintsProvider);
     final commonPastHistoryAsync = ref.watch(commonPastHistoryProvider);
+    final commonVitalSignsAsync = ref.watch(commonVitalSignsProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -40,9 +46,7 @@ class StepDiagnosis extends ConsumerWidget {
               title: 'Chief Complaints *',
               currentValue: state.chiefComplaints,
               onChanged: (val) => notifier.updateChiefComplaints(val),
-              commonItems: commonList.isEmpty 
-                  ? const ['Fever', 'Cough', 'Body Ache', 'Headache', 'Vomiting', 'Loose Motion', 'Cold', 'Weakness', 'Chest Pain', 'Abdominal Pain']
-                  : commonList,
+              commonItems: commonList,
               hint: 'Add custom complaint...',
               onCustomAdd: (val) async {
                  await CommonComplaintRepository().addOrUpdateComplaint(val);
@@ -59,9 +63,7 @@ class StepDiagnosis extends ConsumerWidget {
               title: 'Diagnosis *',
               currentValue: state.diagnosis,
               onChanged: (val) => notifier.updateDiagnosis(val),
-              commonItems: commonList.isEmpty 
-                  ? const ['Fever', 'Cold', 'UTI', 'Pneumonia', 'Gastritis', 'Anemia', 'Hypertension', 'Diabetes'] 
-                  : commonList,
+              commonItems: commonList,
               hint: 'Add custom diagnosis...',
               onCustomAdd: (val) async {
                  await CommonDiagnosisRepository().addOrUpdateDiagnosis(val);
@@ -72,13 +74,23 @@ class StepDiagnosis extends ConsumerWidget {
             error: (_, __) => const SizedBox(),
           ),
           const SizedBox(height: 32),
-          _buildMultiChipSection(
-            context,
-            title: 'Vital Signs',
-            currentValue: state.vitalSigns,
-            onChanged: (val) => notifier.updateVitals(val),
-            commonItems: const ['BP', 'Pulse', 'Temp', 'SpO2', 'RR', 'Weight', 'Height'],
-            hint: 'Add vital sign (e.g. BP: 120/80)...',
+          commonVitalSignsAsync.when(
+            data: (commonList) => _buildMultiChipSection(
+              context,
+              title: 'Vital Signs',
+              currentValue: state.vitalSigns,
+              onChanged: (val) => notifier.updateVitals(val),
+              commonItems: commonList,
+              hint: 'Add vital sign (e.g. BP: 120/80)...',
+              onCustomAdd: (val) async {
+                 // For vitals, if they type "BP: 120/80", we might want to save "BP" as the suggestion
+                 final suggestionName = val.contains(':') ? val.split(':')[0].trim() : val;
+                 await CommonVitalSignRepository().addOrUpdateVitalSign(suggestionName);
+                 ref.invalidate(commonVitalSignsProvider);
+              }
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, __) => const SizedBox(),
           ),
           const SizedBox(height: 32),
           commonPastHistoryAsync.when(
@@ -87,9 +99,7 @@ class StepDiagnosis extends ConsumerWidget {
               title: 'Past History',
               currentValue: state.pastHistory,
               onChanged: (val) => notifier.updatePastHistory(val),
-              commonItems: commonList.isEmpty 
-                  ? const ['DM', 'HTN', 'BA', 'CKD', 'IHD', 'Surgery', 'Allergy', 'Asthma']
-                  : commonList,
+              commonItems: commonList,
               hint: 'Add past history...',
               onCustomAdd: (val) async {
                  await CommonPastHistoryRepository().addOrUpdatePastHistory(val);

@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdigi/app/app_colors.dart';
@@ -23,21 +24,6 @@ class StepAdvice extends ConsumerWidget {
     final commonAdviceAsync = ref.watch(commonAdviceProvider);
     final commonLabTestsAsync = ref.watch(commonLabTestProvider);
 
-    final List<String> defaultAdvice = [
-      'Drink plenty of water',
-      'Take complete rest',
-      'Avoid cold food/drinks',
-      'Walk for 30 minutes daily',
-      'Stop smoking',
-      'Avoid oily and spicy food',
-      'Eat fresh fruits and vegetables',
-      'Maintain personal hygiene'
-    ];
-
-    final List<String> defaultTests = [
-      'CBC', 'CRP', 'Blood Sugar (F/PP)', 'Urine R/M/E', 'X-ray Chest P/A View', 'ECG', 'USG of W/A', 'Lipid Profile'
-    ];
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -49,7 +35,7 @@ class StepAdvice extends ConsumerWidget {
               title: 'Advice',
               currentValue: state.advice,
               onChanged: (val) => notifier.updateAdvice(val),
-              commonItems: commonList.isEmpty ? defaultAdvice : commonList,
+              commonItems: commonList,
               hint: 'Add custom advice...',
               onCustomAdd: (val) async {
                 await CommonAdviceRepository().addOrUpdateAdvice(val);
@@ -65,7 +51,7 @@ class StepAdvice extends ConsumerWidget {
               context,
               state,
               notifier,
-              commonList.isEmpty ? defaultTests : commonList,
+              commonList,
               onCustomAdd: (val) async {
                 await CommonLabTestRepository().addOrUpdateLabTest(val);
                 ref.invalidate(commonLabTestProvider);
@@ -77,18 +63,72 @@ class StepAdvice extends ConsumerWidget {
           const SizedBox(height: 32),
           const Text('Follow-up / Next Visit', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.topHeaderColor)),
           const SizedBox(height: 12),
-          TextFormField(
-            key: Key('next_visit_${state.nextVisit}'),
-            initialValue: state.nextVisit,
-            onChanged: notifier.updateNextVisit,
-            decoration: InputDecoration(
-              hintText: 'e.g. After 7 days or 15/05/2026',
-              prefixIcon: const Icon(Icons.calendar_today, color: AppColors.primaryColor),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-            ),
+          Wrap(
+            spacing: 8,
+            children: [
+              'After 3 days',
+              'After 7 days',
+              'After 15 days',
+              'After 1 month',
+            ].map((duration) => ActionChip(
+              label: Text(duration),
+              onPressed: () => notifier.updateNextVisit(duration),
+              backgroundColor: state.nextVisit == duration ? AppColors.primaryColor.withOpacity(0.1) : Colors.white,
+              labelStyle: TextStyle(
+                color: state.nextVisit == duration ? AppColors.primaryColor : Colors.black87,
+                fontSize: 12,
+              ),
+            )).toList(),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  key: Key('next_visit_${state.nextVisit}'),
+                  initialValue: state.nextVisit,
+                  onChanged: notifier.updateNextVisit,
+                  decoration: InputDecoration(
+                    hintText: 'e.g. After 7 days or 15/05/2026',
+                    prefixIcon: const Icon(Icons.calendar_today, color: AppColors.primaryColor),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              IconButton.filled(
+                onPressed: () async {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now().add(const Duration(days: 7)),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                    builder: (context, child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: const ColorScheme.light(
+                            primary: AppColors.primaryColor,
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
+                  );
+                  if (picked != null) {
+                    notifier.updateNextVisit(DateFormat('dd/MM/yyyy').format(picked));
+                  }
+                },
+                icon: const Icon(Icons.date_range),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  minimumSize: const Size(56, 56),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 100),
         ],

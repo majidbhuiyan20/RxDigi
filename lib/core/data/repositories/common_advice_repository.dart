@@ -3,14 +3,38 @@ import '../database/database_helper.dart';
 class CommonAdviceRepository {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
 
+  // Define defaults to ensure they are always available alongside custom entries
+  static const List<String> _defaultAdvice = [
+    'Drink plenty of water',
+    'Rest for 2 days',
+    'Avoid spicy food',
+    'Walk for 30 mins daily',
+    'Avoid smoking',
+    'Regular follow-up',
+    'Take medicine after meal',
+    'Avoid lifting heavy weights'
+  ];
+
   Future<List<String>> getCommonAdvice() async {
     final db = await _databaseHelper.database;
+    
+    // Load manually inserted/used data from local storage first
     final result = await db.query(
       'common_advice',
       orderBy: 'usageCount DESC, lastUsed DESC',
-      limit: 20,
     );
-    return result.map((map) => map['name'] as String).toList();
+    
+    final savedItems = result.map((map) => map['name'] as String).toList();
+    
+    // Merge with defaults so they are never lost, but prioritize used items
+    final combined = List<String>.from(savedItems);
+    for (var item in _defaultAdvice) {
+      if (!combined.any((e) => e.toLowerCase() == item.toLowerCase())) {
+        combined.add(item);
+      }
+    }
+    
+    return combined;
   }
 
   Future<void> addOrUpdateAdvice(String name) async {

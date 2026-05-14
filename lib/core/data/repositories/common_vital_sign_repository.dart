@@ -1,19 +1,19 @@
 import '../database/database_helper.dart';
 
-class CommonPastHistoryRepository {
+class CommonVitalSignRepository {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
 
   // Define defaults to ensure they are always available alongside custom entries
-  static const List<String> _defaultHistory = [
-    'DM', 'HTN', 'BA', 'CKD', 'IHD', 'Surgery', 'Allergy', 'Asthma'
+  static const List<String> _defaultVitals = [
+    'BP', 'Pulse', 'Temp', 'SpO2', 'RR', 'Weight', 'Height'
   ];
 
-  Future<List<String>> getCommonPastHistory() async {
+  Future<List<String>> getCommonVitalSigns() async {
     final db = await _databaseHelper.database;
     
     // Load manually inserted/used data from local storage first
     final result = await db.query(
-      'common_past_history',
+      'common_vital_signs',
       orderBy: 'usageCount DESC, lastUsed DESC',
     );
     
@@ -21,7 +21,7 @@ class CommonPastHistoryRepository {
     
     // Merge with defaults so they are never lost, but prioritize used items
     final combined = List<String>.from(savedItems);
-    for (var item in _defaultHistory) {
+    for (var item in _defaultVitals) {
       if (!combined.any((e) => e.toLowerCase() == item.toLowerCase())) {
         combined.add(item);
       }
@@ -30,13 +30,13 @@ class CommonPastHistoryRepository {
     return combined;
   }
 
-  Future<void> addOrUpdatePastHistory(String name) async {
+  Future<void> addOrUpdateVitalSign(String name) async {
     if (name.trim().isEmpty) return;
     final db = await _databaseHelper.database;
     final trimmedName = name.trim();
 
     final exists = await db.query(
-      'common_past_history',
+      'common_vital_signs',
       where: 'name = ?',
       whereArgs: [trimmedName],
     );
@@ -44,7 +44,7 @@ class CommonPastHistoryRepository {
     if (exists.isNotEmpty) {
       final count = (exists.first['usageCount'] as int) + 1;
       await db.update(
-        'common_past_history',
+        'common_vital_signs',
         {
           'usageCount': count,
           'lastUsed': DateTime.now().toIso8601String(),
@@ -53,7 +53,7 @@ class CommonPastHistoryRepository {
         whereArgs: [trimmedName],
       );
     } else {
-      await db.insert('common_past_history', {
+      await db.insert('common_vital_signs', {
         'name': trimmedName,
         'usageCount': 1,
         'lastUsed': DateTime.now().toIso8601String(),

@@ -28,7 +28,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -116,6 +116,16 @@ class DatabaseHelper {
           ''');
           await db.execute('''
             CREATE TABLE IF NOT EXISTS common_past_history (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT UNIQUE,
+              usageCount INTEGER DEFAULT 1,
+              lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+          ''');
+        }
+        if (oldVersion < 7) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS common_vital_signs (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               name TEXT UNIQUE,
               usageCount INTEGER DEFAULT 1,
@@ -266,6 +276,16 @@ class DatabaseHelper {
     // Common Past History Table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS common_past_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE,
+        usageCount INTEGER DEFAULT 1,
+        lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    // Common Vital Signs Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS common_vital_signs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE,
         usageCount INTEGER DEFAULT 1,

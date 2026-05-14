@@ -6,6 +6,12 @@ import 'package:rxdigi/core/data/models/prescription_model.dart';
 import 'package:rxdigi/core/data/repositories/prescription_repository.dart';
 import 'package:rxdigi/core/data/repositories/doctor_repository.dart';
 import 'package:rxdigi/core/data/repositories/patient_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_advice_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_lab_test_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_complaint_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_diagnosis_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_past_history_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_vital_sign_repository.dart';
 
 class PrescriptionState {
   final int? id;
@@ -181,6 +187,9 @@ class PrescriptionNotifier extends StateNotifier<PrescriptionState> {
         await _prescriptionRepo.update(prescription);
         id = state.id!;
       }
+
+      // 5. Persist manually entered/selected items for future suggestions
+      await _persistCommonItems();
       
       state = state.copyWith(isLoading: false);
       return id;
@@ -188,6 +197,60 @@ class PrescriptionNotifier extends StateNotifier<PrescriptionState> {
       print('Error saving prescription: $e');
       state = state.copyWith(isLoading: false);
       return -1;
+    }
+  }
+
+  Future<void> _persistCommonItems() async {
+    // Persist Complaints
+    if (state.chiefComplaints != null && state.chiefComplaints!.isNotEmpty) {
+      final repo = CommonComplaintRepository();
+      for (var item in state.chiefComplaints!.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty)) {
+        await repo.addOrUpdateComplaint(item);
+      }
+    }
+
+    // Persist Diagnosis
+    if (state.diagnosis != null && state.diagnosis!.isNotEmpty) {
+      final repo = CommonDiagnosisRepository();
+      for (var item in state.diagnosis!.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty)) {
+        await repo.addOrUpdateDiagnosis(item);
+      }
+    }
+
+    // Persist Vital Signs
+    if (state.vitalSigns != null && state.vitalSigns!.isNotEmpty) {
+      final repo = CommonVitalSignRepository();
+      // Vitals might be like "BP: 120/80, Pulse: 80"
+      for (var item in state.vitalSigns!.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty)) {
+        // Extract the name part if it contains a colon (e.g., "BP" from "BP: 120/80")
+        final name = item.contains(':') ? item.split(':')[0].trim() : item;
+        await repo.addOrUpdateVitalSign(name);
+      }
+    }
+
+    // Persist Past History
+    if (state.pastHistory != null && state.pastHistory!.isNotEmpty) {
+      final repo = CommonPastHistoryRepository();
+      for (var item in state.pastHistory!.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty)) {
+        await repo.addOrUpdatePastHistory(item);
+      }
+    }
+
+    // Persist Advice
+    if (state.advice != null && state.advice!.isNotEmpty) {
+      final repo = CommonAdviceRepository();
+      // Advice uses ". " as separator in the UI logic
+      for (var item in state.advice!.split('. ').map((e) => e.trim()).where((e) => e.isNotEmpty)) {
+        await repo.addOrUpdateAdvice(item);
+      }
+    }
+
+    // Persist Lab Tests
+    if (state.labTests.isNotEmpty) {
+      final repo = CommonLabTestRepository();
+      for (var item in state.labTests) {
+        await repo.addOrUpdateLabTest(item);
+      }
     }
   }
 
