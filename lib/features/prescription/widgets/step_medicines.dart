@@ -214,6 +214,7 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
 
     return Column(
       children: [
+        // Search Header
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
@@ -223,8 +224,14 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
                   controller: _searchController,
                   onChanged: _onSearch,
                   decoration: InputDecoration(
-                    hintText: 'Search Medicine (Napa, Azithro...)',
+                    hintText: 'Search Medicine...',
                     prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchController.text.isNotEmpty 
+                      ? IconButton(icon: const Icon(Icons.clear), onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchResults = []);
+                        }) 
+                      : null,
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -245,78 +252,98 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
             ],
           ),
         ),
-        if (_searchResults.isNotEmpty)
-          Expanded(
-            child: ListView.builder(
-              itemCount: _searchResults.length,
-              itemBuilder: (context, index) {
-                final med = _searchResults[index];
-                return ListTile(
-                  title: Text(med.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('${med.genericName} • ${med.dosageForm}'),
-                  trailing: Icon(Icons.add_circle_outline, color: AppColors.primaryColor),
-                  onTap: () => _showAddMedicineDialog(med),
-                );
-              },
-            ),
-          )
-        else ...[
-          favoritesAsync.when(
-            data: (favorites) {
-              if (favorites.isEmpty) return const SizedBox.shrink();
-              return SizedBox(
-                height: 50,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: favorites.length,
-                  itemBuilder: (context, index) {
-                    final med = favorites[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ActionChip(
-                        label: Text(med.name),
-                        backgroundColor: AppColors.primaryColor.withOpacity(0.05),
-                        onPressed: () => _showAddMedicineDialog(med),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: addedMedicines.length,
-              itemBuilder: (context, index) {
-                final med = addedMedicines[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(12),
-                    title: Text('${med.medicineName} ${med.strength ?? ""}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+
+        // Result Area
+        Expanded(
+          child: Stack(
+            children: [
+              // Default View: Favorites + Added Medicines
+              Column(
+                children: [
+                  favoritesAsync.when(
+                    data: (favorites) {
+                      if (favorites.isEmpty) return const SizedBox.shrink();
+                      return SizedBox(
+                        height: 50,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: favorites.length,
+                          itemBuilder: (context, index) {
+                            final med = favorites[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: ActionChip(
+                                label: Text(med.name),
+                                backgroundColor: AppColors.primaryColor.withOpacity(0.05),
+                                onPressed: () => _showAddMedicineDialog(med),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
                       children: [
-                        const SizedBox(height: 4),
-                        Text('${med.dose} · ${med.instruction} · ${med.duration}', style: TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.w500)),
+                        Text('ADDED MEDICINES', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
                       ],
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
-                      onPressed: () => ref.read(prescriptionProvider.notifier).removeMedicine(index),
-                    ),
                   ),
-                );
-              },
-            ),
+                  Expanded(
+                    child: addedMedicines.isEmpty
+                      ? const Center(child: Text('No medicines added yet', style: TextStyle(color: Colors.grey)))
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: addedMedicines.length,
+                          itemBuilder: (context, index) {
+                            final med = addedMedicines[index];
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(12),
+                                title: Text('${med.medicineName} ${med.strength ?? ""}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                subtitle: Text('${med.dose} · ${med.duration}', style: TextStyle(color: AppColors.primaryColor)),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                                  onPressed: () => ref.read(prescriptionProvider.notifier).removeMedicine(index),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                  ),
+                ],
+              ),
+
+              // Search Overlay
+              if (_searchResults.isNotEmpty)
+                Container(
+                  color: const Color(0xFFF8F9FD),
+                  child: ListView.builder(
+                    itemCount: _searchResults.length,
+                    itemBuilder: (context, index) {
+                      final med = _searchResults[index];
+                      return ListTile(
+                        title: Text(med.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text('${med.genericName} • ${med.dosageForm}'),
+                        trailing: Icon(Icons.add_circle_outline, color: AppColors.primaryColor),
+                        onTap: () => _showAddMedicineDialog(med),
+                      );
+                    },
+                  ),
+                ),
+              
+              if (_isSearching)
+                const Center(child: CircularProgressIndicator()),
+            ],
           ),
-        ],
+        ),
       ],
     );
   }
