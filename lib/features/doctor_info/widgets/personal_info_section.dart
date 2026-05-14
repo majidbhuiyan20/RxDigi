@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rxdigi/features/doctor_info/view_model/doctor_onboarding_notifier.dart';
 import 'package:rxdigi/features/doctor_info/widgets/selectable_title_chip.dart';
 
@@ -211,6 +213,40 @@ class _PersonalInfoSectionState extends ConsumerState<PersonalInfoSection> {
               }
               return null;
             },
+          ),
+          const SizedBox(height: 16,),
+          const CardSectionTitle(title: 'Digital Signature (Optional)',),
+          const SizedBox(height: 8,),
+          GestureDetector(
+            onTap: () async {
+              final picker = ImagePicker();
+              final image = await picker.pickImage(source: ImageSource.gallery);
+              if (image != null) {
+                notifier.updateField(signaturePath: image.path);
+              }
+            },
+            child: Container(
+              height: 120,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.borderColor, style: BorderStyle.solid),
+              ),
+              child: onboardingState.signaturePath != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(File(onboardingState.signaturePath!), fit: BoxFit.contain),
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.drive_file_rename_outline, color: AppColors.textGreyColor.withOpacity(0.5), size: 32),
+                        const SizedBox(height: 8),
+                        Text('Tap to upload signature', style: TextStyle(color: AppColors.textGreyColor, fontSize: 13)),
+                      ],
+                    ),
+            ),
           ),
           const SizedBox(height: 8,),
         ],

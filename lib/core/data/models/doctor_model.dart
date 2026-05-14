@@ -24,6 +24,8 @@ class DoctorModel {
   final String? offDays;
   final String? position;
   final String? department;
+  final String? signaturePath;
+  final String? clinicLogoPath;
 
   DoctorModel({
     this.id,
@@ -51,6 +53,8 @@ class DoctorModel {
     this.offDays,
     this.position,
     this.department,
+    this.signaturePath,
+    this.clinicLogoPath,
   });
 
   Map<String, dynamic> toMap() {
@@ -80,6 +84,8 @@ class DoctorModel {
       'offDays': offDays,
       'position': position,
       'department': department,
+      'signaturePath': signaturePath,
+      'clinicLogoPath': clinicLogoPath,
     };
   }
 
@@ -110,6 +116,8 @@ class DoctorModel {
       offDays: map['offDays'],
       position: map['position'],
       department: map['department'],
+      signaturePath: map['signaturePath'],
+      clinicLogoPath: map['clinicLogoPath'],
     );
   }
 
@@ -139,6 +147,8 @@ class DoctorModel {
     String? offDays,
     String? position,
     String? department,
+    String? signaturePath,
+    String? clinicLogoPath,
   }) {
     return DoctorModel(
       id: id ?? this.id,
@@ -166,6 +176,8 @@ class DoctorModel {
       offDays: offDays ?? this.offDays,
       position: position ?? this.position,
       department: department ?? this.department,
+      signaturePath: signaturePath ?? this.signaturePath,
+      clinicLogoPath: clinicLogoPath ?? this.clinicLogoPath,
     );
   }
 }

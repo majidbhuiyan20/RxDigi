@@ -28,7 +28,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -81,6 +81,14 @@ class DatabaseHelper {
             }
           }
         }
+        if (oldVersion < 5) {
+          try {
+            await db.execute('ALTER TABLE doctors ADD COLUMN signaturePath TEXT');
+            await db.execute('ALTER TABLE doctors ADD COLUMN clinicLogoPath TEXT');
+          } catch (e) {
+            print('Error adding signature/logo columns: $e');
+          }
+        }
       },
     );
   }
@@ -114,6 +122,8 @@ class DatabaseHelper {
         offDays TEXT,
         position TEXT,
         department TEXT,
+        signaturePath TEXT,
+        clinicLogoPath TEXT,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     ''');

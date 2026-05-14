@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -35,6 +35,16 @@ class PdfGenerator {
     final lightGrey = PdfColor.fromHex('#F5F7F8');
     final dividerColor = PdfColor.fromHex('#CFD8DC');
 
+    pw.MemoryImage? clinicLogo;
+    if (doctor.clinicLogoPath != null && File(doctor.clinicLogoPath!).existsSync()) {
+      clinicLogo = pw.MemoryImage(File(doctor.clinicLogoPath!).readAsBytesSync());
+    }
+
+    pw.MemoryImage? signature;
+    if (doctor.signaturePath != null && File(doctor.signaturePath!).existsSync()) {
+      signature = pw.MemoryImage(File(doctor.signaturePath!).readAsBytesSync());
+    }
+
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
@@ -59,6 +69,13 @@ class PdfGenerator {
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
+                  if (clinicLogo != null)
+                    pw.Container(
+                      width: 60,
+                      height: 60,
+                      margin: const pw.EdgeInsets.only(right: 15),
+                      child: pw.Image(clinicLogo),
+                    ),
                   pw.Expanded(
                     flex: 3,
                     child: pw.Column(
@@ -126,6 +143,23 @@ class PdfGenerator {
         footer: (pw.Context context) {
           return pw.Column(
             children: [
+              if (signature != null)
+                pw.Container(
+                  alignment: pw.Alignment.centerRight,
+                  margin: const pw.EdgeInsets.only(bottom: 10),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.end,
+                    children: [
+                      pw.Container(
+                        height: 40,
+                        width: 80,
+                        child: pw.Image(signature),
+                      ),
+                      pw.Container(width: 100, height: 0.5, color: PdfColors.grey400),
+                      pw.Text('Authorized Signature', style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey600)),
+                    ],
+                  ),
+                ),
               pw.Divider(color: dividerColor, thickness: 0.5),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
