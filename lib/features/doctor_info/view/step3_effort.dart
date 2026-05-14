@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rxdigi/features/doctor_info/view_model/doctor_onboarding_notifier.dart';
 import 'package:rxdigi/features/doctor_info/widgets/cutom_textfield_widgets.dart';
 
@@ -111,8 +113,42 @@ class _Step3EffortState extends ConsumerState<Step3Effort> {
                               onChanged: (value) =>
                                   notifier.updateField(roomNumber: value),
                             ),
+                            const SizedBox(height: 16),
+                            const CardSectionTitle(title: 'Chamber Logo (Optional)'),
+                            const SizedBox(height: 12),
+                            GestureDetector(
+                              onTap: () async {
+                                final picker = ImagePicker();
+                                final image = await picker.pickImage(source: ImageSource.gallery);
+                                if (image != null) {
+                                  notifier.updateField(clinicLogoPath: image.path);
+                                }
+                              },
+                              child: Container(
+                                height: 100,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[50],
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppColors.borderColor),
+                                ),
+                                child: onboardingState.clinicLogoPath != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.file(File(onboardingState.clinicLogoPath!), fit: BoxFit.cover),
+                                      )
+                                    : Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.add_photo_alternate_outlined, color: AppColors.textGreyColor.withOpacity(0.5), size: 28),
+                                          const SizedBox(height: 4),
+                                          const Text('Logo', style: TextStyle(color: AppColors.textGreyColor, fontSize: 12)),
+                                        ],
+                                      ),
+                              ),
+                            ),
                             const SizedBox(
-                              height: 12,
+                              height: 16,
                             ),
                             Row(
                               children: [

@@ -1,20 +1,20 @@
 import '../database/database_helper.dart';
 
-class CommonDiagnosisRepository {
+class CommonLabTestRepository {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
 
   // Define defaults to ensure they are always available alongside custom entries
-  static const List<String> _defaultDiagnosis = [
-    'Hypertension', 'Diabetes Mellitus', 'Acute Febrile Illness', 'Bronchial Asthma',
-    'IHD', 'Dyspepsia', 'UTI', 'COPD', 'Gastroenteritis', 'Migraine'
+  static const List<String> _defaultLabTests = [
+    'CBC', 'RBS', 'S. Creatinine', 'Lipid Profile', 'ALT (SGPT)', 'TSH', 
+    'USG of W/A', 'Chest X-ray P/A View', 'ECG', 'Urine R/E', 'HbA1c'
   ];
 
-  Future<List<String>> getCommonDiagnosis() async {
+  Future<List<String>> getCommonLabTests() async {
     final db = await _databaseHelper.database;
     
     // Load manually inserted/used data from local storage first
     final result = await db.query(
-      'common_diagnosis',
+      'common_lab_tests',
       orderBy: 'usageCount DESC, lastUsed DESC',
     );
     
@@ -22,7 +22,7 @@ class CommonDiagnosisRepository {
     
     // Merge with defaults so they are never lost, but prioritize used items
     final combined = List<String>.from(savedItems);
-    for (var item in _defaultDiagnosis) {
+    for (var item in _defaultLabTests) {
       if (!combined.any((e) => e.toLowerCase() == item.toLowerCase())) {
         combined.add(item);
       }
@@ -31,13 +31,13 @@ class CommonDiagnosisRepository {
     return combined;
   }
 
-  Future<void> addOrUpdateDiagnosis(String name) async {
+  Future<void> addOrUpdateLabTest(String name) async {
     if (name.trim().isEmpty) return;
     final db = await _databaseHelper.database;
     final trimmedName = name.trim();
 
     final exists = await db.query(
-      'common_diagnosis',
+      'common_lab_tests',
       where: 'name = ?',
       whereArgs: [trimmedName],
     );
@@ -45,7 +45,7 @@ class CommonDiagnosisRepository {
     if (exists.isNotEmpty) {
       final count = (exists.first['usageCount'] as int) + 1;
       await db.update(
-        'common_diagnosis',
+        'common_lab_tests',
         {
           'usageCount': count,
           'lastUsed': DateTime.now().toIso8601String(),
@@ -54,7 +54,7 @@ class CommonDiagnosisRepository {
         whereArgs: [trimmedName],
       );
     } else {
-      await db.insert('common_diagnosis', {
+      await db.insert('common_lab_tests', {
         'name': trimmedName,
         'usageCount': 1,
         'lastUsed': DateTime.now().toIso8601String(),

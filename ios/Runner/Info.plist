@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to let you upload your signature and clinic logo.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to your camera to let you take a photo of your signature and clinic logo.</string>
 </dict>
 </plist>

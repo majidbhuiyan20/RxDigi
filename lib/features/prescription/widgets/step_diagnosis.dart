@@ -2,10 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdigi/app/app_colors.dart';
 import 'package:rxdigi/core/data/repositories/common_diagnosis_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_complaint_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_past_history_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_vital_sign_repository.dart';
 import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
 
 final commonDiagnosisProvider = FutureProvider<List<String>>((ref) {
   return CommonDiagnosisRepository().getCommonDiagnosis();
+});
+
+final commonComplaintsProvider = FutureProvider<List<String>>((ref) {
+  return CommonComplaintRepository().getCommonComplaints();
+});
+
+final commonPastHistoryProvider = FutureProvider<List<String>>((ref) {
+  return CommonPastHistoryRepository().getCommonPastHistory();
+});
+
+final commonVitalSignsProvider = FutureProvider<List<String>>((ref) {
+  return CommonVitalSignRepository().getCommonVitalSigns();
 });
 
 class StepDiagnosis extends ConsumerWidget {
@@ -16,22 +31,30 @@ class StepDiagnosis extends ConsumerWidget {
     final state = ref.watch(prescriptionProvider);
     final notifier = ref.read(prescriptionProvider.notifier);
     final commonDiagnosisAsync = ref.watch(commonDiagnosisProvider);
+    final commonComplaintsAsync = ref.watch(commonComplaintsProvider);
+    final commonPastHistoryAsync = ref.watch(commonPastHistoryProvider);
+    final commonVitalSignsAsync = ref.watch(commonVitalSignsProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMultiChipSection(
-            context,
-            title: 'Chief Complaints *',
-            currentValue: state.chiefComplaints,
-            onChanged: (val) => notifier.updateChiefComplaints(val),
-            commonItems: const [
-              'Fever', 'Cough', 'Body Ache', 'Headache', 'Vomiting', 
-              'Loose Motion', 'Cold', 'Weakness', 'Chest Pain', 'Abdominal Pain'
-            ],
-            hint: 'Add custom complaint...',
+          commonComplaintsAsync.when(
+            data: (commonList) => _buildMultiChipSection(
+              context,
+              title: 'Chief Complaints *',
+              currentValue: state.chiefComplaints,
+              onChanged: (val) => notifier.updateChiefComplaints(val),
+              commonItems: commonList,
+              hint: 'Add custom complaint...',
+              onCustomAdd: (val) async {
+                 await CommonComplaintRepository().addOrUpdateComplaint(val);
+                 ref.invalidate(commonComplaintsProvider);
+              }
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, __) => const SizedBox(),
           ),
           const SizedBox(height: 32),
           commonDiagnosisAsync.when(
@@ -40,9 +63,7 @@ class StepDiagnosis extends ConsumerWidget {
               title: 'Diagnosis *',
               currentValue: state.diagnosis,
               onChanged: (val) => notifier.updateDiagnosis(val),
-              commonItems: commonList.isEmpty 
-                  ? const ['Fever', 'Cold', 'UTI', 'Pneumonia', 'Gastritis', 'Anemia', 'Hypertension', 'Diabetes'] 
-                  : commonList,
+              commonItems: commonList,
               hint: 'Add custom diagnosis...',
               onCustomAdd: (val) async {
                  await CommonDiagnosisRepository().addOrUpdateDiagnosis(val);
@@ -53,22 +74,40 @@ class StepDiagnosis extends ConsumerWidget {
             error: (_, __) => const SizedBox(),
           ),
           const SizedBox(height: 32),
-          _buildMultiChipSection(
-            context,
-            title: 'Vital Signs',
-            currentValue: state.vitalSigns,
-            onChanged: (val) => notifier.updateVitals(val),
-            commonItems: const ['BP', 'Pulse', 'Temp', 'SpO2', 'RR', 'Weight', 'Height'],
-            hint: 'Add vital sign (e.g. BP: 120/80)...',
+          commonVitalSignsAsync.when(
+            data: (commonList) => _buildMultiChipSection(
+              context,
+              title: 'Vital Signs',
+              currentValue: state.vitalSigns,
+              onChanged: (val) => notifier.updateVitals(val),
+              commonItems: commonList,
+              hint: 'Add vital sign (e.g. BP: 120/80)...',
+              onCustomAdd: (val) async {
+                 // For vitals, if they type "BP: 120/80", we might want to save "BP" as the suggestion
+                 final suggestionName = val.contains(':') ? val.split(':')[0].trim() : val;
+                 await CommonVitalSignRepository().addOrUpdateVitalSign(suggestionName);
+                 ref.invalidate(commonVitalSignsProvider);
+              }
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, __) => const SizedBox(),
           ),
           const SizedBox(height: 32),
-          _buildMultiChipSection(
-            context,
-            title: 'Past History',
-            currentValue: state.pastHistory,
-            onChanged: (val) => notifier.updatePastHistory(val),
-            commonItems: const ['DM', 'HTN', 'BA', 'CKD', 'IHD', 'Surgery', 'Allergy', 'Asthma'],
-            hint: 'Add past history...',
+          commonPastHistoryAsync.when(
+            data: (commonList) => _buildMultiChipSection(
+              context,
+              title: 'Past History',
+              currentValue: state.pastHistory,
+              onChanged: (val) => notifier.updatePastHistory(val),
+              commonItems: commonList,
+              hint: 'Add past history...',
+              onCustomAdd: (val) async {
+                 await CommonPastHistoryRepository().addOrUpdatePastHistory(val);
+                 ref.invalidate(commonPastHistoryProvider);
+              }
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, __) => const SizedBox(),
           ),
           const SizedBox(height: 100),
         ],
@@ -99,7 +138,7 @@ class StepDiagnosis extends ConsumerWidget {
             TextButton.icon(
               onPressed: () => _showCustomAddDialog(context, title, hint, (val) {
                 if (!selectedItems.contains(val)) {
-                  final newList = [...selectedItems, val];
+                  final newList = [val, ...selectedItems];
                   onChanged(newList.join(', '));
                   if (onCustomAdd != null) onCustomAdd(val);
                 }
@@ -110,7 +149,39 @@ class StepDiagnosis extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 8),
-        
+
+        // Suggestions (Common items) - Now shown ABOVE the selection box
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: commonItems.map((item) {
+            final isSelected = selectedItems.contains(item);
+            return ActionChip(
+              label: Text(item),
+              backgroundColor: isSelected ? AppColors.primaryColor.withOpacity(0.1) : Colors.white,
+              labelStyle: TextStyle(
+                fontSize: 12,
+                color: isSelected ? AppColors.primaryColor : Colors.black87,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: isSelected ? AppColors.primaryColor : Colors.grey.shade300),
+              ),
+              onPressed: () {
+                if (!isSelected) {
+                  final newList = [item, ...selectedItems];
+                  onChanged(newList.join(', '));
+                } else {
+                  final newList = selectedItems.where((e) => e != item).toList();
+                  onChanged(newList.join(', '));
+                }
+              },
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 12),
+
         // Selected Items (shown as removable chips)
         Container(
           width: double.infinity,
@@ -139,38 +210,6 @@ class StepDiagnosis extends ConsumerWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   )).toList(),
                 ),
-        ),
-        const SizedBox(height: 12),
-
-        // Suggestions (Common items)
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: commonItems.map((item) {
-            final isSelected = selectedItems.contains(item);
-            return ActionChip(
-              label: Text(item),
-              backgroundColor: isSelected ? AppColors.primaryColor.withOpacity(0.1) : Colors.white,
-              labelStyle: TextStyle(
-                fontSize: 12,
-                color: isSelected ? AppColors.primaryColor : Colors.black87,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: isSelected ? AppColors.primaryColor : Colors.grey.shade300),
-              ),
-              onPressed: () {
-                if (!isSelected) {
-                  final newList = [...selectedItems, item];
-                  onChanged(newList.join(', '));
-                } else {
-                  final newList = selectedItems.where((e) => e != item).toList();
-                  onChanged(newList.join(', '));
-                }
-              },
-            );
-          }).toList(),
         ),
       ],
     );

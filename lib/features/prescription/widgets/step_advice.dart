@@ -1,7 +1,18 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rxdigi/app/app_colors.dart';
+import 'package:rxdigi/core/data/repositories/common_advice_repository.dart';
+import 'package:rxdigi/core/data/repositories/common_lab_test_repository.dart';
 import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
+
+final commonAdviceProvider = FutureProvider<List<String>>((ref) {
+  return CommonAdviceRepository().getCommonAdvice();
+});
+
+final commonLabTestProvider = FutureProvider<List<String>>((ref) {
+  return CommonLabTestRepository().getCommonLabTests();
+});
 
 class StepAdvice extends ConsumerWidget {
   const StepAdvice({super.key});
@@ -10,52 +21,114 @@ class StepAdvice extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(prescriptionProvider);
     final notifier = ref.read(prescriptionProvider.notifier);
-
-    final List<String> commonAdvice = [
-      'Drink plenty of water',
-      'Take complete rest',
-      'Avoid cold food/drinks',
-      'Walk for 30 minutes daily',
-      'Stop smoking',
-      'Avoid oily and spicy food',
-      'Eat fresh fruits and vegetables',
-      'Maintain personal hygiene'
-    ];
-
-    final List<String> commonTests = [
-      'CBC', 'CRP', 'Blood Sugar (F/PP)', 'Urine R/M/E', 'X-ray Chest P/A View', 'ECG', 'USG of W/A', 'Lipid Profile'
-    ];
+    final commonAdviceAsync = ref.watch(commonAdviceProvider);
+    final commonLabTestsAsync = ref.watch(commonLabTestProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMultiChipSection(
-            context,
-            title: 'Advice',
-            currentValue: state.advice,
-            onChanged: (val) => notifier.updateAdvice(val),
-            commonItems: commonAdvice,
-            hint: 'Add custom advice...',
+          commonAdviceAsync.when(
+            data: (commonList) => _buildMultiChipSection(
+              context,
+              title: 'Advice',
+              currentValue: state.advice,
+              onChanged: (val) => notifier.updateAdvice(val),
+              commonItems: commonList,
+              hint: 'Add custom advice...',
+              onCustomAdd: (val) async {
+                await CommonAdviceRepository().addOrUpdateAdvice(val);
+                ref.invalidate(commonAdviceProvider);
+              },
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, __) => const SizedBox(),
           ),
           const SizedBox(height: 32),
-          _buildLabTestSection(context, state, notifier, commonTests),
+          commonLabTestsAsync.when(
+            data: (commonList) => _buildLabTestSection(
+              context,
+              state,
+              notifier,
+              commonList,
+              onCustomAdd: (val) async {
+                await CommonLabTestRepository().addOrUpdateLabTest(val);
+                ref.invalidate(commonLabTestProvider);
+              },
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (_, __) => const SizedBox(),
+          ),
           const SizedBox(height: 32),
           const Text('Follow-up / Next Visit', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.topHeaderColor)),
           const SizedBox(height: 12),
-          TextFormField(
-            key: Key('next_visit_${state.nextVisit}'),
-            initialValue: state.nextVisit,
-            onChanged: notifier.updateNextVisit,
-            decoration: InputDecoration(
-              hintText: 'e.g. After 7 days or 15/05/2026',
-              prefixIcon: const Icon(Icons.calendar_today, color: AppColors.primaryColor),
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-            ),
+          Wrap(
+            spacing: 8,
+            children: [
+              'After 3 days',
+              'After 7 days',
+              'After 15 days',
+              'After 1 month',
+            ].map((duration) => ActionChip(
+              label: Text(duration),
+              onPressed: () => notifier.updateNextVisit(duration),
+              backgroundColor: state.nextVisit == duration ? AppColors.primaryColor.withOpacity(0.1) : Colors.white,
+              labelStyle: TextStyle(
+                color: state.nextVisit == duration ? AppColors.primaryColor : Colors.black87,
+                fontSize: 12,
+              ),
+            )).toList(),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  key: Key('next_visit_${state.nextVisit}'),
+                  initialValue: state.nextVisit,
+                  onChanged: notifier.updateNextVisit,
+                  decoration: InputDecoration(
+                    hintText: 'e.g. After 7 days or 15/05/2026',
+                    prefixIcon: const Icon(Icons.calendar_today, color: AppColors.primaryColor),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              IconButton.filled(
+                onPressed: () async {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now().add(const Duration(days: 7)),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                    builder: (context, child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: const ColorScheme.light(
+                            primary: AppColors.primaryColor,
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
+                  );
+                  if (picked != null) {
+                    notifier.updateNextVisit(DateFormat('dd/MM/yyyy').format(picked));
+                  }
+                },
+                icon: const Icon(Icons.date_range),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  minimumSize: const Size(56, 56),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 100),
         ],
@@ -70,6 +143,7 @@ class StepAdvice extends ConsumerWidget {
     required Function(String) onChanged,
     required List<String> commonItems,
     required String hint,
+    Function(String)? onCustomAdd,
   }) {
     final List<String> selectedItems = currentValue != null && currentValue.trim().isNotEmpty
         ? currentValue.split('. ').map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
@@ -85,8 +159,9 @@ class StepAdvice extends ConsumerWidget {
             TextButton.icon(
               onPressed: () => _showCustomAddDialog(context, title, hint, (val) {
                 if (!selectedItems.contains(val)) {
-                  final newList = [...selectedItems, val];
+                  final newList = [val, ...selectedItems];
                   onChanged(newList.join('. '));
+                  if (onCustomAdd != null) onCustomAdd(val);
                 }
               }),
               icon: const Icon(Icons.add_circle_outline, size: 18),
@@ -95,35 +170,6 @@ class StepAdvice extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 8),
-        
-        // Selected Items (shown as removable chips)
-        Container(
-          width: double.infinity,
-
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          child: selectedItems.isEmpty
-              ? Text('No $title selected', style: TextStyle(color: Colors.grey.shade400, fontSize: 14))
-              : Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: selectedItems.map((item) => InputChip(
-                    label: Text(item),
-                    onDeleted: () {
-                      final newList = selectedItems.where((e) => e != item).toList();
-                      onChanged(newList.join('. '));
-                    },
-                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
-                    deleteIconColor: Colors.red,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  )).toList(),
-                ),
-        ),
-        const SizedBox(height: 12),
 
         // Suggestions (Common items)
         Wrap(
@@ -145,8 +191,9 @@ class StepAdvice extends ConsumerWidget {
               ),
               onPressed: () {
                 if (!isSelected) {
-                  final newList = [...selectedItems, item];
+                  final newList = [item, ...selectedItems];
                   onChanged(newList.join('. '));
+                  if (onCustomAdd != null) onCustomAdd(item);
                 } else {
                   final newList = selectedItems.where((e) => e != item).toList();
                   onChanged(newList.join('. '));
@@ -155,11 +202,45 @@ class StepAdvice extends ConsumerWidget {
             );
           }).toList(),
         ),
+        const SizedBox(height: 12),
+
+        // Selected Items (shown as removable chips)
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: selectedItems.isEmpty
+              ? Center(child: Text('No $title selected', style: TextStyle(color: Colors.grey.shade400, fontSize: 14)))
+              : Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: selectedItems.map((item) => InputChip(
+                    label: Text(item),
+                    onDeleted: () {
+                      final newList = selectedItems.where((e) => e != item).toList();
+                      onChanged(newList.join('. '));
+                    },
+                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+                    deleteIconColor: Colors.red,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  )).toList(),
+                ),
+        ),
       ],
     );
   }
 
-  Widget _buildLabTestSection(BuildContext context, PrescriptionState state, PrescriptionNotifier notifier, List<String> commonItems) {
+  Widget _buildLabTestSection(
+    BuildContext context,
+    PrescriptionState state,
+    PrescriptionNotifier notifier,
+    List<String> commonItems, {
+    Function(String)? onCustomAdd,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -170,6 +251,7 @@ class StepAdvice extends ConsumerWidget {
             TextButton.icon(
               onPressed: () => _showCustomAddDialog(context, 'Lab Test', 'e.g. MRI Brain', (val) {
                 notifier.addLabTest(val);
+                if (onCustomAdd != null) onCustomAdd(val);
               }),
               icon: const Icon(Icons.add_circle_outline, size: 18),
               label: const Text('Custom'),
@@ -177,32 +259,6 @@ class StepAdvice extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 8),
-        
-        // Selected Tests as Chips
-        Container(
-          width: double.infinity,
-
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          child: state.labTests.isEmpty
-              ? Center(child: Text('No Lab Tests selected', style: TextStyle(color: Colors.grey.shade400, fontSize: 14)))
-              : Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: state.labTests.map((test) => InputChip(
-                    label: Text(test),
-                    onDeleted: () => notifier.removeLabTest(test),
-                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
-                    deleteIconColor: Colors.red,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  )).toList(),
-                ),
-        ),
-        const SizedBox(height: 12),
 
         // Suggestions
         Wrap(
@@ -227,10 +283,36 @@ class StepAdvice extends ConsumerWidget {
                   notifier.removeLabTest(test);
                 } else {
                   notifier.addLabTest(test);
+                  if (onCustomAdd != null) onCustomAdd(test);
                 }
               },
             );
           }).toList(),
+        ),
+        const SizedBox(height: 12),
+
+        // Selected Tests as Chips
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: state.labTests.isEmpty
+              ? Center(child: Text('No Lab Tests selected', style: TextStyle(color: Colors.grey.shade400, fontSize: 14)))
+              : Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: state.labTests.map((test) => InputChip(
+                    label: Text(test),
+                    onDeleted: () => notifier.removeLabTest(test),
+                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+                    deleteIconColor: Colors.red,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  )).toList(),
+                ),
         ),
       ],
     );

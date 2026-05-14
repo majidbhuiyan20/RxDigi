@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import '../../../core/data/models/doctor_model.dart';
 import '../../../core/data/providers/doctor_provider.dart';
 
@@ -27,6 +30,8 @@ class DoctorOnboardingState {
   final List<String> offDays;
   final String? position;
   final String? department;
+  final String? signaturePath;
+  final String? clinicLogoPath;
 
   DoctorOnboardingState({
     this.title,
@@ -52,6 +57,8 @@ class DoctorOnboardingState {
     this.offDays = const [],
     this.position,
     this.department,
+    this.signaturePath,
+    this.clinicLogoPath,
   });
 
   DoctorOnboardingState copyWith({
@@ -78,6 +85,8 @@ class DoctorOnboardingState {
     List<String>? offDays,
     String? position,
     String? department,
+    String? signaturePath,
+    String? clinicLogoPath,
   }) {
     return DoctorOnboardingState(
       title: title ?? this.title,
@@ -103,6 +112,8 @@ class DoctorOnboardingState {
       offDays: offDays ?? this.offDays,
       position: position ?? this.position,
       department: department ?? this.department,
+      signaturePath: signaturePath ?? this.signaturePath,
+      clinicLogoPath: clinicLogoPath ?? this.clinicLogoPath,
     );
   }
 
@@ -131,6 +142,8 @@ class DoctorOnboardingState {
       offDays: offDays.join(', '),
       position: position,
       department: department,
+      signaturePath: signaturePath,
+      clinicLogoPath: clinicLogoPath,
     );
   }
 }
@@ -166,6 +179,8 @@ class DoctorOnboardingNotifier extends StateNotifier<DoctorOnboardingState> {
     List<String>? offDays,
     String? position,
     String? department,
+    String? signaturePath,
+    String? clinicLogoPath,
   }) {
     state = state.copyWith(
       title: title,
@@ -191,12 +206,43 @@ class DoctorOnboardingNotifier extends StateNotifier<DoctorOnboardingState> {
       offDays: offDays,
       position: position,
       department: department,
+      signaturePath: signaturePath,
+      clinicLogoPath: clinicLogoPath,
     );
   }
 
   Future<void> saveDoctor(WidgetRef ref) async {
     final repository = ref.read(doctorRepositoryProvider);
-    await repository.insert(state.toModel());
+    
+    String? finalSignaturePath = state.signaturePath;
+    String? finalLogoPath = state.clinicLogoPath;
+
+    final appDir = await getApplicationDocumentsDirectory();
+
+    if (state.signaturePath != null && !state.signaturePath!.contains(appDir.path)) {
+      final file = File(state.signaturePath!);
+      if (await file.exists()) {
+        final fileName = 'signature_${DateTime.now().millisecondsSinceEpoch}${p.extension(state.signaturePath!)}';
+        final savedFile = await file.copy(p.join(appDir.path, fileName));
+        finalSignaturePath = savedFile.path;
+      }
+    }
+
+    if (state.clinicLogoPath != null && !state.clinicLogoPath!.contains(appDir.path)) {
+      final file = File(state.clinicLogoPath!);
+      if (await file.exists()) {
+        final fileName = 'logo_${DateTime.now().millisecondsSinceEpoch}${p.extension(state.clinicLogoPath!)}';
+        final savedFile = await file.copy(p.join(appDir.path, fileName));
+        finalLogoPath = savedFile.path;
+      }
+    }
+
+    final doctorModel = state.toModel().copyWith(
+      signaturePath: finalSignaturePath,
+      clinicLogoPath: finalLogoPath,
+    );
+
+    await repository.insert(doctorModel);
     ref.invalidate(latestDoctorProvider);
   }
 }

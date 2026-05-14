@@ -1,76 +1,47 @@
-name: "Build & Release"
+name: Build APK Fast
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
       - master
-  pull_request:
-    branches:
-      - main
-      - master
-  workflow_dispatch:
-    inputs:
-      branch_name:
-        description: 'Branch to build from'
-        required: true
-        default: 'main'
 
 jobs:
   build:
-    name: Build & Release
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch_name || github.ref }}
+      - uses: actions/checkout@v4
 
-      - name: Set up Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: zulu
           java-version: '17'
 
-      - name: Set up Flutter
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.3'
-          channel: 'stable'
+          flutter-version: '3.41.9'
+          channel: stable
           cache: true
 
-      - name: Build Release APKs
-        run: |
-          flutter build apk --release --split-per-abi
+      - name: Get Dependencies
+        run: flutter pub get
 
-      - name: Build Profile APKs
-        run: flutter build apk --profile --split-per-abi
+      - name: Build APKs
+        run: flutter build apk --release --split-per-abi
 
-      - name: Build App Bundle
-        run: flutter build appbundle --release
-
-      - name: Build iOS IPA (Unsigned)
-        run: |
-          flutter build ios --no-codesign
-          cd build/ios/iphoneos
-          mkdir Payload
-          cp -r Runner.app Payload
-          zip -r app.ipa Payload
-
-      - name: Upload Artifacts
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-builds
-          path: |
-            build/app/outputs/flutter-apk/*.apk
-            build/app/outputs/bundle/release/*.aab
-            build/app/outputs/apk/profile/*.apk
-            build/ios/iphoneos/app.ipa
+          name: app-release
+          path: build/app/outputs/flutter-apk/*.apk
 
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/flutter-apk/*.apk,build/app/outputs/bundle/release/*.aab,build/app/outputs/apk/profile/*.apk,build/ios/iphoneos/app.ipa"
-          tag: v1.0.${{ github.run_number }}-${{ github.event.inputs.branch_name || 'main' }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: build/app/outputs/flutter-apk/*.apk
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.TOKEN }}
