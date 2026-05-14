@@ -28,7 +28,7 @@ class StepDiagnosis extends ConsumerWidget {
             currentValue: state.chiefComplaints,
             onChanged: (val) => notifier.updateChiefComplaints(val),
             commonItems: const [
-              'Fever', 'Cough', 'Body Ache', 'Headache', 'Vomiting', 
+              'Fever', 'Cough', 'Body Ache', 'Headache', 'Vomiting',
               'Loose Motion', 'Cold', 'Weakness', 'Chest Pain', 'Abdominal Pain'
             ],
             hint: 'Add custom complaint...',
@@ -99,7 +99,7 @@ class StepDiagnosis extends ConsumerWidget {
             TextButton.icon(
               onPressed: () => _showCustomAddDialog(context, title, hint, (val) {
                 if (!selectedItems.contains(val)) {
-                  final newList = [...selectedItems, val];
+                  final newList = [val, ...selectedItems];
                   onChanged(newList.join(', '));
                   if (onCustomAdd != null) onCustomAdd(val);
                 }
@@ -110,7 +110,39 @@ class StepDiagnosis extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 8),
-        
+
+        // Suggestions (Common items) - Now shown ABOVE the selection box
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: commonItems.map((item) {
+            final isSelected = selectedItems.contains(item);
+            return ActionChip(
+              label: Text(item),
+              backgroundColor: isSelected ? AppColors.primaryColor.withOpacity(0.1) : Colors.white,
+              labelStyle: TextStyle(
+                fontSize: 12,
+                color: isSelected ? AppColors.primaryColor : Colors.black87,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: isSelected ? AppColors.primaryColor : Colors.grey.shade300),
+              ),
+              onPressed: () {
+                if (!isSelected) {
+                  final newList = [item, ...selectedItems];
+                  onChanged(newList.join(', '));
+                } else {
+                  final newList = selectedItems.where((e) => e != item).toList();
+                  onChanged(newList.join(', '));
+                }
+              },
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 12),
+
         // Selected Items (shown as removable chips)
         Container(
           width: double.infinity,
@@ -139,38 +171,6 @@ class StepDiagnosis extends ConsumerWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   )).toList(),
                 ),
-        ),
-        const SizedBox(height: 12),
-
-        // Suggestions (Common items)
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: commonItems.map((item) {
-            final isSelected = selectedItems.contains(item);
-            return ActionChip(
-              label: Text(item),
-              backgroundColor: isSelected ? AppColors.primaryColor.withOpacity(0.1) : Colors.white,
-              labelStyle: TextStyle(
-                fontSize: 12,
-                color: isSelected ? AppColors.primaryColor : Colors.black87,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: isSelected ? AppColors.primaryColor : Colors.grey.shade300),
-              ),
-              onPressed: () {
-                if (!isSelected) {
-                  final newList = [...selectedItems, item];
-                  onChanged(newList.join(', '));
-                } else {
-                  final newList = selectedItems.where((e) => e != item).toList();
-                  onChanged(newList.join(', '));
-                }
-              },
-            );
-          }).toList(),
         ),
       ],
     );

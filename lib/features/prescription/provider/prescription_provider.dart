@@ -91,7 +91,7 @@ class PrescriptionNotifier extends StateNotifier<PrescriptionState> {
   }
 
   void addMedicine(MedicineInPrescription medicine) {
-    state = state.copyWith(medicines: [...state.medicines, medicine]);
+    state = state.copyWith(medicines: [medicine, ...state.medicines]);
   }
 
   void removeMedicine(int index) {
@@ -110,7 +110,7 @@ class PrescriptionNotifier extends StateNotifier<PrescriptionState> {
 
   void addLabTest(String test) {
     if (!state.labTests.contains(test)) {
-      state = state.copyWith(labTests: [...state.labTests, test]);
+      state = state.copyWith(labTests: [test, ...state.labTests]);
     }
   }
 

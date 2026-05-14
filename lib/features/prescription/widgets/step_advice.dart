@@ -95,35 +95,6 @@ class StepAdvice extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 8),
-        
-        // Selected Items (shown as removable chips)
-        Container(
-          width: double.infinity,
-
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          child: selectedItems.isEmpty
-              ? Text('No $title selected', style: TextStyle(color: Colors.grey.shade400, fontSize: 14))
-              : Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: selectedItems.map((item) => InputChip(
-                    label: Text(item),
-                    onDeleted: () {
-                      final newList = selectedItems.where((e) => e != item).toList();
-                      onChanged(newList.join('. '));
-                    },
-                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
-                    deleteIconColor: Colors.red,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  )).toList(),
-                ),
-        ),
-        const SizedBox(height: 12),
 
         // Suggestions (Common items)
         Wrap(
@@ -155,6 +126,34 @@ class StepAdvice extends ConsumerWidget {
             );
           }).toList(),
         ),
+        const SizedBox(height: 12),
+
+        // Selected Items (shown as removable chips)
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: selectedItems.isEmpty
+              ? Center(child: Text('No $title selected', style: TextStyle(color: Colors.grey.shade400, fontSize: 14)))
+              : Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: selectedItems.map((item) => InputChip(
+                    label: Text(item),
+                    onDeleted: () {
+                      final newList = selectedItems.where((e) => e != item).toList();
+                      onChanged(newList.join('. '));
+                    },
+                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+                    deleteIconColor: Colors.red,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  )).toList(),
+                ),
+        ),
       ],
     );
   }
@@ -178,32 +177,6 @@ class StepAdvice extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         
-        // Selected Tests as Chips
-        Container(
-          width: double.infinity,
-
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          child: state.labTests.isEmpty
-              ? Center(child: Text('No Lab Tests selected', style: TextStyle(color: Colors.grey.shade400, fontSize: 14)))
-              : Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: state.labTests.map((test) => InputChip(
-                    label: Text(test),
-                    onDeleted: () => notifier.removeLabTest(test),
-                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
-                    deleteIconColor: Colors.red,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  )).toList(),
-                ),
-        ),
-        const SizedBox(height: 12),
-
         // Suggestions
         Wrap(
           spacing: 8,
@@ -231,6 +204,31 @@ class StepAdvice extends ConsumerWidget {
               },
             );
           }).toList(),
+        ),
+        const SizedBox(height: 12),
+
+        // Selected Tests as Chips
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: state.labTests.isEmpty
+              ? Center(child: Text('No Lab Tests selected', style: TextStyle(color: Colors.grey.shade400, fontSize: 14)))
+              : Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: state.labTests.map((test) => InputChip(
+                    label: Text(test),
+                    onDeleted: () => notifier.removeLabTest(test),
+                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+                    deleteIconColor: Colors.red,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  )).toList(),
+                ),
         ),
       ],
     );
