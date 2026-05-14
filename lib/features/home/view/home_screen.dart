@@ -55,12 +55,12 @@ class HomeScreen extends ConsumerWidget {
             children: [
               // --- 1. Enhanced Header (Fixed) ---
               Container(
+                height: 70 + MediaQuery.of(context).padding.top,
                 width: double.infinity,
-                padding: EdgeInsets.fromLTRB(
-                  24,
-                  MediaQuery.of(context).padding.top + 16,
-                  24,
-                  40,
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: MediaQuery.of(context).padding.top,
                 ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -68,84 +68,43 @@ class HomeScreen extends ConsumerWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(40),
-                    bottomRight: Radius.circular(40),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryColor.withOpacity(0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                todayDate.toUpperCase(),
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.6),
-                                  fontSize: 12,
-                                  letterSpacing: 1.2,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'PlusJakartaSans',
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Welcome, ${doctor.title ?? ''} ${doctor.fullName.split(' ').first}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'PlayfairDisplay',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => Navigator.pushNamed(context, AppRoutes.settingsScreenRoute),
-                          child: Hero(
-                            tag: 'settings_icon',
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: Colors.white.withOpacity(0.1)),
-                              ),
-                              child: const Icon(Icons.settings_outlined, color: Colors.white, size: 24),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, color: Colors.white70, size: 16),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            doctor.clinicName,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${doctor.title ?? ''} ${doctor.fullName.split(' ').first}',
                             style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                              fontFamily: 'PlusJakartaSans',
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
+                          Text(
+                            todayDate,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pushNamed(context, AppRoutes.settingsScreenRoute),
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
                         ),
-                      ],
+                        child: const Icon(Icons.settings, color: Colors.white, size: 20),
+                      ),
                     ),
                   ],
                 ),
@@ -153,51 +112,44 @@ class HomeScreen extends ConsumerWidget {
 
               Expanded(
                 child: SingleChildScrollView(
-                  clipBehavior: Clip.none,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Transform.translate(
-                          offset: const Offset(0, -20),
-                          child: Row(
-                            children: [
-                              _buildSummaryCard(
-                                context,
-                                title: "Prescriptions",
-                                count: todayPrescriptionCount.toString(),
-                                icon: Icons.assignment_outlined,
-                                color: AppColors.actionBlue,
-                              ),
-                              const SizedBox(width: 16),
-                              _buildSummaryCard(
-                                context,
-                                title: "Today's Patients",
-                                count: todayUniquePatientsCount.toString(),
-                                icon: Icons.groups_outlined,
-                                color: AppColors.successColor,
-                              ),
-                            ],
-                          ),
+                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                        child: Row(
+                          children: [
+                            _buildSummaryCard(
+                              context,
+                              title: "Prescriptions",
+                              count: todayPrescriptionCount.toString(),
+                              icon: Icons.assignment_outlined,
+                              color: AppColors.actionBlue,
+                            ),
+                            const SizedBox(width: 16),
+                            _buildSummaryCard(
+                              context,
+                              title: "Today's Patients",
+                              count: todayUniquePatientsCount.toString(),
+                              icon: Icons.groups_outlined,
+                              color: AppColors.successColor,
+                            ),
+                          ],
                         ),
-                      ),
-
+                      ),SizedBox(height: 16,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // --- 2. Quick Actions ---
-                            const SizedBox(height: 12),
                             Text(
                               "Quick Actions",
-                              style: AppTextStyles.largeBlackTextStyle(context).copyWith(fontSize: 18),
+                              style: AppTextStyles.largeBlackTextStyle(context).copyWith(fontSize: 18, letterSpacing: -0.5),
                             ),
-                            const SizedBox(height: 16),
                             GridView.count(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
+                              padding: EdgeInsets.symmetric(vertical: 16),
                               crossAxisCount: 2,
                               crossAxisSpacing: 16,
                               mainAxisSpacing: 16,
@@ -245,8 +197,8 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 8),
 
-                            const SizedBox(height: 32),
 
                             // --- 3. Recent Prescriptions ---
                             Row(
@@ -254,7 +206,7 @@ class HomeScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   "Recent Activity",
-                                  style: AppTextStyles.largeBlackTextStyle(context).copyWith(fontSize: 18),
+                                  style: AppTextStyles.largeBlackTextStyle(context).copyWith(fontSize: 18, letterSpacing: -0.5),
                                 ),
                                 TextButton(
                                   onPressed: () {
@@ -400,27 +352,28 @@ class HomeScreen extends ConsumerWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.borderColor.withOpacity(0.5)),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color.withOpacity(0.2)),
+            color: color.withOpacity(0.03),
           ),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 20),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Text(
                 title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 15,
+                  fontSize: 14,
                   color: Colors.black87,
                 ),
               ),
@@ -437,7 +390,7 @@ class HomeScreen extends ConsumerWidget {
     return patientAsync.when(
       data: (patient) {
         if (patient == null) return const SizedBox.shrink();
-        
+
         return Material(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
