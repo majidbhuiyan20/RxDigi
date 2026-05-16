@@ -25,7 +25,7 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
   bool _isSearching = false;
 
   void _onSearch(String query) async {
-    if (query.length < 2) {
+    if (query.isEmpty) {
       setState(() => _searchResults = []);
       return;
     }
@@ -263,23 +263,18 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
                   favoritesAsync.when(
                     data: (favorites) {
                       if (favorites.isEmpty) return const SizedBox.shrink();
-                      return SizedBox(
-                        height: 50,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: favorites.length,
-                          itemBuilder: (context, index) {
-                            final med = favorites[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: ActionChip(
-                                label: Text(med.name),
-                                backgroundColor: AppColors.primaryColor.withOpacity(0.05),
-                                onPressed: () => _showAddMedicineDialog(med),
-                              ),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 0,
+                          children: favorites.map((med) {
+                            return ActionChip(
+                              label: Text(med.name),
+                              backgroundColor: AppColors.primaryColor.withOpacity(0.05),
+                              onPressed: () => _showAddMedicineDialog(med),
                             );
-                          },
+                          }).toList(),
                         ),
                       );
                     },
