@@ -55,7 +55,7 @@ class HomeScreen extends ConsumerWidget {
             children: [
               // --- 1. Enhanced Header (Fixed) ---
               Container(
-                height: 70 + MediaQuery.of(context).padding.top,
+                height: 60 + MediaQuery.of(context).padding.top,
                 width: double.infinity,
                 padding: EdgeInsets.only(
                   left: 20,
@@ -74,7 +74,7 @@ class HomeScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment : CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
@@ -116,7 +116,7 @@ class HomeScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
                         child: Row(
                           children: [
                             _buildSummaryCard(
@@ -136,7 +136,7 @@ class HomeScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
-                      ),SizedBox(height: 16,),
+                      ),const SizedBox(height: 12),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
@@ -149,11 +149,11 @@ class HomeScreen extends ConsumerWidget {
                             GridView.count(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              padding: EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                               crossAxisCount: 2,
                               crossAxisSpacing: 16,
                               mainAxisSpacing: 16,
-                              childAspectRatio: 2.2,
+                              childAspectRatio: 2.5,
                               children: [
                                 _buildQuickAction(
                                   context,
@@ -197,9 +197,6 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
-
-
                             // --- 3. Recent Prescriptions ---
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -219,19 +216,20 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+
                             prescriptionsAsync.when(
                               data: (prescriptions) {
                                 if (prescriptions.isEmpty) {
                                   return _buildEmptyState();
                                 }
 
-                                final recent = prescriptions.take(10).toList();
-                                return ListView.separated(
+                                final recent = prescriptions.take(8).toList();
+                                return  ListView.separated(
+                                  padding: EdgeInsets.zero,
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemCount: recent.length,
-                                  separatorBuilder: (context, index) => const SizedBox(height: 12),
+                                  separatorBuilder: (context, index) => const SizedBox(height: 10),
                                   itemBuilder: (context, index) {
                                     final p = recent[index];
                                     return _buildRecentPrescriptionCard(context, ref, p);
@@ -244,7 +242,6 @@ class HomeScreen extends ConsumerWidget {
                               )),
                               error: (err, stack) => Text('Error: $err'),
                             ),
-
                             const SizedBox(height: 40),
                           ],
                         ),
@@ -295,7 +292,7 @@ class HomeScreen extends ConsumerWidget {
       {required String title, required String count, required IconData icon, required Color color}) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
@@ -318,11 +315,11 @@ class HomeScreen extends ConsumerWidget {
               ),
               child: Icon(icon, color: color, size: 22),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
               count,
               style: const TextStyle(
-                fontSize: 26,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -331,7 +328,7 @@ class HomeScreen extends ConsumerWidget {
             Text(
               title,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: AppColors.textGreyColor,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'PlusJakartaSans',
@@ -408,16 +405,16 @@ class HomeScreen extends ConsumerWidget {
             },
             borderRadius: BorderRadius.circular(16),
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.borderColor.withOpacity(0.5)),
               ),
               child: Row(
                 children: [
-                  Container(
-                    height: 48,
-                    width: 48,
+                /* Container(
+                    height: 40,
+                    width: 40,
                     decoration: BoxDecoration(
                       color: AppColors.primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -428,12 +425,12 @@ class HomeScreen extends ConsumerWidget {
                         style: TextStyle(
                           color: AppColors.primaryColor,
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 18,
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
+                ), */
+                const SizedBox(width: 4),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,7 +442,7 @@ class HomeScreen extends ConsumerWidget {
                         const SizedBox(height: 4),
                         Text(
                           DateFormat('dd MMM, yyyy • hh:mm a').format(prescription.date),
-                          style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                         ),
                       ],
                     ),
@@ -458,12 +455,15 @@ class HomeScreen extends ConsumerWidget {
                         await PdfGenerator.printPrescription(prescription, patient, doctor);
                       }
                     },
+                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.all(8),
                   ),
                   IconButton(
                     icon: Icon(Icons.delete_outline, color: Colors.red.shade300, size: 20),
                     onPressed: () => _confirmDeletePrescription(context, ref, prescription, patient.name),
+                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.all(8),
                   ),
-                  Icon(Icons.chevron_right, color: Colors.grey.shade400),
                 ],
               ),
             ),

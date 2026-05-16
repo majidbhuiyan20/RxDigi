@@ -125,12 +125,12 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
                 
                 const Text('Dose (Frequency)', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                _buildChips(['1+0+0', '1+0+1', '1+1+1', '0+0+1', 'Every 8 hours'], dose, (val) => setModalState(() => dose = val)),
+                _buildChips(['1+0+0', '1+0+1', '1+1+1', '0+0+1', 'Every 8 hours', 'Every 6 hours'], dose, (val) => setModalState(() => dose = val)),
                 
                 const SizedBox(height: 16),
                 const Text('Duration', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                _buildChips(['3 days', '5 days', '7 days', '14 days', '1 month'], duration, (val) => setModalState(() => duration = val)),
+                _buildChips(['3 days', '5 days', '7 days', '14 days', '1 month', 'Continue'], duration, (val) => setModalState(() => duration = val)),
 
                 const SizedBox(height: 16),
                 const Text('Instruction', style: TextStyle(fontWeight: FontWeight.bold)),
