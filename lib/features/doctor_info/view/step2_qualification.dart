@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdigi/features/doctor_info/view_model/doctor_onboarding_notifier.dart';
-import 'package:rxdigi/features/doctor_info/widgets/card_section_title.dart';
-import 'package:rxdigi/features/doctor_info/widgets/card_title_section.dart';
-import 'package:rxdigi/features/doctor_info/widgets/cutom_textfield_widgets.dart';
-import 'package:rxdigi/features/doctor_info/widgets/selectable_title_chip.dart';
+import 'package:prescripto/features/doctor_info/view_model/doctor_onboarding_notifier.dart';
+import 'package:prescripto/features/doctor_info/widgets/card_section_title.dart';
+import 'package:prescripto/features/doctor_info/widgets/card_title_section.dart';
+import 'package:prescripto/features/doctor_info/widgets/cutom_textfield_widgets.dart';
+import 'package:prescripto/features/doctor_info/widgets/selectable_title_chip.dart';
 
 import '../../../app/app_colors.dart';
 import '../../../app/app_text_style.dart';

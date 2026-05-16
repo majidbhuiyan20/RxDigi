@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/app/app_text_style.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/app/app_text_style.dart';
 
 final selectedTitleProvider = StateProvider<String?>((ref) => null);
 final selectedGenderProvider = StateProvider<String?>((ref) => null);

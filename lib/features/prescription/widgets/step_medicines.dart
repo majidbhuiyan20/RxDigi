@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/core/data/models/medicine_model.dart';
-import 'package:rxdigi/core/data/models/medicine_in_prescription_model.dart';
-import 'package:rxdigi/core/data/repositories/medicine_repository.dart';
-import 'package:rxdigi/core/data/repositories/favorite_medicine_repository.dart';
-import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/core/data/models/medicine_model.dart';
+import 'package:prescripto/core/data/models/medicine_in_prescription_model.dart';
+import 'package:prescripto/core/data/repositories/medicine_repository.dart';
+import 'package:prescripto/core/data/repositories/favorite_medicine_repository.dart';
+import 'package:prescripto/features/prescription/provider/prescription_provider.dart';
 
 final favoriteMedicinesProvider = FutureProvider<List<MedicineModel>>((ref) {
   return FavoriteMedicineRepository().getFavorites();

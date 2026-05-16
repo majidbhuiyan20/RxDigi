@@ -1,10 +1,10 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/core/data/repositories/common_advice_repository.dart';
-import 'package:rxdigi/core/data/repositories/common_lab_test_repository.dart';
-import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/core/data/repositories/common_advice_repository.dart';
+import 'package:prescripto/core/data/repositories/common_lab_test_repository.dart';
+import 'package:prescripto/features/prescription/provider/prescription_provider.dart';
 
 final commonAdviceProvider = FutureProvider<List<String>>((ref) {
   return CommonAdviceRepository().getCommonAdvice();

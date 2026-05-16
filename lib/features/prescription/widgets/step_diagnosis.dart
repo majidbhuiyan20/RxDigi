@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/core/data/repositories/common_diagnosis_repository.dart';
-import 'package:rxdigi/core/data/repositories/common_complaint_repository.dart';
-import 'package:rxdigi/core/data/repositories/common_past_history_repository.dart';
-import 'package:rxdigi/core/data/repositories/common_vital_sign_repository.dart';
-import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/core/data/repositories/common_diagnosis_repository.dart';
+import 'package:prescripto/core/data/repositories/common_complaint_repository.dart';
+import 'package:prescripto/core/data/repositories/common_past_history_repository.dart';
+import 'package:prescripto/core/data/repositories/common_vital_sign_repository.dart';
+import 'package:prescripto/features/prescription/provider/prescription_provider.dart';
 
 final commonDiagnosisProvider = FutureProvider<List<String>>((ref) {
   return CommonDiagnosisRepository().getCommonDiagnosis();

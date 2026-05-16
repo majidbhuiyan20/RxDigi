@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/core/data/models/medicine_model.dart';
-import 'package:rxdigi/core/data/repositories/medicine_repository.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/core/data/models/medicine_model.dart';
+import 'package:prescripto/core/data/repositories/medicine_repository.dart';
 
 class MedicinesScreen extends ConsumerStatefulWidget {
   const MedicinesScreen({super.key});

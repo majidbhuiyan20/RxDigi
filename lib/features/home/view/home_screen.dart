@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/app/app_routes.dart';
-import 'package:rxdigi/app/app_text_style.dart';
-import 'package:rxdigi/core/data/providers/doctor_provider.dart';
-import 'package:rxdigi/core/data/providers/prescription_provider.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/app/app_routes.dart';
+import 'package:prescripto/app/app_text_style.dart';
+import 'package:prescripto/core/data/providers/doctor_provider.dart';
+import 'package:prescripto/core/data/providers/prescription_provider.dart';
 
-import 'package:rxdigi/core/data/models/prescription_model.dart';
-import 'package:rxdigi/core/data/providers/patient_provider.dart';
-import 'package:rxdigi/features/medicines/view/medicines_screen.dart';
-import 'package:rxdigi/features/patients/view/patients_screen.dart';
-import 'package:rxdigi/features/prescription/view/prescription_details_screen.dart';
+import 'package:prescripto/core/data/models/prescription_model.dart';
+import 'package:prescripto/core/data/providers/patient_provider.dart';
+import 'package:prescripto/features/medicines/view/medicines_screen.dart';
+import 'package:prescripto/features/patients/view/patients_screen.dart';
+import 'package:prescripto/features/prescription/view/prescription_details_screen.dart';
 
 import '../../../core/utils/pdf_generator.dart';
 import '../../prescription/view/new_prescription_screen.dart';

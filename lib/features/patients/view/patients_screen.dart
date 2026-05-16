@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/core/data/models/patient_model.dart';
-import 'package:rxdigi/core/data/providers/patient_provider.dart';
-import 'package:rxdigi/features/patients/view/patient_details_screen.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/core/data/models/patient_model.dart';
+import 'package:prescripto/core/data/providers/patient_provider.dart';
+import 'package:prescripto/features/patients/view/patient_details_screen.dart';
 
 class PatientsScreen extends ConsumerStatefulWidget {
   const PatientsScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdigi/features/doctor_info/view_model/doctor_onboarding_notifier.dart';
+import 'package:prescripto/features/doctor_info/view_model/doctor_onboarding_notifier.dart';
 
 import '../../../app/app_colors.dart';
 import '../../../l10n/app_localizations.dart';

@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
-import 'package:rxdigi/core/data/models/prescription_model.dart';
-import 'package:rxdigi/core/data/models/patient_model.dart';
-import 'package:rxdigi/core/data/models/doctor_model.dart';
+import 'package:prescripto/core/data/models/prescription_model.dart';
+import 'package:prescripto/core/data/models/patient_model.dart';
+import 'package:prescripto/core/data/models/doctor_model.dart';
 
 class PdfExportService {
   // Generate PDF content as text (can be extended to real PDF with pdf package)

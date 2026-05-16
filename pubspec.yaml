@@ -1,5 +1,5 @@
-name: rxdigi
-description: "A new Flutter project."
+name: prescripto
+description: "A professional prescription management system for doctors."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -40,6 +40,14 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+  rename_app: ^1.6.2
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/prescripto.png"
+  min_sdk_android: 21
 
 flutter:
   uses-material-design: true
@@ -49,6 +57,7 @@ flutter:
     - assets/file/
     - assets/fonts/
     - assets/images/
+    - assets/icons/
 
   fonts:
     # Oswald Font Family

@@ -1,17 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:rxdigi/core/data/models/medicine_in_prescription_model.dart';
-import 'package:rxdigi/core/data/models/patient_model.dart';
-import 'package:rxdigi/core/data/models/prescription_model.dart';
-import 'package:rxdigi/core/data/repositories/prescription_repository.dart';
-import 'package:rxdigi/core/data/repositories/doctor_repository.dart';
-import 'package:rxdigi/core/data/repositories/patient_repository.dart';
-import 'package:rxdigi/core/data/repositories/common_advice_repository.dart';
-import 'package:rxdigi/core/data/repositories/common_lab_test_repository.dart';
-import 'package:rxdigi/core/data/repositories/common_complaint_repository.dart';
-import 'package:rxdigi/core/data/repositories/common_diagnosis_repository.dart';
-import 'package:rxdigi/core/data/repositories/common_past_history_repository.dart';
-import 'package:rxdigi/core/data/repositories/common_vital_sign_repository.dart';
+import 'package:prescripto/core/data/models/medicine_in_prescription_model.dart';
+import 'package:prescripto/core/data/models/patient_model.dart';
+import 'package:prescripto/core/data/models/prescription_model.dart';
+import 'package:prescripto/core/data/repositories/prescription_repository.dart';
+import 'package:prescripto/core/data/repositories/doctor_repository.dart';
+import 'package:prescripto/core/data/repositories/patient_repository.dart';
+import 'package:prescripto/core/data/repositories/common_advice_repository.dart';
+import 'package:prescripto/core/data/repositories/common_lab_test_repository.dart';
+import 'package:prescripto/core/data/repositories/common_complaint_repository.dart';
+import 'package:prescripto/core/data/repositories/common_diagnosis_repository.dart';
+import 'package:prescripto/core/data/repositories/common_past_history_repository.dart';
+import 'package:prescripto/core/data/repositories/common_vital_sign_repository.dart';
 
 class PrescriptionState {
   final int? id;
