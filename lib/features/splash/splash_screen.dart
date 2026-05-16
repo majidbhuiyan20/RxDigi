@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/app/app_routes.dart';
-import 'package:rxdigi/app/app_text_style.dart';
-import 'package:rxdigi/core/data/providers/doctor_provider.dart';
-import 'package:rxdigi/core/data/providers/medicine_provider.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/app/app_routes.dart';
+import 'package:prescripto/app/app_text_style.dart';
+import 'package:prescripto/core/data/providers/doctor_provider.dart';
+import 'package:prescripto/core/data/providers/medicine_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -45,31 +45,28 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
-          color: Color(0XFF195FC7)
+        decoration: const BoxDecoration(
+          color: Colors.white,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-
-            /// 🔹 RxDigi Styled Text
-            RichText(
-              text: TextSpan(
-
-                children: [
-                  TextSpan(
-                    text: "Rx",
-                    style: AppTextStyles.playfairFontLogo,
-                  ),
-                  TextSpan(
-                    text: "Digi",
-                    style: AppTextStyles.oswaldFontLogo,
-                  ),
-                ],
+            /// 🔹 App Icon
+            Image.asset(
+              'assets/icons/prescripto.png',
+              width: 150.w,
+              height: 150.w,
+            ),
+            SizedBox(height: 24.h),
+            /// 🔹 App Name
+            Text(
+              "Prescripto",
+              style: AppTextStyles.oswaldFontLogo.copyWith(
+                color: AppColors.primaryColor,
+                fontSize: 32.sp,
               ),
             ),
-
           ],
         ),
       ),

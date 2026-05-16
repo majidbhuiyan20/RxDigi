@@ -1,10 +1,10 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/app/app_text_style.dart';
-import 'package:rxdigi/l10n/app_localizations.dart';
-import 'package:rxdigi/l10n/app_localizations_bn.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/app/app_text_style.dart';
+import 'package:prescripto/l10n/app_localizations.dart';
+import 'package:prescripto/l10n/app_localizations_bn.dart';
 
 import '../../common_widgets/primary_button.dart';
 import '../widgets/card_section_title.dart';

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdigi/features/doctor_info/view_model/doctor_onboarding_notifier.dart';
-import 'package:rxdigi/features/doctor_info/widgets/card_section_title.dart';
-import 'package:rxdigi/features/doctor_info/widgets/card_title_section.dart';
-import 'package:rxdigi/features/doctor_info/widgets/cutom_textfield_widgets.dart';
-import 'package:rxdigi/features/doctor_info/widgets/selectable_title_chip.dart';
+import 'package:prescripto/features/doctor_info/view_model/doctor_onboarding_notifier.dart';
+import 'package:prescripto/features/doctor_info/widgets/card_section_title.dart';
+import 'package:prescripto/features/doctor_info/widgets/card_title_section.dart';
+import 'package:prescripto/features/doctor_info/widgets/cutom_textfield_widgets.dart';
+import 'package:prescripto/features/doctor_info/widgets/selectable_title_chip.dart';
 
 import '../../../app/app_colors.dart';
 import '../../../app/app_text_style.dart';
@@ -80,6 +80,7 @@ class _Step2QualificationState extends ConsumerState<Step2Qualification> {
   final List<String> customPrimaryDegrees = [];
   final List<String> customHigherDegrees = [];
   final TextEditingController _degreeController = TextEditingController();
+  final TextEditingController _specializationController = TextEditingController();
   final TextEditingController _subSpecialityController = TextEditingController();
   final TextEditingController _collegeController = TextEditingController();
   final TextEditingController _passingYearController = TextEditingController();
@@ -104,6 +105,7 @@ class _Step2QualificationState extends ConsumerState<Step2Qualification> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = ref.read(doctorOnboardingProvider);
+      _specializationController.text = state.specialization ?? '';
       _subSpecialityController.text = state.subSpecialization ?? '';
       _collegeController.text = state.collegeName ?? '';
       _passingYearController.text = state.passingYear ?? '';
@@ -119,6 +121,7 @@ class _Step2QualificationState extends ConsumerState<Step2Qualification> {
   @override
   void dispose() {
     _degreeController.dispose();
+    _specializationController.dispose();
     _subSpecialityController.dispose();
     _collegeController.dispose();
     _passingYearController.dispose();
@@ -383,91 +386,16 @@ class _Step2QualificationState extends ConsumerState<Step2Qualification> {
                         const SizedBox(height: 4),
                         const CardSectionTitle(title: "Specialization"),
                         const SizedBox(height: 12),
-                        FormField<String>(
-                          initialValue: onboardingState.specialization,
+                        CustomTextFieldWidgets(
+                          controller: _specializationController,
+                          onChanged: (value) => onboardingNotifier.updateField(specialization: value),
+                          hintText: "Ex: Cardiology",
+                          prefixIcon: Icons.local_hospital,
                           validator: (value) {
-                            if (onboardingState.specialization == null) {
-                              return 'Please select a specialization';
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter specialization';
                             }
                             return null;
-                          },
-                          builder: (state) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: state.hasError ? Colors.red : AppColors.borderColor,
-                                      width: 1.5,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                                    child: DropdownButton<String>(
-                                      value: onboardingState.specialization,
-                                      hint: Row(
-                                        children: [
-                                          Icon(Icons.local_hospital, color: Colors.grey[400], size: 20),
-                                          const SizedBox(width: 10),
-                                          Text(
-                                            'Select Specialization',
-                                            style: TextStyle(
-                                              color: Colors.grey[500],
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      isExpanded: true,
-                                      underline: const SizedBox(),
-                                      icon: Icon(Icons.expand_more, color: Colors.grey[600]),
-                                      items: specializations.map((String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Row(
-                                            children: [
-                                              Icon(Icons.check_circle, color: AppColors.borderColor, size: 18),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                value,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.black87,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? newValue) {
-                                        onboardingNotifier.updateField(specialization: newValue);
-                                        state.didChange(newValue);
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                if (state.hasError)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8.0, left: 12),
-                                    child: Text(
-                                      state.errorText!,
-                                      style: const TextStyle(color: Colors.red, fontSize: 12),
-                                    ),
-                                  ),
-                              ],
-                            );
                           },
                         ),
                         const SizedBox(height: 16),

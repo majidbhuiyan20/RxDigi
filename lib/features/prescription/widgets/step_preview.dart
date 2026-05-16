@@ -1,13 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/core/data/models/prescription_model.dart';
-import 'package:rxdigi/core/data/providers/doctor_provider.dart';
-import 'package:rxdigi/core/data/providers/patient_provider.dart';
-import 'package:rxdigi/core/data/providers/prescription_provider.dart' as core_providers;
-import 'package:rxdigi/core/utils/pdf_generator.dart';
-import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/core/data/models/prescription_model.dart';
+import 'package:prescripto/core/data/providers/doctor_provider.dart';
+import 'package:prescripto/core/data/providers/patient_provider.dart';
+import 'package:prescripto/core/data/providers/prescription_provider.dart' as core_providers;
+import 'package:prescripto/core/utils/pdf_generator.dart';
+import 'package:prescripto/features/prescription/provider/prescription_provider.dart';
 
 class StepPreview extends ConsumerStatefulWidget {
   const StepPreview({super.key});
@@ -144,12 +145,19 @@ class _StepPreviewState extends ConsumerState<StepPreview> {
                     ],
                     
                     const SizedBox(height: 60),
-                    const Align(
+                    Align(
                       alignment: Alignment.bottomRight,
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Divider(indent: 200),
-                          Text('Doctor\'s Signature', style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic)),
+                          if (doctor.signaturePath != null && File(doctor.signaturePath!).existsSync())
+                            Container(
+                              height: 50,
+                              width: 100,
+                              margin: const EdgeInsets.only(bottom: 4),
+                              child: Image.file(File(doctor.signaturePath!), fit: BoxFit.contain),
+                            ),
+                          const SizedBox(width: 120, child: Divider()),
                         ],
                       ),
                     ),

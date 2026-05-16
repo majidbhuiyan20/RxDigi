@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rxdigi/app/app_colors.dart';
+import 'package:prescripto/app/app_colors.dart';
 
 class AppTextStyles {
   static const String oswald = 'Oswald';

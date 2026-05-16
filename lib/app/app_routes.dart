@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:rxdigi/features/doctor_info/view/onboarding_flow.dart';
-import 'package:rxdigi/features/home/view/home_screen.dart';
-import 'package:rxdigi/features/home/view/main_navigation_screen.dart';
-import 'package:rxdigi/features/settings/view/settings_screen.dart';
+import 'package:prescripto/features/doctor_info/view/onboarding_flow.dart';
+import 'package:prescripto/features/home/view/home_screen.dart';
+import 'package:prescripto/features/home/view/main_navigation_screen.dart';
+import 'package:prescripto/features/settings/view/settings_screen.dart';
 import '../features/splash/splash_screen.dart';
 import 'app_string.dart';
 

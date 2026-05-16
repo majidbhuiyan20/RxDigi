@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/core/data/models/medicine_model.dart';
-import 'package:rxdigi/core/data/models/medicine_in_prescription_model.dart';
-import 'package:rxdigi/core/data/repositories/medicine_repository.dart';
-import 'package:rxdigi/core/data/repositories/favorite_medicine_repository.dart';
-import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/core/data/models/medicine_model.dart';
+import 'package:prescripto/core/data/models/medicine_in_prescription_model.dart';
+import 'package:prescripto/core/data/repositories/medicine_repository.dart';
+import 'package:prescripto/core/data/repositories/favorite_medicine_repository.dart';
+import 'package:prescripto/features/prescription/provider/prescription_provider.dart';
 
 final favoriteMedicinesProvider = FutureProvider<List<MedicineModel>>((ref) {
   return FavoriteMedicineRepository().getFavorites();
@@ -125,18 +125,18 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
                 
                 const Text('Dose (Frequency)', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                _buildChips(['1+0+0', '1+0+1', '1+1+1', '0+0+1', 'Every 8 hours'], dose, (val) => setModalState(() => dose = val)),
+                _buildChips(['1+0+0', '1+0+1', '1+1+1', '0+0+1', 'Every 8 hours', 'Every 6 hours'], dose, (val) => setModalState(() => dose = val)),
                 
                 const SizedBox(height: 16),
                 const Text('Duration', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                _buildChips(['3 days', '5 days', '7 days', '14 days', '1 month'], duration, (val) => setModalState(() => duration = val)),
+                _buildChips(['3 days', '5 days', '7 days', '14 days', '1 month', 'Continue'], duration, (val) => setModalState(() => duration = val)),
 
                 const SizedBox(height: 16),
                 const Text('Instruction', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 _buildChips(['After meal', 'Before meal', 'With meal', 'Empty stomach'], instruction, (val) => setModalState(() => instruction = val)),
-
+//updatejhvhv
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,

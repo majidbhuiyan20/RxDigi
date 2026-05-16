@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/core/data/models/patient_model.dart';
-import 'package:rxdigi/core/data/models/prescription_model.dart';
-import 'package:rxdigi/core/data/providers/prescription_provider.dart';
-import 'package:rxdigi/core/data/providers/doctor_provider.dart';
-import 'package:rxdigi/core/utils/pdf_generator.dart';
-import 'package:rxdigi/core/data/providers/patient_provider.dart';
-import 'package:rxdigi/features/prescription/provider/prescription_provider.dart';
-import 'package:rxdigi/features/prescription/view/new_prescription_screen.dart';
-import 'package:rxdigi/features/prescription/view/prescription_details_screen.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/core/data/models/patient_model.dart';
+import 'package:prescripto/core/data/models/prescription_model.dart';
+import 'package:prescripto/core/data/providers/prescription_provider.dart';
+import 'package:prescripto/core/data/providers/doctor_provider.dart';
+import 'package:prescripto/core/utils/pdf_generator.dart';
+import 'package:prescripto/core/data/providers/patient_provider.dart';
+import 'package:prescripto/features/prescription/provider/prescription_provider.dart';
+import 'package:prescripto/features/prescription/view/new_prescription_screen.dart';
+import 'package:prescripto/features/prescription/view/prescription_details_screen.dart';
 
 class PatientDetailsScreen extends ConsumerWidget {
   final PatientModel patient;

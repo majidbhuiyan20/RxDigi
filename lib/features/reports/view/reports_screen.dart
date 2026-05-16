@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rxdigi/app/app_colors.dart';
-import 'package:rxdigi/core/data/providers/prescription_provider.dart';
+import 'package:prescripto/app/app_colors.dart';
+import 'package:prescripto/core/data/providers/prescription_provider.dart';
 
 class ReportsScreen extends ConsumerWidget {
   const ReportsScreen({super.key});
