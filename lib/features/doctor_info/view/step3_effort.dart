@@ -239,15 +239,15 @@ class _Step3EffortState extends ConsumerState<Step3Effort> {
                             const SizedBox(
                               height: 16,
                             ),
-                            CardSectionTitle(title: l10n.phoneNumber),
-                            const SizedBox(height: 12),
-                            CustomTextFieldWidgets(
-                              hintText: "Enter Phone Number",
-                              prefixIcon: Icons.phone,
-                              onChanged: (value) =>
-                                  notifier.updateField(phoneNumber: value),
-                            ),
-                            const SizedBox(height: 16),
+                            // CardSectionTitle(title: l10n.phoneNumber),
+                            // const SizedBox(height: 12),
+                            // CustomTextFieldWidgets(
+                            //   hintText: "Enter Phone Number",
+                            //   prefixIcon: Icons.phone,
+                            //   onChanged: (value) =>
+                            //       notifier.updateField(phoneNumber: value),
+                            // ),
+                            // const SizedBox(height: 16),
                             CardSectionTitle(title: l10n.serialBooking),
                             const SizedBox(height: 12),
                             CustomTextFieldWidgets(

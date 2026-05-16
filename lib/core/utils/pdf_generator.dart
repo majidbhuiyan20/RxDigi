@@ -86,6 +86,10 @@ class PdfGenerator {
                         pw.SizedBox(height: 4),
                         pw.Text(doctor.degrees ?? '',
                           style: pw.TextStyle(font: _fontMedium, fontSize: 11, color: textColor)),
+                        if (doctor.collegeName?.isNotEmpty == true)
+                          pw.Text(doctor.collegeName!,
+                            style: pw.TextStyle(fontSize: 9, color: textColor)),
+                        pw.SizedBox(height: 4),
                         pw.Container(
                           margin: const pw.EdgeInsets.symmetric(vertical: 4),
                           padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -93,7 +97,7 @@ class PdfGenerator {
                             color: accentColor,
                             borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
                           ),
-                          child: pw.Text(doctor.specialization ?? '',
+                          child: pw.Text('${doctor.specialization ?? ''}${doctor.subSpecialization?.isNotEmpty == true ? " (${doctor.subSpecialization})" : ""}',
                             style: pw.TextStyle(font: _fontBold, fontSize: 10, color: PdfColors.white)),
                         ),
                       ],
@@ -112,6 +116,9 @@ class PdfGenerator {
                         pw.SizedBox(height: 4),
                         pw.Text('Phone: ${doctor.mobile}',
                           style: pw.TextStyle(font: _fontBold, fontSize: 10, color: primaryColor)),
+                        if (doctor.email.isNotEmpty)
+                          pw.Text('Email: ${doctor.email}',
+                            style: pw.TextStyle(fontSize: 9, color: textColor)),
                       ],
                     ),
                   ),
