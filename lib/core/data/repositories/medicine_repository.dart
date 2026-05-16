@@ -156,12 +156,19 @@ class MedicineRepository extends BaseRepository<MedicineModel> {
   Future<List<MedicineModel>> searchMedicines(String query) async {
     try {
       final db = await _databaseHelper.database;
-      final result = await db.query(
-        'medicines',
-        where: 'name LIKE ? OR genericName LIKE ? OR manufacturer LIKE ?',
-        whereArgs: ['%$query%', '%$query%', '%$query%'],
-        limit: 50, // Limit search results for performance
-      );
+      // Search by name (prioritizing starts-with), genericName, and manufacturer
+      // Using rawQuery because query() doesn't support parameters in orderBy
+      final result = await db.rawQuery('''
+        SELECT * FROM medicines 
+        WHERE name LIKE ? OR genericName LIKE ? OR manufacturer LIKE ?
+        ORDER BY CASE WHEN name LIKE ? THEN 0 ELSE 1 END, name ASC
+        LIMIT 50
+      ''', [
+        '%$query%', // For name LIKE
+        '%$query%', // For genericName LIKE
+        '%$query%', // For manufacturer LIKE
+        '$query%'   // For the CASE WHEN (starts with)
+      ]);
       return result.map((map) => MedicineModel.fromMap(map)).toList();
     } catch (e) {
       print('Error searching medicines: $e');

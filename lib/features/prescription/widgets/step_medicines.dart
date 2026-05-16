@@ -25,7 +25,7 @@ class _StepMedicinesState extends ConsumerState<StepMedicines> {
   bool _isSearching = false;
 
   void _onSearch(String query) async {
-    if (query.length < 2) {
+    if (query.isEmpty) {
       setState(() => _searchResults = []);
       return;
     }
