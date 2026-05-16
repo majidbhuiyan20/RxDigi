@@ -163,7 +163,6 @@ class PdfGenerator {
                         child: pw.Image(signature),
                       ),
                       pw.Container(width: 100, height: 0.5, color: PdfColors.grey400),
-                      pw.Text('Authorized Signature', style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey600)),
                     ],
                   ),
                 ),

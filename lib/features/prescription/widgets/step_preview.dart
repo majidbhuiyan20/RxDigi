@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -144,12 +145,19 @@ class _StepPreviewState extends ConsumerState<StepPreview> {
                     ],
                     
                     const SizedBox(height: 60),
-                    const Align(
+                    Align(
                       alignment: Alignment.bottomRight,
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Divider(indent: 200),
-                          Text('Doctor\'s Signature', style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic)),
+                          if (doctor.signaturePath != null && File(doctor.signaturePath!).existsSync())
+                            Container(
+                              height: 50,
+                              width: 100,
+                              margin: const EdgeInsets.only(bottom: 4),
+                              child: Image.file(File(doctor.signaturePath!), fit: BoxFit.contain),
+                            ),
+                          const SizedBox(width: 120, child: Divider()),
                         ],
                       ),
                     ),
