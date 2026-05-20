@@ -315,3 +315,4 @@ class PdfGenerator {
     await sharePrescription(prescription, patient, doctor);
   }
 }
+//
