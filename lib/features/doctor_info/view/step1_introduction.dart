@@ -1,19 +1,9 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:prescripto/app/app_colors.dart';
 import 'package:prescripto/app/app_text_style.dart';
 import 'package:prescripto/l10n/app_localizations.dart';
-import 'package:prescripto/l10n/app_localizations_bn.dart';
-
-import '../../common_widgets/primary_button.dart';
-import '../widgets/card_section_title.dart';
-import '../widgets/card_title_section.dart';
 import '../widgets/contact_section.dart';
-import '../widgets/dotted_circular_border.dart';
 import '../widgets/personal_info_section.dart';
-import '../widgets/profile_image_section.dart';
-import '../widgets/selectable_title_chip.dart';
 
 class Step1Introduction extends StatefulWidget {
   final VoidCallback onNext;
@@ -44,12 +34,12 @@ class _Step1IntroductionState extends State<Step1Introduction> {
                 children: [
                   Text(
                     l10n.yourInformation,
-                    style: AppTextStyles.largeBlackTextStyle(context)
+                    style: AppTextStyles.normalLargeBlackTextStyle(context)
                         .copyWith(color: AppColors.primaryColor),
                   ),
                   Text(
                     l10n.infoPrintedOnPrescription,
-                    style: AppTextStyles.smallGreyTextStyle(context),
+                    style: AppTextStyles.normalSmallGreyTextStyle(context),
                   ),
                   const SizedBox(height: 16),
                   PersonalInfoSection(isDesktop: isDesktop, l10n: l10n),
@@ -61,7 +51,7 @@ class _Step1IntroductionState extends State<Step1Introduction> {
                     children: [
                       Expanded(
                         child: GestureDetector(
-                          onTap: widget.onNext, // Allow skip or just move on
+                          onTap: widget.onNext,
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
@@ -79,6 +69,7 @@ class _Step1IntroductionState extends State<Step1Introduction> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.primaryColor,
+                                  fontFamily: AppTextStyles.plusJakartaSans,
                                 ),
                               ),
                             ),
@@ -90,9 +81,6 @@ class _Step1IntroductionState extends State<Step1Introduction> {
                         child: GestureDetector(
                           onTap: () {
                             if (_formKey.currentState!.validate()) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Step 1 Saved')),
-                              );
                               widget.onNext();
                             }
                           },
@@ -109,6 +97,7 @@ class _Step1IntroductionState extends State<Step1Introduction> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
+                                  fontFamily: AppTextStyles.plusJakartaSans,
                                 ),
                               ),
                             ),
@@ -127,14 +116,3 @@ class _Step1IntroductionState extends State<Step1Introduction> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-

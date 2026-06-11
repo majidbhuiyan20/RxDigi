@@ -35,7 +35,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       if (latestDoctor != null) {
         Navigator.pushReplacementNamed(context, AppRoutes.homeScreenRoute);
       } else {
-        Navigator.pushReplacementNamed(context, AppRoutes.onboardingFlow);
+        // Navigate to Intro Onboarding if doctor info is not filled
+        Navigator.pushReplacementNamed(context, AppRoutes.introOnboarding);
       }
     }
   }

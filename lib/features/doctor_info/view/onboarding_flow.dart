@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:prescripto/app/app_colors.dart';
 import 'package:prescripto/features/doctor_info/view/step1_introduction.dart';
 import 'package:prescripto/features/doctor_info/view/step2_qualification.dart';
@@ -29,57 +28,77 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   @override
   Widget build(BuildContext context) {
     final currentStep = ref.watch(onboardingStepProvider);
-    final isDesktop   = MediaQuery.of(context).size.width > 600;
+    final size = MediaQuery.of(context).size;
+    final isDesktop = size.width > 900;
 
     ref.listen<int>(onboardingStepProvider, (previous, next) {
-      _pageController.animateToPage(
-        next,
-        duration: const Duration(milliseconds: 400),
-        curve:    Curves.easeInOut,
-      );
+      if (_pageController.hasClients) {
+        _pageController.animateToPage(
+          next,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOut,
+        );
+      }
     });
 
     return Scaffold(
-     backgroundColor: const Color(0xFF0D3592),
-      //backgroundColor: AppColors.rxPrimaryColor,
+      backgroundColor: const Color(0xFF0D3592),
       body: SafeArea(
         child: Column(
           children: [
+            // Header is always full width or centered
             StepHeader(
               currentStep: currentStep,
               totalSteps: _totalSteps,
             ),
 
             Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  Step1Introduction(
-                    onNext: () => ref
-                        .read(onboardingStepProvider.notifier)
-                        .next(_totalSteps),
+              child: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
                   ),
-                  Step2Qualification(
-                    onNext: () => ref
-                        .read(onboardingStepProvider.notifier)
-                        .next(_totalSteps),
-                    onBack: () => ref
-                        .read(onboardingStepProvider.notifier)
-                        .previous(),
+                ),
+                child: Center(
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: isDesktop ? 800 : double.infinity,
+                    ),
+                    child: PageView(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        Step1Introduction(
+                          onNext: () => ref
+                              .read(onboardingStepProvider.notifier)
+                              .next(_totalSteps),
+                        ),
+                        Step2Qualification(
+                          onNext: () => ref
+                              .read(onboardingStepProvider.notifier)
+                              .next(_totalSteps),
+                          onBack: () => ref
+                              .read(onboardingStepProvider.notifier)
+                              .previous(),
+                        ),
+                        Step3Effort(
+                          onNext: () {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              AppRoutes.homeScreenRoute,
+                            );
+                          },
+                          onBack: () => ref
+                              .read(onboardingStepProvider.notifier)
+                              .previous(),
+                        ),
+                      ],
+                    ),
                   ),
-                  Step3Effort(
-                    onNext: () {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        AppRoutes.homeScreenRoute,
-                      );
-                    },
-                    onBack: () => ref
-                        .read(onboardingStepProvider.notifier)
-                        .previous(),
-                  ),
-                ],
+                ),
               ),
             ),
           ],
