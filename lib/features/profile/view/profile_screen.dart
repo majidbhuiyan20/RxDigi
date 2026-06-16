@@ -15,12 +15,7 @@ class ProfileScreen extends ConsumerWidget {
       backgroundColor: AppColors.appBackgroundColor,
       appBar: AppBar(
         title: const Text('Doctor Profile'),
-        actions: [
-          IconButton(
-            onPressed: () => Navigator.pushNamed(context, AppRoutes.settingsScreenRoute),
-            icon: const Icon(Icons.settings_outlined),
-          ),
-        ],
+
       ),
       body: doctorAsync.when(
         data: (doctor) {

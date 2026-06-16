@@ -95,17 +95,17 @@ class HomeScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    IconButton(
-                      onPressed: () => Navigator.pushNamed(context, AppRoutes.settingsScreenRoute),
-                      icon: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.settings, color: Colors.white, size: 20),
-                      ),
-                    ),
+                    // IconButton(
+                    //   onPressed: () => Navigator.pushNamed(context, AppRoutes.settingsScreenRoute),
+                    //   icon: Container(
+                    //     padding: const EdgeInsets.all(6),
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.white.withOpacity(0.2),
+                    //       shape: BoxShape.circle,
+                    //     ),
+                    //     child: const Icon(Icons.settings, color: Colors.white, size: 20),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

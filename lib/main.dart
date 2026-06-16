@@ -11,8 +11,6 @@ Future<void> main() async {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-
-      // ✅ load saved locale code BEFORE runApp
       final savedCode = await loadSavedLocaleCode();
       debugPrint("🌍 Starting with locale: $savedCode");
 
