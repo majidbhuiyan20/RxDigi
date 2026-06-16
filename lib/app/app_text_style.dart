@@ -5,6 +5,7 @@ class AppTextStyles {
   static const String oswald = 'Oswald';
   static const String playfair = 'PlayfairDisplay';
   static const String tiroBangla = 'TiroBangla';
+  static const String plusJakartaSans = 'PlusJakartaSans';
 
   // 🔹 Detect Bangla
   static bool _isBangla(BuildContext context) {
@@ -13,6 +14,10 @@ class AppTextStyles {
 
   static String _getFont(BuildContext context) {
     return _isBangla(context) ? tiroBangla : playfair;
+  }
+
+  static String _getNormalFont(BuildContext context) {
+    return _isBangla(context) ? tiroBangla : plusJakartaSans;
   }
 
   // 🔹 Logo Styles
@@ -51,6 +56,25 @@ class AppTextStyles {
     return TextStyle(
       fontFamily: _getFont(context),
       fontWeight: FontWeight.w600,
+      fontSize: 16,
+      color: AppColors.textGreyColor,
+    );
+  }
+
+  // 🔹 Normal Font Styles (Sans-serif)
+  static TextStyle normalLargeBlackTextStyle(BuildContext context) {
+    return TextStyle(
+      fontFamily: _getNormalFont(context),
+      fontWeight: FontWeight.w700,
+      fontSize: 28,
+      color: AppColors.textBlackColor,
+    );
+  }
+
+  static TextStyle normalSmallGreyTextStyle(BuildContext context) {
+    return TextStyle(
+      fontFamily: _getNormalFont(context),
+      fontWeight: FontWeight.w500,
       fontSize: 16,
       color: AppColors.textGreyColor,
     );

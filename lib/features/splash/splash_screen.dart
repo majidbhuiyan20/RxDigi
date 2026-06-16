@@ -26,7 +26,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     await ref.read(loadMedicinesFromCsvProvider.future);
 
     // 2. Short delay for branding
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
 
     // 3. Check if doctor profile exists
     final latestDoctor = await ref.read(latestDoctorProvider.future);
@@ -35,7 +35,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       if (latestDoctor != null) {
         Navigator.pushReplacementNamed(context, AppRoutes.homeScreenRoute);
       } else {
-        Navigator.pushReplacementNamed(context, AppRoutes.onboardingFlow);
+        // Navigate to Intro Onboarding if doctor info is not filled
+        Navigator.pushReplacementNamed(context, AppRoutes.introOnboarding);
       }
     }
   }
@@ -55,18 +56,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             /// 🔹 App Icon
             Image.asset(
               'assets/icons/prescripto.png',
-              width: 150.w,
-              height: 150.w,
+              width: 180.w,
+              height: 180.w,
             ),
             SizedBox(height: 24.h),
-            /// 🔹 App Name
-            Text(
-              "Prescripto",
-              style: AppTextStyles.oswaldFontLogo.copyWith(
-                color: AppColors.primaryColor,
-                fontSize: 32.sp,
-              ),
-            ),
+            // /// 🔹 App Name
+            // Text(
+            //   "Prescripto",
+            //   style: AppTextStyles.oswaldFontLogo.copyWith(
+            //     color: AppColors.primaryColor,
+            //     fontSize: 32.sp,
+            //   ),
+            // ),
           ],
         ),
       ),
