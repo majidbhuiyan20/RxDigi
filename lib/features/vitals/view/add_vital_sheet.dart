@@ -34,7 +34,7 @@ class _AddVitalSheetState extends ConsumerState<AddVitalSheet> {
     super.dispose();
   }
 
-  void _saveVital() {
+  Future<void> _saveVital() async {
     final v1 = double.tryParse(_val1Controller.text.trim());
     if (v1 == null || v1 <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -62,8 +62,12 @@ class _AddVitalSheetState extends ConsumerState<AddVitalSheet> {
       recordedAt: DateTime.now(),
     );
 
-    ref.read(vitalsListProvider.notifier).addVital(vital);
-    Navigator.pop(context);
+    await ref.read(vitalsRepositoryProvider).insertVital(vital);
+    ref.invalidate(vitalsListProvider);
+
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -155,7 +159,7 @@ class _AddVitalSheetState extends ConsumerState<AddVitalSheet> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _sugarCategory,
+                initialValue: _sugarCategory,
                 decoration: InputDecoration(
                   labelText: 'Timing',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -244,7 +248,7 @@ class _AddVitalSheetState extends ConsumerState<AddVitalSheet> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? color.withOpacity(0.12) : Colors.grey.shade100,
+            color: isSelected ? color.withValues(alpha: 0.12) : Colors.grey.shade100,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected ? color : Colors.transparent,

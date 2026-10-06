@@ -28,7 +28,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 8,
+      version: 9,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -144,6 +144,38 @@ class DatabaseHelper {
               category TEXT,
               notes TEXT,
               recordedAt TEXT NOT NULL
+            )
+          ''');
+        }
+        if (oldVersion < 9) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS medicine_reminders (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              medicineName TEXT NOT NULL,
+              dosageForm TEXT,
+              dosageStrength TEXT,
+              instructions TEXT,
+              morning INTEGER DEFAULT 0,
+              noon INTEGER DEFAULT 0,
+              night INTEGER DEFAULT 0,
+              morningTime TEXT DEFAULT '08:00',
+              noonTime TEXT DEFAULT '13:00',
+              nightTime TEXT DEFAULT '20:00',
+              startDate TEXT NOT NULL,
+              durationDays INTEGER DEFAULT 0,
+              isActive INTEGER DEFAULT 1,
+              createdAt TEXT NOT NULL
+            )
+          ''');
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS medicine_adherence_logs (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              reminderId INTEGER NOT NULL,
+              date TEXT NOT NULL,
+              slot TEXT NOT NULL,
+              isTaken INTEGER DEFAULT 1,
+              takenAt TEXT NOT NULL,
+              UNIQUE(reminderId, date, slot)
             )
           ''');
         }
@@ -318,6 +350,40 @@ class DatabaseHelper {
         category TEXT,
         notes TEXT,
         recordedAt TEXT NOT NULL
+      )
+    ''');
+
+    // Medicine Reminders Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS medicine_reminders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        medicineName TEXT NOT NULL,
+        dosageForm TEXT,
+        dosageStrength TEXT,
+        instructions TEXT,
+        morning INTEGER DEFAULT 0,
+        noon INTEGER DEFAULT 0,
+        night INTEGER DEFAULT 0,
+        morningTime TEXT DEFAULT '08:00',
+        noonTime TEXT DEFAULT '13:00',
+        nightTime TEXT DEFAULT '20:00',
+        startDate TEXT NOT NULL,
+        durationDays INTEGER DEFAULT 0,
+        isActive INTEGER DEFAULT 1,
+        createdAt TEXT NOT NULL
+      )
+    ''');
+
+    // Medicine Adherence Logs Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS medicine_adherence_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        reminderId INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        slot TEXT NOT NULL,
+        isTaken INTEGER DEFAULT 1,
+        takenAt TEXT NOT NULL,
+        UNIQUE(reminderId, date, slot)
       )
     ''');
   }

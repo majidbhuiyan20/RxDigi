@@ -67,3 +67,4 @@ class HealthTipModel {
   List<String> getDonts(bool isBn) => isBn ? dontListBn : dontListEn;
   String getDisclaimer(bool isBn) => isBn ? disclaimerBn : disclaimerEn;
 }
+

@@ -6,6 +6,7 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
+      fontFamily: 'PlusJakartaSans',
       colorSchemeSeed: AppColors.primaryColor,
       scaffoldBackgroundColor: AppColors.appBackgroundColor,
       appBarTheme: const AppBarTheme(
@@ -29,10 +30,11 @@ class AppTheme {
   }
 
   static ThemeData get darkTheme {
-    return ThemeData(brightness: Brightness.dark,
-    inputDecorationTheme: _getInputDecorationTheme(),
+    return ThemeData(
+      brightness: Brightness.dark,
+      fontFamily: 'PlusJakartaSans',
+      inputDecorationTheme: _getInputDecorationTheme(),
       filledButtonTheme: _getFilledButtonThemeData(),
-
     );
   }
 

@@ -6,36 +6,9 @@ final vitalsRepositoryProvider = Provider<VitalsRepository>((ref) {
   return VitalsRepository();
 });
 
-class VitalsNotifier extends StateNotifier<AsyncValue<List<VitalLogModel>>> {
-  final VitalsRepository _repository;
-
-  VitalsNotifier(this._repository) : super(const AsyncValue.loading()) {
-    loadVitals();
-  }
-
-  Future<void> loadVitals() async {
-    try {
-      final vitals = await _repository.getAllVitals();
-      state = AsyncValue.data(vitals);
-    } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
-    }
-  }
-
-  Future<void> addVital(VitalLogModel vital) async {
-    await _repository.insertVital(vital);
-    await loadVitals();
-  }
-
-  Future<void> deleteVital(int id) async {
-    await _repository.deleteVital(id);
-    await loadVitals();
-  }
-}
-
-final vitalsListProvider = StateNotifierProvider<VitalsNotifier, AsyncValue<List<VitalLogModel>>>((ref) {
+final vitalsListProvider = FutureProvider<List<VitalLogModel>>((ref) async {
   final repo = ref.watch(vitalsRepositoryProvider);
-  return VitalsNotifier(repo);
+  return repo.getAllVitals();
 });
 
 final latestBpProvider = Provider<VitalLogModel?>((ref) {

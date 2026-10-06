@@ -297,7 +297,7 @@ class _Step2QualificationState extends ConsumerState<Step2Qualification> {
                         const SizedBox(height: 16),
                         Row(
                           children: [
-                            Text("Higher Degree", style: TextStyle(color: AppColors.textBlackColor, fontFamily: "PlayfairDisplay", fontWeight: FontWeight.w700, fontSize: 16)),
+                            Text("Higher Degree", style: TextStyle(color: AppColors.textBlackColor, fontFamily: "PlusJakartaSans", fontWeight: FontWeight.w700, fontSize: 16)),
                             const Spacer(),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -305,7 +305,7 @@ class _Step2QualificationState extends ConsumerState<Step2Qualification> {
                                 color: const Color(0XFFEEF2F8),
                                 borderRadius: BorderRadius.circular(30),
                               ),
-                              child: Text("Select Multiple", style: TextStyle(fontWeight: FontWeight.w500, fontFamily: AppTextStyles.playfair)),
+                              child: Text("Select Multiple", style: TextStyle(fontWeight: FontWeight.w500, fontFamily: AppTextStyles.plusJakartaSans)),
                             )
                           ],
                         ),
@@ -401,7 +401,7 @@ class _Step2QualificationState extends ConsumerState<Step2Qualification> {
                         const SizedBox(height: 16),
                         Row(
                           children: [
-                            Text("Sub-Speciality", style: TextStyle(color: AppColors.textBlackColor, fontFamily: "PlayfairDisplay", fontWeight: FontWeight.w700, fontSize: 16)),
+                            Text("Sub-Speciality", style: TextStyle(color: AppColors.textBlackColor, fontFamily: "PlusJakartaSans", fontWeight: FontWeight.w700, fontSize: 16)),
                             const Spacer(),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

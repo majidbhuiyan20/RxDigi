@@ -155,7 +155,7 @@ class _Step3EffortState extends ConsumerState<Step3Effort> {
                                 Text(l10n.titlePosition,
                                     style: TextStyle(
                                         color: AppColors.textBlackColor,
-                                        fontFamily: "PlayfairDisplay",
+                                        fontFamily: "PlusJakartaSans",
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16)),
                                 const Spacer(),
@@ -206,7 +206,7 @@ class _Step3EffortState extends ConsumerState<Step3Effort> {
                                 Text(l10n.department,
                                     style: TextStyle(
                                         color: AppColors.textBlackColor,
-                                        fontFamily: "PlayfairDisplay",
+                                        fontFamily: "PlusJakartaSans",
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16)),
                                 const Spacer(),

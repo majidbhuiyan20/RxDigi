@@ -11,6 +11,25 @@ final healthTipsListProvider = FutureProvider<List<HealthTipModel>>((ref) async 
   return repo.getAllTips();
 });
 
-final tipLanguageIsBnProvider = StateProvider<bool>((ref) => true);
+class TipLanguageNotifier extends Notifier<bool> {
+  @override
+  bool build() => true;
 
-final selectedTipCategoryProvider = StateProvider<String?>((ref) => null);
+  set state(bool value) => super.state = value;
+  void toggle() => state = !state;
+}
+
+final tipLanguageIsBnProvider = NotifierProvider<TipLanguageNotifier, bool>(() {
+  return TipLanguageNotifier();
+});
+
+class SelectedTipCategoryNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  set state(String? value) => super.state = value;
+}
+
+final selectedTipCategoryProvider = NotifierProvider<SelectedTipCategoryNotifier, String?>(() {
+  return SelectedTipCategoryNotifier();
+});

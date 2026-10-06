@@ -13,7 +13,7 @@ class AppTextStyles {
   }
 
   static String _getFont(BuildContext context) {
-    return _isBangla(context) ? tiroBangla : playfair;
+    return _isBangla(context) ? tiroBangla : plusJakartaSans;
   }
 
   static String _getNormalFont(BuildContext context) {
@@ -22,21 +22,21 @@ class AppTextStyles {
 
   // 🔹 Logo Styles
   static TextStyle oswaldFontLogo = TextStyle(
-    fontFamily: oswald,
-    fontWeight: FontWeight.w700,
+    fontFamily: plusJakartaSans,
+    fontWeight: FontWeight.w800,
     fontSize: 56,
     color: const Color(0XFF74C1B7),
   );
   static TextStyle primaryBlackBoldText = TextStyle(
-    fontFamily: oswald,
+    fontFamily: plusJakartaSans,
     fontWeight: FontWeight.w600,
     fontSize: 16,
     color: const Color(0XFF384357),
   );
 
   static TextStyle playfairFontLogo = TextStyle(
-    fontFamily: playfair,
-    fontWeight: FontWeight.w700,
+    fontFamily: plusJakartaSans,
+    fontWeight: FontWeight.w800,
     fontSize: 56,
     color: Colors.white,
   );

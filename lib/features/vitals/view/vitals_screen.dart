@@ -186,9 +186,10 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
         ),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
-      onDismissed: (_) {
+      onDismissed: (_) async {
         if (item.id != null) {
-          ref.read(vitalsListProvider.notifier).deleteVital(item.id!);
+          await ref.read(vitalsRepositoryProvider).deleteVital(item.id!);
+          ref.invalidate(vitalsListProvider);
         }
       },
       child: Container(
@@ -204,7 +205,7 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: cardColor.withOpacity(0.12),
+                color: cardColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: cardColor, size: 24),
@@ -225,7 +226,7 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
                           decoration: BoxDecoration(
-                            color: cardColor.withOpacity(0.1),
+                            color: cardColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
