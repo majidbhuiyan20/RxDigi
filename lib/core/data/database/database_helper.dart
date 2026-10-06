@@ -28,7 +28,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 7,
+      version: 8,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -130,6 +130,20 @@ class DatabaseHelper {
               name TEXT UNIQUE,
               usageCount INTEGER DEFAULT 1,
               lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+          ''');
+        }
+        if (oldVersion < 8) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS user_vitals (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              type TEXT NOT NULL,
+              value1 REAL NOT NULL,
+              value2 REAL,
+              unit TEXT NOT NULL,
+              category TEXT,
+              notes TEXT,
+              recordedAt TEXT NOT NULL
             )
           ''');
         }
@@ -290,6 +304,20 @@ class DatabaseHelper {
         name TEXT UNIQUE,
         usageCount INTEGER DEFAULT 1,
         lastUsed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    // User Vitals Log Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS user_vitals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        type TEXT NOT NULL,
+        value1 REAL NOT NULL,
+        value2 REAL,
+        unit TEXT NOT NULL,
+        category TEXT,
+        notes TEXT,
+        recordedAt TEXT NOT NULL
       )
     ''');
   }

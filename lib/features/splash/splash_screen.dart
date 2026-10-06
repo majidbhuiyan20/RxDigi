@@ -28,16 +28,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     // 2. Short delay for branding
     await Future.delayed(const Duration(seconds: 3));
 
-    // 3. Check if doctor profile exists
-    final latestDoctor = await ref.read(latestDoctorProvider.future);
-
+    // 3. Navigate directly to Main Dashboard
     if (mounted) {
-      if (latestDoctor != null) {
-        Navigator.pushReplacementNamed(context, AppRoutes.homeScreenRoute);
-      } else {
-        // Navigate to Intro Onboarding if doctor info is not filled
-        Navigator.pushReplacementNamed(context, AppRoutes.introOnboarding);
-      }
+      Navigator.pushReplacementNamed(context, AppRoutes.homeScreenRoute);
     }
   }
   @override

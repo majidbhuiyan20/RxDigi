@@ -12,6 +12,14 @@ import 'package:prescripto/core/data/providers/patient_provider.dart';
 import 'package:prescripto/features/medicines/view/medicines_screen.dart';
 import 'package:prescripto/features/patients/view/patients_screen.dart';
 import 'package:prescripto/features/prescription/view/prescription_details_screen.dart';
+import 'package:prescripto/features/health_tips/models/health_tip_model.dart';
+import 'package:prescripto/features/health_tips/provider/health_tips_provider.dart';
+import 'package:prescripto/features/health_tips/view/health_tips_screen.dart';
+import 'package:prescripto/features/health_tips/view/health_tip_detail_screen.dart';
+import 'package:prescripto/features/vitals/models/vital_log_model.dart';
+import 'package:prescripto/features/vitals/provider/vitals_provider.dart';
+import 'package:prescripto/features/vitals/view/vitals_screen.dart';
+import 'package:prescripto/features/vitals/view/add_vital_sheet.dart';
 
 import '../../../core/utils/pdf_generator.dart';
 import '../../prescription/view/new_prescription_screen.dart';
@@ -24,16 +32,20 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final latestDoctorAsync = ref.watch(latestDoctorProvider);
     final prescriptionsAsync = ref.watch(prescriptionListProvider);
+    final latestBp = ref.watch(latestBpProvider);
+    final latestSugar = ref.watch(latestSugarProvider);
+    final latestWeight = ref.watch(latestWeightProvider);
+    final tipsAsync = ref.watch(healthTipsListProvider);
+    final isTipBn = ref.watch(tipLanguageIsBnProvider);
 
     return Scaffold(
       backgroundColor: AppColors.appBackgroundColor,
       body: latestDoctorAsync.when(
         data: (doctor) {
-          if (doctor == null) {
-            return const Center(child: Text('No doctor profile found.'));
-          }
-
           final String todayDate = DateFormat('EEEE, d MMMM yyyy').format(DateTime.now());
+          final String titleName = doctor != null
+              ? '${doctor.title ?? 'Dr.'} ${doctor.fullName.split(' ').first}'
+              : 'RxDigi Health Hub';
 
           int todayPrescriptionCount = 0;
           int todayUniquePatientsCount = 0;
@@ -41,7 +53,6 @@ class HomeScreen extends ConsumerWidget {
           if (prescriptionsAsync.hasValue) {
             final now = DateTime.now();
             final todayPrescriptions = prescriptionsAsync.value!.where((p) {
-              // Using prescription.date instead of createdAt for business logic
               return p.date.year == now.year &&
                   p.date.month == now.month &&
                   p.date.day == now.day;
@@ -53,7 +64,7 @@ class HomeScreen extends ConsumerWidget {
 
           return Column(
             children: [
-              // --- 1. Enhanced Header (Fixed) ---
+              // --- 1. Top Header ---
               Container(
                 height: 60 + MediaQuery.of(context).padding.top,
                 width: double.infinity,
@@ -74,11 +85,11 @@ class HomeScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Column(
-                        crossAxisAlignment : CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '${doctor.title ?? ''} ${doctor.fullName.split(' ').first}',
+                            titleName,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
@@ -88,24 +99,24 @@ class HomeScreen extends ConsumerWidget {
                           Text(
                             todayDate,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 12,
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 11.5,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    // IconButton(
-                    //   onPressed: () => Navigator.pushNamed(context, AppRoutes.settingsScreenRoute),
-                    //   icon: Container(
-                    //     padding: const EdgeInsets.all(6),
-                    //     decoration: BoxDecoration(
-                    //       color: Colors.white.withOpacity(0.2),
-                    //       shape: BoxShape.circle,
-                    //     ),
-                    //     child: const Icon(Icons.settings, color: Colors.white, size: 20),
-                    //   ),
-                    // ),
+                    IconButton(
+                      onPressed: () => Navigator.pushNamed(context, AppRoutes.settingsScreenRoute),
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.settings_outlined, color: Colors.white, size: 20),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -115,28 +126,81 @@ class HomeScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                        child: Row(
-                          children: [
-                            _buildSummaryCard(
-                              context,
-                              title: "Prescriptions",
-                              count: todayPrescriptionCount.toString(),
-                              icon: Icons.assignment_outlined,
-                              color: AppColors.actionBlue,
-                            ),
-                            const SizedBox(width: 16),
-                            _buildSummaryCard(
-                              context,
-                              title: "Today's Patients",
-                              count: todayUniquePatientsCount.toString(),
-                              icon: Icons.groups_outlined,
-                              color: AppColors.successColor,
-                            ),
-                          ],
+                      // Prescriber Profile Setup Prompt (If doctor is null)
+                      if (doctor == null)
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE0F2F1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFF80CBC4)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.badge_outlined, color: Color(0xFF00695C), size: 24),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Doctor or Prescriber?',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF004D40))),
+                                    Text('Tap to setup clinic pad & qualifications',
+                                      style: TextStyle(fontSize: 11.5, color: Colors.teal.shade800)),
+                                  ],
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => Navigator.pushNamed(context, AppRoutes.introOnboarding),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF004D40),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                                child: const Text('Setup',
+                                  style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),const SizedBox(height: 12),
+
+                      // --- 2. Health Vitals Section ---
+                      _buildVitalsSection(context, latestBp, latestSugar, latestWeight),
+
+                      // --- 3. Featured Health Tip of the Day ---
+                      _buildFeaturedTip(context, ref, tipsAsync, isTipBn),
+
+                      // --- 4. Prescriptions Counter (If doctor or has prescriptions) ---
+                      if (doctor != null || todayPrescriptionCount > 0)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                          child: Row(
+                            children: [
+                              _buildSummaryCard(
+                                context,
+                                title: "Prescriptions",
+                                count: todayPrescriptionCount.toString(),
+                                icon: Icons.assignment_outlined,
+                                color: AppColors.actionBlue,
+                              ),
+                              const SizedBox(width: 14),
+                              _buildSummaryCard(
+                                context,
+                                title: "Today's Patients",
+                                count: todayUniquePatientsCount.toString(),
+                                icon: Icons.groups_outlined,
+                                color: AppColors.successColor,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      const SizedBox(height: 16),
+
+                      // --- 5. Quick Actions Grid ---
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
@@ -151,8 +215,8 @@ class HomeScreen extends ConsumerWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               crossAxisCount: 2,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
+                              crossAxisSpacing: 14,
+                              mainAxisSpacing: 12,
                               childAspectRatio: 2.5,
                               children: [
                                 _buildQuickAction(
@@ -160,19 +224,35 @@ class HomeScreen extends ConsumerWidget {
                                   title: "New Rx",
                                   icon: Icons.add_circle_outline,
                                   color: AppColors.actionBlue,
+                                  onTap: () {
+                                    if (doctor == null) {
+                                      Navigator.pushNamed(context, AppRoutes.introOnboarding);
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const NewPrescriptionScreen()),
+                                      );
+                                    }
+                                  },
+                                ),
+                                _buildQuickAction(
+                                  context,
+                                  title: "Health Vitals",
+                                  icon: Icons.monitor_heart_outlined,
+                                  color: const Color(0xFFE53935),
                                   onTap: () => Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => const NewPrescriptionScreen()),
+                                    MaterialPageRoute(builder: (context) => const VitalsScreen()),
                                   ),
                                 ),
                                 _buildQuickAction(
                                   context,
-                                  title: "Patients",
-                                  icon: Icons.person_search_outlined,
-                                  color: AppColors.actionOrange,
+                                  title: "Health Tips",
+                                  icon: Icons.health_and_safety_outlined,
+                                  color: const Color(0xFF00897B),
                                   onTap: () => Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => const PatientsScreen()),
+                                    MaterialPageRoute(builder: (context) => const HealthTipsScreen()),
                                   ),
                                 ),
                                 _buildQuickAction(
@@ -187,6 +267,16 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                                 _buildQuickAction(
                                   context,
+                                  title: "Patients",
+                                  icon: Icons.person_search_outlined,
+                                  color: AppColors.actionOrange,
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const PatientsScreen()),
+                                  ),
+                                ),
+                                _buildQuickAction(
+                                  context,
                                   title: "Reports",
                                   icon: Icons.bar_chart_outlined,
                                   color: AppColors.actionPurple,
@@ -197,7 +287,8 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                            // --- 3. Recent Prescriptions ---
+
+                            // --- 6. Recent Prescriptions ---
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -504,6 +595,290 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildVitalsSection(
+    BuildContext context,
+    VitalLogModel? bp,
+    VitalLogModel? sugar,
+    VitalLogModel? weight,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'My Health Vitals',
+                style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const VitalsScreen()),
+                  );
+                },
+                child: Text(
+                  'View Log',
+                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              _buildVitalItem(
+                context,
+                title: 'Blood Pressure',
+                value: bp != null ? '${bp.value1.toInt()}/${bp.value2?.toInt() ?? 0}' : '-- / --',
+                unit: 'mmHg',
+                badge: bp?.getBpStatus() ?? '+ Log BP',
+                icon: Icons.favorite_rounded,
+                color: const Color(0xFFE53935),
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => const AddVitalSheet(initialType: 'BP'),
+                  );
+                },
+              ),
+              const SizedBox(width: 8),
+              _buildVitalItem(
+                context,
+                title: 'Blood Glucose',
+                value: sugar != null ? sugar.value1.toStringAsFixed(1) : '--.-',
+                unit: 'mmol/L',
+                badge: sugar?.category ?? '+ Log Sugar',
+                icon: Icons.water_drop_rounded,
+                color: const Color(0xFF1E88E5),
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => const AddVitalSheet(initialType: 'SUGAR'),
+                  );
+                },
+              ),
+              const SizedBox(width: 8),
+              _buildVitalItem(
+                context,
+                title: 'Weight & BMI',
+                value: weight != null ? weight.value1.toStringAsFixed(1) : '--.-',
+                unit: 'kg',
+                badge: weight?.getBmi() != null ? 'BMI ${weight!.getBmi()!.toStringAsFixed(1)}' : '+ Log Weight',
+                icon: Icons.monitor_weight_rounded,
+                color: const Color(0xFF00897B),
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => const AddVitalSheet(initialType: 'WEIGHT'),
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVitalItem(
+    BuildContext context, {
+    required String title,
+    required String value,
+    required String unit,
+    required String badge,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: color, size: 14),
+                  ),
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        badge,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: color),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                value,
+                style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+              ),
+              Text(
+                unit,
+                style: TextStyle(fontSize: 9.5, color: Colors.grey.shade500),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeaturedTip(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<List<HealthTipModel>> tipsAsync,
+    bool isBn,
+  ) {
+    return tipsAsync.when(
+      data: (tips) {
+        if (tips.isEmpty) return const SizedBox.shrink();
+        final featured = tips.first;
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HealthTipDetailScreen(tip: featured),
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFE8F5E9), Color(0xFFC8E6C9)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFA5D6A7)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2E7D32),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.star, color: Colors.white, size: 12),
+                                const SizedBox(width: 4),
+                                Text(
+                                  isBn ? 'দৈনিক স্বাস্থ্য টিপস' : 'Daily Health Tip',
+                                  style: const TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            featured.getCategory(isBn),
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF1B5E20)),
+                          ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          ref.read(tipLanguageIsBnProvider.notifier).state = !isBn;
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            isBn ? 'EN' : 'বাং',
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF2E7D32)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    featured.getTitle(isBn),
+                    style: const TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1B5E20),
+                      height: 1.25,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    featured.getSummary(isBn),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.green.shade900,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }
