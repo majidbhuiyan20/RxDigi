@@ -28,7 +28,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 9,
+      version: 10,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -176,6 +176,30 @@ class DatabaseHelper {
               isTaken INTEGER DEFAULT 1,
               takenAt TEXT NOT NULL,
               UNIQUE(reminderId, date, slot)
+            )
+          ''');
+        }
+        if (oldVersion < 10) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS health_habits (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              title TEXT NOT NULL,
+              category TEXT NOT NULL,
+              icon TEXT DEFAULT 'check_circle',
+              color TEXT DEFAULT '#00897B',
+              reminderTime TEXT,
+              isActive INTEGER DEFAULT 1,
+              createdAt TEXT NOT NULL
+            )
+          ''');
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS habit_logs (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              habitId INTEGER NOT NULL,
+              date TEXT NOT NULL,
+              completed INTEGER DEFAULT 1,
+              completedAt TEXT NOT NULL,
+              UNIQUE(habitId, date)
             )
           ''');
         }
@@ -384,6 +408,32 @@ class DatabaseHelper {
         isTaken INTEGER DEFAULT 1,
         takenAt TEXT NOT NULL,
         UNIQUE(reminderId, date, slot)
+      )
+    ''');
+
+    // Daily Health Habits Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS health_habits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        category TEXT NOT NULL,
+        icon TEXT DEFAULT 'check_circle',
+        color TEXT DEFAULT '#00897B',
+        reminderTime TEXT,
+        isActive INTEGER DEFAULT 1,
+        createdAt TEXT NOT NULL
+      )
+    ''');
+
+    // Daily Health Habit Completion Logs Table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS habit_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        habitId INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        completed INTEGER DEFAULT 1,
+        completedAt TEXT NOT NULL,
+        UNIQUE(habitId, date)
       )
     ''');
   }

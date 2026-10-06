@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../vitals/models/vital_log_model.dart';
 import '../../vitals/provider/vitals_provider.dart';
 import '../../vitals/view/vitals_screen.dart';
 import '../../vitals/view/add_vital_sheet.dart';
@@ -156,7 +155,18 @@ class HomeVitalsCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(icon, color: color, size: 20),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+              const SizedBox(height: 4),
               Text(
                 value,
                 maxLines: 1,

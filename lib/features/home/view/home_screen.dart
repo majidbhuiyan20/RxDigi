@@ -3,6 +3,7 @@ import '../widgets/home_header.dart';
 import '../widgets/today_medicine_card.dart';
 import '../widgets/home_vitals_card.dart';
 import '../widgets/featured_tip_card.dart';
+import '../../habit_tracker/widgets/health_habit_home_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -25,6 +26,10 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   // Daily Medicine Routine & Adherence Checklist
                   TodayMedicineCard(),
+                  SizedBox(height: 20),
+
+                  // Daily habits and medicine adherence summary
+                  HealthHabitHomeCard(),
                   SizedBox(height: 20),
 
                   // Personal Health Vitals (BP, Sugar, Weight)

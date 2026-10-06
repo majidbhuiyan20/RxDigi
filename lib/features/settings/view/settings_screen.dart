@@ -106,6 +106,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 await db.delete('patients');
                 await db.delete('medicine_reminders');
                 await db.delete('medicine_adherence_logs');
+                await db.delete('health_habits');
+                await db.delete('habit_logs');
                 ref.invalidate(vitalsListProvider);
                 ref.invalidate(prescriptionListProvider);
                 ref.invalidate(patientListProvider);
