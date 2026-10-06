@@ -223,33 +223,67 @@ class HealthHabitScreen extends ConsumerWidget {
 }
 
 Future<void> _showAddHabitSheet(BuildContext context, WidgetRef ref, bool isBn) async {
-  final titleController = TextEditingController();
-  var category = 'Wellness';
-  String? reminderTime;
   final result = await showModalBottomSheet<HealthHabitModel>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (sheetContext) => StatefulBuilder(builder: (context, setState) {
-      return Container(
-        padding: EdgeInsets.fromLTRB(20, 18, 20, MediaQuery.of(context).viewInsets.bottom + 24),
-        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
-        child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+    builder: (_) => _AddHabitSheet(isBn: isBn),
+  );
+  if (result != null) await ref.read(healthHabitNotifierProvider.notifier).add(result);
+}
+
+class _AddHabitSheet extends StatefulWidget {
+  final bool isBn;
+
+  const _AddHabitSheet({required this.isBn});
+
+  @override
+  State<_AddHabitSheet> createState() => _AddHabitSheetState();
+}
+
+class _AddHabitSheetState extends State<_AddHabitSheet> {
+  final _titleController = TextEditingController();
+  String _category = 'Wellness';
+  String? _reminderTime;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isBn = widget.isBn;
+    return Container(
+      padding: EdgeInsets.fromLTRB(20, 18, 20, MediaQuery.of(context).viewInsets.bottom + 24),
+      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+      child: SingleChildScrollView(
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Center(child: Container(width: 42, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(4)))),
           const SizedBox(height: 18),
           Text(isBn ? 'Custom habit যোগ করুন' : 'Add custom habit', style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
-          TextField(controller: titleController, autofocus: true, decoration: InputDecoration(labelText: isBn ? 'Habit-এর নাম' : 'Habit name', hintText: isBn ? 'যেমন: ৮ গ্লাস পানি' : 'e.g. Drink 8 glasses of water', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
+          TextField(controller: _titleController, autofocus: true, decoration: InputDecoration(labelText: isBn ? 'Habit-এর নাম' : 'Habit name', hintText: isBn ? 'যেমন: ৮ গ্লাস পানি' : 'e.g. Drink 8 glasses of water', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
           const SizedBox(height: 12),
-          DropdownButtonFormField<String>(initialValue: category, decoration: InputDecoration(labelText: isBn ? 'Category' : 'Category', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))), items: ['Wellness', 'Nutrition', 'Exercise', 'Sleep', 'Medicine', 'Vitals'].map((value) => DropdownMenuItem(value: value, child: Text(value))).toList(), onChanged: (value) => setState(() => category = value ?? category)),
+          DropdownButtonFormField<String>(initialValue: _category, decoration: InputDecoration(labelText: 'Category', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))), items: ['Wellness', 'Nutrition', 'Exercise', 'Sleep', 'Medicine', 'Vitals'].map((value) => DropdownMenuItem(value: value, child: Text(value))).toList(), onChanged: (value) => setState(() => _category = value ?? _category)),
           const SizedBox(height: 12),
-          OutlinedButton.icon(onPressed: () async { final picked = await showTimePicker(context: context, initialTime: const TimeOfDay(hour: 8, minute: 0)); if (picked != null) setState(() => reminderTime = picked.format(context)); }, icon: const Icon(Icons.notifications_none_rounded), label: Text(reminderTime == null ? (isBn ? 'Reminder time যোগ করুন' : 'Add reminder time') : reminderTime!)),
+          OutlinedButton.icon(onPressed: _pickReminderTime, icon: const Icon(Icons.notifications_none_rounded), label: Text(_reminderTime == null ? (isBn ? 'Reminder time যোগ করুন' : 'Add reminder time') : _reminderTime!)),
           const SizedBox(height: 14),
-          SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () { if (titleController.text.trim().isEmpty) return; Navigator.pop(sheetContext, HealthHabitModel(title: titleController.text.trim(), category: category, reminderTime: reminderTime, createdAt: DateTime.now().toIso8601String())); }, child: Text(isBn ? 'সংরক্ষণ করুন' : 'Save habit'))),
-        ])),
-      );
-    }),
-  );
-  titleController.dispose();
-  if (result != null) await ref.read(healthHabitNotifierProvider.notifier).add(result);
+          SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _save, child: Text(isBn ? 'সংরক্ষণ করুন' : 'Save habit'))),
+        ]),
+      ),
+    );
+  }
+
+  Future<void> _pickReminderTime() async {
+    final picked = await showTimePicker(context: context, initialTime: const TimeOfDay(hour: 8, minute: 0));
+    if (picked != null && mounted) setState(() => _reminderTime = picked.format(context));
+  }
+
+  void _save() {
+    final title = _titleController.text.trim();
+    if (title.isEmpty) return;
+    Navigator.pop(context, HealthHabitModel(title: title, category: _category, reminderTime: _reminderTime, createdAt: DateTime.now().toIso8601String()));
+  }
 }
