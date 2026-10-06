@@ -60,4 +60,15 @@ class VitalLogModel {
     final heightMeters = value2! / 100.0;
     return value1 / (heightMeters * heightMeters);
   }
+
+  String get displayValue {
+    if (type == 'BP') {
+      return value2 != null ? '${value1.toInt()}/${value2!.toInt()}' : '${value1.toInt()}';
+    } else if (type == 'SUGAR') {
+      return value1.toStringAsFixed(1);
+    } else if (type == 'WEIGHT') {
+      return value1.toStringAsFixed(1);
+    }
+    return '$value1';
+  }
 }

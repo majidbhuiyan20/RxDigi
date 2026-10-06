@@ -8,6 +8,7 @@ import '../../../core/data/providers/patient_provider.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../l10n/local_provider.dart';
 import '../../vitals/provider/vitals_provider.dart';
+import '../../medicine_reminder/provider/medicine_reminder_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -103,9 +104,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 await db.delete('user_vitals');
                 await db.delete('prescriptions');
                 await db.delete('patients');
+                await db.delete('medicine_reminders');
+                await db.delete('medicine_adherence_logs');
                 ref.invalidate(vitalsListProvider);
                 ref.invalidate(prescriptionListProvider);
                 ref.invalidate(patientListProvider);
+                ref.invalidate(activeRemindersProvider);
+                ref.invalidate(allRemindersProvider);
+                ref.invalidate(todayAdherenceMapProvider);
 
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(

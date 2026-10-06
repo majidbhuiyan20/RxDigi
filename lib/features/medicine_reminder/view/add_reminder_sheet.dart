@@ -1,6 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
+import '../../../app/slot_style.dart';
+import '../../../core/data/models/medicine_model.dart';
+import '../../../core/data/providers/medicine_provider.dart';
 import '../models/medicine_reminder_model.dart';
 import '../provider/medicine_reminder_provider.dart';
 
@@ -45,11 +50,57 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
     'Empty Stomach',
   ];
 
+  // Quick dose patterns: morning + noon + night
+  final List<List<int>> _dosePatterns = const [
+    [1, 0, 0],
+    [0, 0, 1],
+    [1, 0, 1],
+    [1, 1, 1],
+    [0, 1, 0],
+    [0, 1, 1],
+  ];
+
+  List<MedicineModel> _suggestions = [];
+  Timer? _debounce;
+
   @override
   void dispose() {
+    _debounce?.cancel();
     _nameController.dispose();
     _strengthController.dispose();
     super.dispose();
+  }
+
+  void _onNameChanged(String value) {
+    _debounce?.cancel();
+    final q = value.trim();
+    if (q.length < 2) {
+      setState(() => _suggestions = []);
+      return;
+    }
+    _debounce = Timer(const Duration(milliseconds: 250), () async {
+      final results = await ref.read(medicineRepositoryProvider).searchMedicines(q);
+      if (!mounted) return;
+      setState(() => _suggestions = results);
+    });
+  }
+
+  void _selectMedicine(MedicineModel m) {
+    FocusScope.of(context).unfocus();
+    final form = (m.dosageForm ?? '').toLowerCase();
+    String matched = _dosageForm;
+    for (final f in _forms) {
+      if (form.contains(f.toLowerCase())) {
+        matched = f;
+        break;
+      }
+    }
+    setState(() {
+      _nameController.text = m.name;
+      _strengthController.text = m.strength ?? '';
+      _dosageForm = matched;
+      _suggestions = [];
+    });
   }
 
   String _formatTimeOfDay(TimeOfDay time) {
@@ -198,11 +249,53 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
             const SizedBox(height: 6),
             TextField(
               controller: _nameController,
+              onChanged: _onNameChanged,
+              textInputAction: TextInputAction.search,
               decoration: InputDecoration(
-                hintText: isBn ? 'যেমন: Napa, Seclo, Metformin' : 'e.g. Napa, Seclo, Metformin',
-                prefixIcon: const Icon(Icons.medication_liquid_outlined, color: AppColors.primaryColor),
+                hintText: isBn ? 'ঔষধের নাম লিখুন (যেমন: Napa)' : 'Type medicine name (e.g. Napa)',
+                prefixIcon: Icon(PhosphorIconsRegular.magnifyingGlass, color: AppColors.primaryColor),
+                suffixIcon: _nameController.text.isEmpty
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.close_rounded, size: 18),
+                        onPressed: () {
+                          _nameController.clear();
+                          setState(() => _suggestions = []);
+                        },
+                      ),
               ),
             ),
+            if (_suggestions.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(top: 6),
+                constraints: const BoxConstraints(maxHeight: 220),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: _suggestions.length,
+                  separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey.shade100),
+                  itemBuilder: (context, i) {
+                    final m = _suggestions[i];
+                    final sub = [m.strength, m.dosageForm, m.genericName]
+                        .where((e) => e != null && e.trim().isNotEmpty)
+                        .join(' • ');
+                    return ListTile(
+                      dense: true,
+                      title: Text(m.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                      subtitle: sub.isEmpty
+                          ? null
+                          : Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11.5)),
+                      trailing: Icon(PhosphorIconsRegular.plusCircle, color: AppColors.primaryColor, size: 20),
+                      onTap: () => _selectMedicine(m),
+                    );
+                  },
+                ),
+              ),
             const SizedBox(height: 16),
 
             // Form & Strength Row
@@ -259,11 +352,37 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
               style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
             ),
             const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _dosePatterns.map((p) {
+                final selected = _morning == (p[0] == 1) && _noon == (p[1] == 1) && _night == (p[2] == 1);
+                return ChoiceChip(
+                  label: Text(p.join(' + ')),
+                  selected: selected,
+                  showCheckmark: false,
+                  selectedColor: AppColors.primaryColor,
+                  backgroundColor: Colors.white,
+                  labelStyle: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color: selected ? Colors.white : Colors.black87,
+                  ),
+                  side: BorderSide(color: selected ? AppColors.primaryColor : Colors.grey.shade300),
+                  onSelected: (_) => setState(() {
+                    _morning = p[0] == 1;
+                    _noon = p[1] == 1;
+                    _night = p[2] == 1;
+                  }),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 12),
             Row(
               children: [
                 _buildScheduleSlot(
                   title: isBn ? 'সকাল' : 'Morning',
-                  emoji: '🌅',
+                  style: SlotStyle.morning,
                   isSelected: _morning,
                   timeText: _formatTimeOfDay(_morningTime),
                   onToggle: () => setState(() => _morning = !_morning),
@@ -272,7 +391,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                 const SizedBox(width: 8),
                 _buildScheduleSlot(
                   title: isBn ? 'দুপুর' : 'Noon',
-                  emoji: '☀️',
+                  style: SlotStyle.noon,
                   isSelected: _noon,
                   timeText: _formatTimeOfDay(_noonTime),
                   onToggle: () => setState(() => _noon = !_noon),
@@ -281,7 +400,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                 const SizedBox(width: 8),
                 _buildScheduleSlot(
                   title: isBn ? 'রাত' : 'Night',
-                  emoji: '🌙',
+                  style: SlotStyle.night,
                   isSelected: _night,
                   timeText: _formatTimeOfDay(_nightTime),
                   onToggle: () => setState(() => _night = !_night),
@@ -375,7 +494,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
 
   Widget _buildScheduleSlot({
     required String title,
-    required String emoji,
+    required SlotStyle style,
     required bool isSelected,
     required String timeText,
     required VoidCallback onToggle,
@@ -397,7 +516,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
           ),
           child: Column(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 22)),
+              Icon(style.icon, size: 26, color: isSelected ? style.color : Colors.grey.shade400),
               const SizedBox(height: 4),
               Text(
                 title,

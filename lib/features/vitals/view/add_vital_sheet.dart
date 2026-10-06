@@ -9,6 +9,15 @@ class AddVitalSheet extends ConsumerStatefulWidget {
 
   const AddVitalSheet({super.key, this.initialType = 'BP'});
 
+  static Future<void> show(BuildContext context, [String initialType = 'BP']) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddVitalSheet(initialType: initialType),
+    );
+  }
+
   @override
   ConsumerState<AddVitalSheet> createState() => _AddVitalSheetState();
 }
