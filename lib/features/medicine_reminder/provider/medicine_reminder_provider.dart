@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/medicine_reminder_model.dart';
+import '../models/medicine_adherence_model.dart';
 import '../repository/medicine_reminder_repository.dart';
 
 final medicineReminderRepoProvider = Provider<MedicineReminderRepository>((ref) {
@@ -31,6 +32,12 @@ final todayAdherenceMapProvider = FutureProvider<Map<String, bool>>((ref) async 
   return await repo.getAdherenceMapForDate(today);
 });
 
+// Weekly Adherence Report for Analytics & Consistency tracking
+final weeklyAdherenceReportProvider = FutureProvider<WeeklyAdherenceReport>((ref) async {
+  final repo = ref.watch(medicineReminderRepoProvider);
+  return await repo.getWeeklyAdherenceReport();
+});
+
 // Notifier to handle adherence toggling and reminder operations
 class MedicineReminderNotifier extends Notifier<void> {
   @override
@@ -42,6 +49,7 @@ class MedicineReminderNotifier extends Notifier<void> {
     ref.invalidate(activeRemindersProvider);
     ref.invalidate(allRemindersProvider);
     ref.invalidate(todayAdherenceMapProvider);
+    ref.invalidate(weeklyAdherenceReportProvider);
   }
 
   Future<void> toggleReminderActive(int id, bool isActive) async {
@@ -50,6 +58,7 @@ class MedicineReminderNotifier extends Notifier<void> {
     ref.invalidate(activeRemindersProvider);
     ref.invalidate(allRemindersProvider);
     ref.invalidate(todayAdherenceMapProvider);
+    ref.invalidate(weeklyAdherenceReportProvider);
   }
 
   Future<void> deleteReminder(int id) async {
@@ -58,6 +67,7 @@ class MedicineReminderNotifier extends Notifier<void> {
     ref.invalidate(activeRemindersProvider);
     ref.invalidate(allRemindersProvider);
     ref.invalidate(todayAdherenceMapProvider);
+    ref.invalidate(weeklyAdherenceReportProvider);
   }
 
   Future<void> toggleAdherence({
@@ -86,6 +96,7 @@ class MedicineReminderNotifier extends Notifier<void> {
     ref.invalidate(todayAdherenceMapProvider);
     ref.invalidate(activeRemindersProvider);
     ref.invalidate(allRemindersProvider);
+    ref.invalidate(weeklyAdherenceReportProvider);
   }
 
   Future<void> refillStock(int reminderId, int addedStock) async {
@@ -93,6 +104,7 @@ class MedicineReminderNotifier extends Notifier<void> {
     await repo.refillStock(reminderId, addedStock);
     ref.invalidate(activeRemindersProvider);
     ref.invalidate(allRemindersProvider);
+    ref.invalidate(weeklyAdherenceReportProvider);
   }
 }
 

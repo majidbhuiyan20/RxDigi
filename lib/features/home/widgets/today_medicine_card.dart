@@ -1,52 +1,163 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
 import '../../../app/slot_style.dart';
 import '../../medicine_reminder/models/medicine_reminder_model.dart';
+import '../../medicine_reminder/models/medicine_adherence_model.dart';
 import '../../medicine_reminder/provider/medicine_reminder_provider.dart';
 import '../../medicine_reminder/view/add_reminder_sheet.dart';
 import '../../medicine_reminder/view/medicine_reminder_screen.dart';
 
-class TodayMedicineCard extends ConsumerWidget {
+class TodayMedicineCard extends ConsumerStatefulWidget {
   const TodayMedicineCard({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TodayMedicineCard> createState() => _TodayMedicineCardState();
+}
+
+class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
+  // Filters: 'current', 'pending', 'taken', 'all'
+  String _selectedFilter = 'current';
+  bool _showAnalytics = false;
+
+  String _getCurrentSlotKey() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 17) return 'noon';
+    if (hour >= 17 && hour < 21) return 'evening';
+    return 'night';
+  }
+
+  String _getSlotTitle(String slotKey, bool isBn) {
+    switch (slotKey) {
+      case 'morning':
+        return isBn ? 'সকাল' : 'Morning';
+      case 'noon':
+        return isBn ? 'দুপুর' : 'Noon';
+      case 'evening':
+        return isBn ? 'সন্ধ্যা' : 'Evening';
+      case 'night':
+        return isBn ? 'রাত' : 'Night';
+      default:
+        return slotKey;
+    }
+  }
+
+  bool _isSlotOverdue(String slotKey) {
+    final hour = DateTime.now().hour;
+    switch (slotKey) {
+      case 'morning':
+        return hour >= 12;
+      case 'noon':
+        return hour >= 17;
+      case 'evening':
+        return hour >= 21;
+      case 'night':
+        return false;
+      default:
+        return false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
     final remindersAsync = ref.watch(activeRemindersProvider);
     final adherenceAsync = ref.watch(todayAdherenceMapProvider);
+    final weeklyReportAsync = ref.watch(weeklyAdherenceReportProvider);
 
     return remindersAsync.when(
       data: (reminders) {
-        final adherenceMap = adherenceAsync.value ?? {};
+        if (reminders.isEmpty) {
+          return _buildNoRemindersCard(context, isBn);
+        }
 
-        // Calculate dose counts
-        int totalTodayDoses = 0;
-        int takenTodayDoses = 0;
+        final adherenceMap = adherenceAsync.value ?? {};
+        final weeklyReport = weeklyReportAsync.value;
+
+        // Flatten all scheduled doses for today
+        final allDoses = <_DoseItem>[];
         for (final r in reminders) {
-          if (r.id != null) {
-            if (r.morning) {
-              totalTodayDoses++;
-              if (adherenceMap['${r.id}_morning'] == true) takenTodayDoses++;
-            }
-            if (r.noon) {
-              totalTodayDoses++;
-              if (adherenceMap['${r.id}_noon'] == true) takenTodayDoses++;
-            }
-            if (r.evening) {
-              totalTodayDoses++;
-              if (adherenceMap['${r.id}_evening'] == true) takenTodayDoses++;
-            }
-            if (r.night) {
-              totalTodayDoses++;
-              if (adherenceMap['${r.id}_night'] == true) takenTodayDoses++;
-            }
+          if (r.id == null) continue;
+          if (r.morning) {
+            final isTaken = adherenceMap['${r.id}_morning'] == true;
+            allDoses.add(_DoseItem(
+              reminder: r,
+              slotKey: 'morning',
+              slotTitle: _getSlotTitle('morning', isBn),
+              slotStyle: SlotStyle.morning,
+              time: r.morningTime,
+              isTaken: isTaken,
+              isOverdue: !isTaken && _isSlotOverdue('morning'),
+            ));
+          }
+          if (r.noon) {
+            final isTaken = adherenceMap['${r.id}_noon'] == true;
+            allDoses.add(_DoseItem(
+              reminder: r,
+              slotKey: 'noon',
+              slotTitle: _getSlotTitle('noon', isBn),
+              slotStyle: SlotStyle.noon,
+              time: r.noonTime,
+              isTaken: isTaken,
+              isOverdue: !isTaken && _isSlotOverdue('noon'),
+            ));
+          }
+          if (r.evening) {
+            final isTaken = adherenceMap['${r.id}_evening'] == true;
+            allDoses.add(_DoseItem(
+              reminder: r,
+              slotKey: 'evening',
+              slotTitle: _getSlotTitle('evening', isBn),
+              slotStyle: SlotStyle.evening,
+              time: r.eveningTime,
+              isTaken: isTaken,
+              isOverdue: !isTaken && _isSlotOverdue('evening'),
+            ));
+          }
+          if (r.night) {
+            final isTaken = adherenceMap['${r.id}_night'] == true;
+            allDoses.add(_DoseItem(
+              reminder: r,
+              slotKey: 'night',
+              slotTitle: _getSlotTitle('night', isBn),
+              slotStyle: SlotStyle.night,
+              time: r.nightTime,
+              isTaken: isTaken,
+              isOverdue: !isTaken && _isSlotOverdue('night'),
+            ));
           }
         }
 
-        final double progress = totalTodayDoses > 0 ? (takenTodayDoses / totalTodayDoses) : 0.0;
+        final totalDoses = allDoses.length;
+        final takenDoses = allDoses.where((d) => d.isTaken).length;
+        final pendingDoses = allDoses.where((d) => !d.isTaken).length;
+        final overdueDoses = allDoses.where((d) => d.isOverdue).length;
+        final currentSlot = _getCurrentSlotKey();
+        final currentSlotDoses = allDoses.where((d) => d.slotKey == currentSlot).toList();
+
+        final double progress = totalDoses > 0 ? (takenDoses / totalDoses) : 0.0;
         final int percent = (progress * 100).toInt();
+
+        // Filter the doses list
+        List<_DoseItem> displayedDoses;
+        switch (_selectedFilter) {
+          case 'current':
+            displayedDoses = currentSlotDoses;
+            break;
+          case 'pending':
+            displayedDoses = allDoses.where((d) => !d.isTaken).toList();
+            break;
+          case 'taken':
+            displayedDoses = allDoses.where((d) => d.isTaken).toList();
+            break;
+          case 'all':
+          default:
+            displayedDoses = allDoses;
+            break;
+        }
 
         return Container(
           decoration: BoxDecoration(
@@ -65,7 +176,7 @@ class TodayMedicineCard extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Row
+              // 1. Header with Title & Add button
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -84,14 +195,29 @@ class TodayMedicineCard extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      Text(
-                        isBn ? 'আজকের ঔষধের রুটিন' : "Today's Medicine Routine",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                          color: Color(0xFF1E293B),
-                          letterSpacing: -0.2,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isBn ? 'আজকের ঔষধের রুটিন' : "Today's Medication",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              color: Color(0xFF1E293B),
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                          Text(
+                            isBn
+                                ? '$totalDoses টির মধ্যে $takenDoses টি সম্পন্ন'
+                                : '$takenDoses of $totalDoses doses taken',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color: Colors.grey.shade500,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -122,97 +248,562 @@ class TodayMedicineCard extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
-              // Progress Bar
-              if (totalTodayDoses > 0) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      isBn
-                          ? '$totalTodayDoses টির মধ্যে $takenTodayDoses টি সম্পন্ন'
-                          : '$takenTodayDoses of $totalTodayDoses doses taken',
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      '$percent%',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: percent == 100 ? const Color(0xFF16A34A) : AppColors.primaryColor,
+              // 2. Progress Bar & Overdue Alert Pill
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (overdueDoses > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF2F2),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFFFECACA)),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 7),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    minHeight: 6,
-                    backgroundColor: const Color(0xFFF1F5F9),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      percent == 100 ? const Color(0xFF16A34A) : AppColors.primaryColor,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-
-              // Empty or Medicine Slots
-              if (reminders.isEmpty)
-                _buildNoRemindersCard(context, isBn)
-              else ...[
-                _buildSlotSection(context, ref, SlotStyle.morning, isBn ? 'সকাল' : 'Morning', reminders, adherenceMap, isBn),
-                _buildSlotSection(context, ref, SlotStyle.noon, isBn ? 'দুপুর' : 'Noon', reminders, adherenceMap, isBn),
-                _buildSlotSection(context, ref, SlotStyle.evening, isBn ? 'সন্ধ্যা' : 'Evening', reminders, adherenceMap, isBn),
-                _buildSlotSection(context, ref, SlotStyle.night, isBn ? 'রাত' : 'Night', reminders, adherenceMap, isBn),
-
-                const SizedBox(height: 6),
-                Center(
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(8),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MedicineReminderScreen()),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
-                            PhosphorIconsRegular.calendarBlank,
-                            size: 15,
-                            color: AppColors.primaryColor,
-                          ),
-                          const SizedBox(width: 5),
+                          const Icon(PhosphorIconsFill.warningCircle, size: 12, color: Color(0xFFDC2626)),
+                          const SizedBox(width: 4),
                           Text(
-                            isBn ? 'সকল ঔষধের সময়সূচী দেখুন' : 'Manage All Medications',
+                            isBn ? '$overdueDoses টি সময় পার হয়েছে!' : '$overdueDoses dose overdue!',
                             style: const TextStyle(
-                              fontSize: 12.5,
-                              color: AppColors.primaryColor,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFDC2626),
                             ),
                           ),
                         ],
                       ),
+                    )
+                  else
+                    Text(
+                      isBn ? 'অগ্রগতি' : 'Progress',
+                      style: TextStyle(fontSize: 11.5, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+                    ),
+                  Text(
+                    '$percent%',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                      color: percent == 100 ? const Color(0xFF16A34A) : AppColors.primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 6,
+                  backgroundColor: const Color(0xFFF1F5F9),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    percent == 100 ? const Color(0xFF16A34A) : AppColors.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // 3. Smart Filter Tabs (Current Slot, Pending, Taken, All)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: [
+                    _buildFilterChip(
+                      key: 'current',
+                      label: isBn
+                          ? 'এখনকার (${_getSlotTitle(currentSlot, isBn)})'
+                          : 'Next Up (${_getSlotTitle(currentSlot, isBn)})',
+                      count: currentSlotDoses.length,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildFilterChip(
+                      key: 'pending',
+                      label: isBn ? 'খাওয়া বাকি' : 'Pending',
+                      count: pendingDoses,
+                      alert: overdueDoses > 0,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildFilterChip(
+                      key: 'taken',
+                      label: isBn ? 'গৃহীত' : 'Taken',
+                      count: takenDoses,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildFilterChip(
+                      key: 'all',
+                      label: isBn ? 'সব' : 'All Doses',
+                      count: totalDoses,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // 4. Dose Items List or Filter-Specific Empty State
+              if (displayedDoses.isEmpty)
+                _buildFilteredEmptyState(isBn)
+              else
+                ...displayedDoses.map((dose) => _buildDoseItem(context, dose, isBn)),
+
+              const SizedBox(height: 6),
+
+              // 5. Expandable 7-Day Consistency & Analytics Section
+              // 5. 7-Day Consistency & Adherence Analytics Section
+              if (weeklyReport != null) ...[
+                const SizedBox(height: 12),
+                _buildWeeklyAnalyticsDrawer(weeklyReport, isBn),
+              ],
+
+              // 6. Manage all medications bottom link
+              const SizedBox(height: 6),
+              Center(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MedicineReminderScreen()),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          PhosphorIconsRegular.calendarBlank,
+                          size: 15,
+                          color: AppColors.primaryColor,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          isBn ? 'সকল ঔষধের পূর্ণ তালিকা ও অ্যালার্ম' : 'Manage All Medications & Alarms',
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: AppColors.primaryColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
+              ),
             ],
           ),
         );
       },
       loading: () => const Center(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(20.0),
           child: CircularProgressIndicator(),
         ),
       ),
       error: (e, _) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildFilterChip({
+    required String key,
+    required String label,
+    required int count,
+    bool alert = false,
+  }) {
+    final isSelected = _selectedFilter == key;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        setState(() {
+          _selectedFilter = key;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (alert ? const Color(0xFFFEF2F2) : AppColors.primaryColor.withOpacity(0.12))
+              : const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected
+                ? (alert ? const Color(0xFFEF4444) : AppColors.primaryColor)
+                : const Color(0xFFE2E8F0),
+            width: isSelected ? 1.4 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                color: isSelected
+                    ? (alert ? const Color(0xFFDC2626) : AppColors.primaryColor)
+                    : const Color(0xFF475569),
+              ),
+            ),
+            const SizedBox(width: 5),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? (alert ? const Color(0xFFEF4444) : AppColors.primaryColor)
+                    : const Color(0xFFCBD5E1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '$count',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDoseItem(BuildContext context, _DoseItem dose, bool isBn) {
+    final med = dose.reminder;
+    final isTaken = dose.isTaken;
+    final isOverdue = dose.isOverdue;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: isTaken
+            ? const Color(0xFFF0FDF4)
+            : (isOverdue ? const Color(0xFFFFFBEB) : const Color(0xFFF8FAFC)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isTaken
+              ? const Color(0xFF86EFAC)
+              : (isOverdue ? const Color(0xFFFDE68A) : const Color(0xFFE2E8F0)),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          // 1-Tap Checkbox with Haptic Feedback
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              if (med.id != null) {
+                ref.read(medicineReminderNotifierProvider.notifier).toggleAdherence(
+                      reminderId: med.id!,
+                      slot: dose.slotKey,
+                      isCurrentlyTaken: isTaken,
+                    );
+              }
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                color: isTaken ? const Color(0xFF16A34A) : Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isTaken
+                      ? const Color(0xFF16A34A)
+                      : (isOverdue ? const Color(0xFFF59E0B) : Colors.grey.shade400),
+                  width: 2,
+                ),
+              ),
+              child: isTaken
+                  ? const Icon(PhosphorIconsBold.check, size: 14, color: Colors.white)
+                  : null,
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          // Medicine Name, Form, Time & Status
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        med.medicineName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          decoration: isTaken ? TextDecoration.lineThrough : null,
+                          color: isTaken ? Colors.grey.shade600 : const Color(0xFF1E293B),
+                        ),
+                      ),
+                    ),
+                    if (med.dosageStrength.isNotEmpty) ...[
+                      const SizedBox(width: 5),
+                      Text(
+                        med.dosageStrength,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isTaken ? Colors.grey : const Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    // Slot badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        color: dose.slotStyle.color.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '${dose.slotTitle} • ${dose.time}',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: dose.slotStyle.color,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      med.instructions,
+                      style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                    ),
+                    if (med.isLowStock || med.isOutOfStock) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: med.isOutOfStock ? Colors.red.shade50 : Colors.orange.shade50,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          med.isOutOfStock
+                              ? (isBn ? 'স্টক শেষ' : 'Empty')
+                              : (isBn ? 'বাকি ${med.currentStock}' : '${med.currentStock} left'),
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.bold,
+                            color: med.isOutOfStock ? Colors.red.shade700 : Colors.orange.shade800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Status Badge
+          if (isTaken)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                isBn ? 'গৃহীত' : 'Taken',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green.shade700,
+                ),
+              ),
+            )
+          else if (isOverdue)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEF2F2),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                isBn ? 'সময় পার' : 'Late',
+                style: const TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFDC2626),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeeklyAnalyticsDrawer(WeeklyAdherenceReport report, bool isBn) {
+    final percent = (report.adherenceRate * 100).toInt();
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                isBn ? 'গত ৭ দিনের নিয়মানুবর্তিতা' : '7-Day Adherence Score',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+              ),
+              Text(
+                '$percent% ${percent >= 80 ? (isBn ? "চমৎকার!" : "Great!") : ""}',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.bold,
+                  color: percent >= 80 ? const Color(0xFF0F766E) : const Color(0xFFD97706),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+
+          // 7-Day Consistency Dots
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: report.dailyStats.map((stat) {
+              final isToday = stat.dateString == getTodayDateString();
+              Color dotColor;
+              if (stat.isNoMeds) {
+                dotColor = const Color(0xFFE2E8F0);
+              } else if (stat.isFull) {
+                dotColor = const Color(0xFF10B981); // Green
+              } else if (stat.isPartial) {
+                dotColor = const Color(0xFFF59E0B); // Amber
+              } else {
+                dotColor = const Color(0xFFEF4444); // Red missed
+              }
+
+              return Column(
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: dotColor.withOpacity(0.18),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isToday ? const Color(0xFF0F766E) : dotColor,
+                        width: isToday ? 2 : 1.2,
+                      ),
+                    ),
+                    child: Center(
+                      child: stat.isFull
+                          ? Icon(PhosphorIconsBold.check, size: 12, color: dotColor)
+                          : (stat.isMissed
+                              ? Icon(PhosphorIconsBold.x, size: 10, color: dotColor)
+                              : null),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    isBn ? stat.dayNameBn : stat.dayNameEn,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
+                      color: isToday ? const Color(0xFF0F766E) : Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 8),
+
+          // Legend
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildLegendDot(const Color(0xFF10B981), isBn ? 'গৃহীত' : 'Taken'),
+              const SizedBox(width: 12),
+              _buildLegendDot(const Color(0xFFF59E0B), isBn ? 'আংশিক' : 'Partial'),
+              const SizedBox(width: 12),
+              _buildLegendDot(const Color(0xFFEF4444), isBn ? 'মিসড' : 'Missed'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendDot(Color color, String text) {
+    return Row(
+      children: [
+        Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 4),
+        Text(text, style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+      ],
+    );
+  }
+
+  Widget _buildFilteredEmptyState(bool isBn) {
+    String message;
+    IconData icon;
+    if (_selectedFilter == 'current') {
+      message = isBn
+          ? 'এই সময়ে কোনো ওষুধ নির্ধারিত নেই বা ইতিমধ্যে গ্রহণ সম্পন্ন হয়েছে!'
+          : 'No medications due for this slot or all taken!';
+      icon = PhosphorIconsRegular.sun;
+    } else if (_selectedFilter == 'pending') {
+      message = isBn
+          ? 'দারুণ! আজকের আর কোনো ওষুধ খাওয়া বাকি নেই।'
+          : 'Great! No pending doses left today.';
+      icon = PhosphorIconsRegular.checkCircle;
+    } else if (_selectedFilter == 'taken') {
+      message = isBn
+          ? 'আজকে এখনও কোনো ওষুধ খাওয়ার হিস্ট্রি যোগ হয়নি।'
+          : 'No medications taken yet today.';
+      icon = PhosphorIconsRegular.clockCountdown;
+    } else {
+      message = isBn ? 'কোনো ওষুধ পাওয়া যায়নি' : 'No medications found';
+      icon = PhosphorIconsRegular.pill;
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 26, color: Colors.grey.shade400),
+          const SizedBox(height: 6),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
     );
   }
 
@@ -221,9 +812,16 @@ class TodayMedicineCard extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.grey.shade100, width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.035),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -271,172 +869,24 @@ class TodayMedicineCard extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildSlotSection(
-    BuildContext context,
-    WidgetRef ref,
-    SlotStyle style,
-    String slotTitle,
-    List<MedicineReminderModel> reminders,
-    Map<String, bool> adherenceMap,
-    bool isBn,
-  ) {
-    final slotKey = style.key;
-    final slotMeds = reminders.where((r) {
-      if (slotKey == 'morning') return r.morning;
-      if (slotKey == 'noon') return r.noon;
-      if (slotKey == 'evening') return r.evening;
-      if (slotKey == 'night') return r.night;
-      return false;
-    }).toList();
+class _DoseItem {
+  final MedicineReminderModel reminder;
+  final String slotKey;
+  final String slotTitle;
+  final SlotStyle slotStyle;
+  final String time;
+  final bool isTaken;
+  final bool isOverdue;
 
-    if (slotMeds.isEmpty) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              SlotIcon(style, size: 18),
-              const SizedBox(width: 6),
-              Text(
-                slotTitle,
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Colors.black87),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          ...slotMeds.map((med) {
-            final isTaken = adherenceMap['${med.id}_$slotKey'] == true;
-            final time = slotKey == 'morning'
-                ? med.morningTime
-                : slotKey == 'noon'
-                    ? med.noonTime
-                    : slotKey == 'evening'
-                        ? med.eveningTime
-                        : med.nightTime;
-
-            return Container(
-              margin: const EdgeInsets.only(bottom: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: isTaken ? const Color(0xFFF0FDF4) : const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isTaken ? const Color(0xFF86EFAC) : Colors.grey.shade200,
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      if (med.id != null) {
-                        ref.read(medicineReminderNotifierProvider.notifier).toggleAdherence(
-                              reminderId: med.id!,
-                              slot: slotKey,
-                              isCurrentlyTaken: isTaken,
-                            );
-                      }
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      width: 26,
-                      height: 26,
-                      decoration: BoxDecoration(
-                        color: isTaken ? Colors.green : Colors.white,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isTaken ? Colors.green : Colors.grey.shade400,
-                          width: 2,
-                        ),
-                      ),
-                      child: isTaken
-                          ? const Icon(PhosphorIconsBold.check, size: 14, color: Colors.white)
-                          : null,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              med.medicineName,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                decoration: isTaken ? TextDecoration.lineThrough : null,
-                                color: isTaken ? Colors.grey.shade600 : Colors.black87,
-                              ),
-                            ),
-                            if (med.dosageStrength.isNotEmpty) ...[
-                              const SizedBox(width: 6),
-                              Text(
-                                med.dosageStrength,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: isTaken ? Colors.grey : Colors.grey.shade700,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              '${med.dosageForm} • ${med.instructions} • $time',
-                              style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
-                            ),
-                            if (med.isLowStock || med.isOutOfStock) ...[
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                                decoration: BoxDecoration(
-                                  color: med.isOutOfStock ? Colors.red.shade50 : Colors.orange.shade50,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  med.isOutOfStock ? (isBn ? 'স্টক শেষ' : 'Empty') : (isBn ? 'বাকি ${med.currentStock}' : '${med.currentStock} left'),
-                                  style: TextStyle(
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: med.isOutOfStock ? Colors.red.shade700 : Colors.orange.shade800,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (isTaken)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade50,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        isBn ? 'গৃহীত' : 'Taken',
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green.shade700,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
+  _DoseItem({
+    required this.reminder,
+    required this.slotKey,
+    required this.slotTitle,
+    required this.slotStyle,
+    required this.time,
+    required this.isTaken,
+    required this.isOverdue,
+  });
 }

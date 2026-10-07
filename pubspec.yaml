@@ -60,6 +60,7 @@ flutter:
     - assets/fonts/
     - assets/icons/
     - assets/data/
+    - assets/data/tips/
 
   fonts:
     # Oswald Font Family

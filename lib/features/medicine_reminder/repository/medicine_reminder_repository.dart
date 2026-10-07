@@ -129,4 +129,79 @@ class MedicineReminderRepository {
       WHERE id = ?
     ''', [addedStock, addedStock, reminderId]);
   }
+
+  Future<WeeklyAdherenceReport> getWeeklyAdherenceReport() async {
+    final db = await _dbHelper.database;
+    final activeMeds = await getActiveReminders();
+
+    // Calculate total scheduled doses in a normal day
+    int dailyScheduledCount = 0;
+    for (final med in activeMeds) {
+      if (med.morning) dailyScheduledCount++;
+      if (med.noon) dailyScheduledCount++;
+      if (med.evening) dailyScheduledCount++;
+      if (med.night) dailyScheduledCount++;
+    }
+
+    final now = DateTime.now();
+    final List<DailyAdherenceStat> dailyStats = [];
+    int totalScheduled7Days = 0;
+    int totalTaken7Days = 0;
+
+    const bnDayNames = ['সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি', 'রবি'];
+    const enDayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    for (int i = 6; i >= 0; i--) {
+      final date = now.subtract(Duration(days: i));
+      final dateStr = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+      final countResult = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM medicine_adherence_logs WHERE date = ? AND isTaken = 1',
+        [dateStr],
+      );
+      final takenCount = Sqflite.firstIntValue(countResult) ?? 0;
+
+      final weekdayIndex = date.weekday - 1;
+      final dayNameBn = bnDayNames[weekdayIndex];
+      final dayNameEn = enDayNames[weekdayIndex];
+
+      final scheduledForDay = dailyScheduledCount;
+      totalScheduled7Days += scheduledForDay;
+      totalTaken7Days += takenCount;
+
+      dailyStats.add(DailyAdherenceStat(
+        date: date,
+        dateString: dateStr,
+        dayNameBn: dayNameBn,
+        dayNameEn: dayNameEn,
+        totalScheduled: scheduledForDay,
+        totalTaken: takenCount,
+      ));
+    }
+
+    int streak = 0;
+    for (int i = dailyStats.length - 1; i >= 0; i--) {
+      final stat = dailyStats[i];
+      if (stat.totalScheduled > 0 && stat.totalTaken >= stat.totalScheduled) {
+        streak++;
+      } else if (i == dailyStats.length - 1) {
+        continue;
+      } else {
+        break;
+      }
+    }
+
+    final rate = totalScheduled7Days > 0 ? (totalTaken7Days / totalScheduled7Days) : 0.0;
+    final missed = totalScheduled7Days > totalTaken7Days ? (totalScheduled7Days - totalTaken7Days) : 0;
+
+    return WeeklyAdherenceReport(
+      adherenceRate: rate,
+      totalTaken: totalTaken7Days,
+      totalScheduled: totalScheduled7Days,
+      currentStreak: streak,
+      missedDoses: missed,
+      dailyStats: dailyStats,
+    );
+  }
 }
+
