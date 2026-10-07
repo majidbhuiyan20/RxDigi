@@ -97,6 +97,93 @@ class MedicineReminderCard extends ConsumerWidget {
                         '${reminder.dosageForm} • ${reminder.instructions}',
                         style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
                       ),
+                      if (reminder.hasStockTracking) ...[
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: reminder.isOutOfStock
+                                    ? Colors.red.shade50
+                                    : reminder.isLowStock
+                                        ? Colors.orange.shade50
+                                        : Colors.green.shade50,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: reminder.isOutOfStock
+                                      ? Colors.red.shade300
+                                      : reminder.isLowStock
+                                          ? Colors.orange.shade300
+                                          : Colors.green.shade300,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    reminder.isOutOfStock
+                                        ? PhosphorIconsRegular.warningCircle
+                                        : reminder.isLowStock
+                                            ? PhosphorIconsRegular.warning
+                                            : PhosphorIconsRegular.package,
+                                    size: 13,
+                                    color: reminder.isOutOfStock
+                                        ? Colors.red.shade700
+                                        : reminder.isLowStock
+                                            ? Colors.orange.shade800
+                                            : Colors.green.shade700,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    reminder.isOutOfStock
+                                        ? (isBn ? 'স্টক শেষ!' : 'Out of stock!')
+                                        : reminder.isLowStock
+                                            ? (isBn ? 'মাত্র ${reminder.currentStock}টি বাকি' : 'Only ${reminder.currentStock} left')
+                                            : (isBn ? 'স্টক: ${reminder.currentStock}টি বাকি' : 'Stock: ${reminder.currentStock} left'),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: reminder.isOutOfStock
+                                          ? Colors.red.shade700
+                                          : reminder.isLowStock
+                                              ? Colors.orange.shade800
+                                              : Colors.green.shade700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            InkWell(
+                              onTap: () {
+                                if (reminder.id != null) {
+                                  ref.read(medicineReminderNotifierProvider.notifier).refillStock(reminder.id!, 10);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(isBn ? '${reminder.medicineName} এ ১০টি ট্যাবলেট যোগ করা হয়েছে' : 'Added 10 pills to ${reminder.medicineName}')),
+                                  );
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(6),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  isBn ? '+১০ রিফিল' : '+10 Refill',
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),

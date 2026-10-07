@@ -84,17 +84,20 @@ class MedicineRepository extends BaseRepository<MedicineModel> {
     try {
       final db = await _databaseHelper.database;
       
-      // Check if medicines already loaded
-      final count = Sqflite.firstIntValue(
-        await db.rawQuery('SELECT COUNT(*) FROM medicines'),
-      );
+      // Check if medicines with prices already loaded
+      final countWithPrice = Sqflite.firstIntValue(
+        await db.rawQuery('SELECT COUNT(*) FROM medicines WHERE price IS NOT NULL'),
+      ) ?? 0;
       
-      if (count != null && count > 0) {
-        print('Medicines already loaded');
+      if (countWithPrice >= 1000) {
+        print('Medicines with prices already loaded ($countWithPrice)');
         return;
       }
 
-      print('Loading medicines from CSV...');
+      print('Loading medicines with prices from CSV...');
+      // Clear old rows if they didn't have prices
+      await db.delete('medicines');
+
       // Load CSV file
       final csvString = await rootBundle.loadString(_csvPath);
       final List<List<dynamic>> rows = const CsvToListConverter().convert(csvString);
@@ -209,6 +212,59 @@ class MedicineRepository extends BaseRepository<MedicineModel> {
       return result.map((map) => MedicineModel.fromMap(map)).toList();
     } catch (e) {
       print('Error fetching medicines by strength: $e');
+      return [];
+    }
+  }
+
+  /// Find alternative brands with the exact generic formula, dosage form, and strength.
+  /// Ordered by price ASC so the cheapest substitute is on top.
+  Future<List<MedicineModel>> getGenericSubstitutes({
+    required String genericName,
+    required String dosageForm,
+    String? strength,
+    int? currentMedicineId,
+  }) async {
+    try {
+      final db = await _databaseHelper.database;
+      final cleanGeneric = genericName.trim();
+      final cleanForm = dosageForm.trim();
+
+      String query = 'SELECT * FROM medicines WHERE genericName = ? AND dosageForm = ?';
+      List<dynamic> args = [cleanGeneric, cleanForm];
+
+      if (strength != null && strength.trim().isNotEmpty) {
+        query += ' AND strength = ?';
+        args.add(strength.trim());
+      }
+
+      if (currentMedicineId != null) {
+        query += ' AND id != ?';
+        args.add(currentMedicineId);
+      }
+
+      query += ' ORDER BY CASE WHEN price IS NULL OR price = 0 THEN 999999 ELSE price END ASC, name ASC';
+
+      final result = await db.rawQuery(query, args);
+      var list = result.map((m) => MedicineModel.fromMap(m)).toList();
+
+      // If exact strength had 0 matches and strength had spaces, try normalized strength comparison
+      if (list.isEmpty && strength != null && strength.trim().isNotEmpty) {
+        final relaxedQuery = 'SELECT * FROM medicines WHERE genericName = ? AND dosageForm = ? ORDER BY CASE WHEN price IS NULL OR price = 0 THEN 999999 ELSE price END ASC';
+        final relaxedResult = await db.rawQuery(relaxedQuery, [cleanGeneric, cleanForm]);
+        final normalizedTarget = strength.replaceAll(' ', '').toLowerCase();
+        list = relaxedResult
+            .map((m) => MedicineModel.fromMap(m))
+            .where((m) {
+              if (currentMedicineId != null && m.id == currentMedicineId) return false;
+              if (m.strength == null) return false;
+              return m.strength!.replaceAll(' ', '').toLowerCase() == normalizedTarget;
+            })
+            .toList();
+      }
+
+      return list;
+    } catch (e) {
+      print('Error fetching generic substitutes: $e');
       return [];
     }
   }

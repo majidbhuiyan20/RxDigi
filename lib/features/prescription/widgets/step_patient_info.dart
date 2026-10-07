@@ -24,6 +24,7 @@ class _StepPatientInfoState extends ConsumerState<StepPatientInfo> {
   String _selectedGender = 'Male';
 
   List<PatientModel> _searchResults = [];
+  bool _isSearching = false;
   bool _isNewPatient = true;
 
   @override
@@ -106,6 +107,12 @@ class _StepPatientInfoState extends ConsumerState<StepPatientInfo> {
               decoration: InputDecoration(
                 hintText: 'Search by phone or name...',
                 prefixIcon: const Icon(Icons.search),
+                suffixIcon: _isSearching
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
+                      )
+                    : null,
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(

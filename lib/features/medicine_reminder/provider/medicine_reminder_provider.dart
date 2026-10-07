@@ -67,13 +67,32 @@ class MedicineReminderNotifier extends Notifier<void> {
   }) async {
     final repo = ref.read(medicineReminderRepoProvider);
     final today = getTodayDateString();
+    final becomingTaken = !isCurrentlyTaken;
+
     await repo.setAdherence(
       reminderId: reminderId,
       date: today,
       slot: slot,
-      isTaken: !isCurrentlyTaken,
+      isTaken: becomingTaken,
     );
+
+    // Automatically update remaining medicine stock
+    if (becomingTaken) {
+      await repo.decrementStock(reminderId);
+    } else {
+      await repo.incrementStock(reminderId);
+    }
+
     ref.invalidate(todayAdherenceMapProvider);
+    ref.invalidate(activeRemindersProvider);
+    ref.invalidate(allRemindersProvider);
+  }
+
+  Future<void> refillStock(int reminderId, int addedStock) async {
+    final repo = ref.read(medicineReminderRepoProvider);
+    await repo.refillStock(reminderId, addedStock);
+    ref.invalidate(activeRemindersProvider);
+    ref.invalidate(allRemindersProvider);
   }
 }
 

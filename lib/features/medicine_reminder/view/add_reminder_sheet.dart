@@ -84,11 +84,16 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
   bool _isSearching = false;
   Timer? _debounce;
 
+  bool _trackStock = false;
+  final _stockController = TextEditingController(text: '10');
+  int _lowStockThreshold = 2;
+
   @override
   void dispose() {
     _debounce?.cancel();
     _nameController.dispose();
     _strengthController.dispose();
+    _stockController.dispose();
     super.dispose();
   }
 
@@ -179,6 +184,8 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
       return;
     }
 
+    final stockVal = _trackStock ? (int.tryParse(_stockController.text.trim()) ?? 10) : 0;
+
     final reminder = MedicineReminderModel(
       medicineName: name,
       dosageForm: _dosageForm,
@@ -194,6 +201,10 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
       nightTime: _formatTimeOfDay(_nightTime),
       startDate: getTodayDateString(),
       durationDays: _durationDays,
+      totalStock: stockVal,
+      currentStock: stockVal,
+      lowStockThreshold: _lowStockThreshold,
+      isRefillAlertEnabled: _trackStock,
       createdAt: DateTime.now().toIso8601String(),
     );
 
@@ -589,6 +600,117 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                 _buildDurationChip(14, isBn ? '১৪ দিন' : '14 Days'),
                 _buildDurationChip(30, isBn ? '৩০ দিন' : '30 Days'),
               ],
+            ),
+            const SizedBox(height: 20),
+
+            // Stock Tracker & Refill Alert
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: _trackStock ? AppColors.primaryColor.withOpacity(0.06) : Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: _trackStock ? AppColors.primaryColor.withOpacity(0.3) : Colors.grey.shade200,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            PhosphorIconsRegular.package,
+                            size: 22,
+                            color: _trackStock ? AppColors.primaryColor : Colors.grey.shade600,
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isBn ? 'পাতা/স্টক ট্র্যাক ও রিফিল অ্যালার্ট' : 'Stock Tracker & Refill Alert',
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                              Text(
+                                isBn ? 'পাতা শেষ হওয়ার ২ দিন আগে অ্যালার্ট পাবেন' : 'Alert before running out of tablets',
+                                style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Switch(
+                        value: _trackStock,
+                        activeColor: AppColors.primaryColor,
+                        onChanged: (val) => setState(() => _trackStock = val),
+                      ),
+                    ],
+                  ),
+                  if (_trackStock) ...[
+                    const SizedBox(height: 12),
+                    const Divider(height: 1),
+                    const SizedBox(height: 12),
+                    Text(
+                      isBn ? 'কতটি ঔষধ কিনেছেন? (বর্তমান স্টক)' : 'Purchased Tablets/Capsules (Stock):',
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _stockController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              hintText: isBn ? 'যেমন: ১০' : 'e.g. 10',
+                              suffixText: isBn ? 'টি' : 'tabs',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ...[10, 15, 20, 30].map((count) => Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: ActionChip(
+                            label: Text('$count'),
+                            labelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                            padding: EdgeInsets.zero,
+                            onPressed: () => setState(() => _stockController.text = '$count'),
+                          ),
+                        )),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      isBn ? 'কতটি বাকি থাকলে অ্যালার্ট পাবেন?' : 'Alert when remaining stock drops to:',
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 8,
+                      children: [2, 3, 5].map((t) {
+                        final isSel = _lowStockThreshold == t;
+                        return ChoiceChip(
+                          label: Text(isBn ? '$t টি বাকি থাকলে' : '$t remaining'),
+                          selected: isSel,
+                          selectedColor: AppColors.primaryColor.withOpacity(0.18),
+                          labelStyle: TextStyle(
+                            fontSize: 11,
+                            fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
+                            color: isSel ? AppColors.primaryColor : Colors.black87,
+                          ),
+                          onSelected: (val) {
+                            if (val) setState(() => _lowStockThreshold = t);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ],
+              ),
             ),
             const SizedBox(height: 24),
 

@@ -340,9 +340,31 @@ class TodayMedicineCard extends ConsumerWidget {
                             ],
                           ],
                         ),
-                        Text(
-                          '${med.dosageForm} • ${med.instructions} • $time',
-                          style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                        Row(
+                          children: [
+                            Text(
+                              '${med.dosageForm} • ${med.instructions} • $time',
+                              style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                            ),
+                            if (med.isLowStock || med.isOutOfStock) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                decoration: BoxDecoration(
+                                  color: med.isOutOfStock ? Colors.red.shade50 : Colors.orange.shade50,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  med.isOutOfStock ? (isBn ? 'স্টক শেষ' : 'Empty') : (isBn ? 'বাকি ${med.currentStock}' : '${med.currentStock} left'),
+                                  style: TextStyle(
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: med.isOutOfStock ? Colors.red.shade700 : Colors.orange.shade800,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ],
                     ),

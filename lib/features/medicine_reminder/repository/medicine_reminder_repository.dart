@@ -102,4 +102,31 @@ class MedicineReminderRepository {
     }
     return map;
   }
+
+  Future<void> decrementStock(int reminderId) async {
+    final db = await _dbHelper.database;
+    await db.rawUpdate('''
+      UPDATE medicine_reminders 
+      SET currentStock = CASE WHEN currentStock > 0 THEN currentStock - 1 ELSE 0 END
+      WHERE id = ? AND totalStock > 0
+    ''', [reminderId]);
+  }
+
+  Future<void> incrementStock(int reminderId) async {
+    final db = await _dbHelper.database;
+    await db.rawUpdate('''
+      UPDATE medicine_reminders 
+      SET currentStock = currentStock + 1
+      WHERE id = ? AND totalStock > 0
+    ''', [reminderId]);
+  }
+
+  Future<void> refillStock(int reminderId, int addedStock) async {
+    final db = await _dbHelper.database;
+    await db.rawUpdate('''
+      UPDATE medicine_reminders 
+      SET currentStock = currentStock + ?, totalStock = totalStock + ?
+      WHERE id = ?
+    ''', [addedStock, addedStock, reminderId]);
+  }
 }

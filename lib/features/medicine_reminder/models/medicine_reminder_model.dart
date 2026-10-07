@@ -14,6 +14,10 @@ class MedicineReminderModel {
   final String nightTime;
   final String startDate;
   final int durationDays; // 0 = ongoing/continuous
+  final int totalStock; // Initial/total stock purchased (e.g. 10 tablets)
+  final int currentStock; // Remaining stock (e.g. 8 tablets)
+  final int lowStockThreshold; // Alert when stock <= this (e.g. 2 tablets)
+  final bool isRefillAlertEnabled;
   final bool isActive;
   final String createdAt;
 
@@ -33,6 +37,10 @@ class MedicineReminderModel {
     this.nightTime = '09:00 PM',
     required this.startDate,
     this.durationDays = 0,
+    this.totalStock = 0,
+    this.currentStock = 0,
+    this.lowStockThreshold = 2,
+    this.isRefillAlertEnabled = true,
     this.isActive = true,
     required this.createdAt,
   });
@@ -54,6 +62,10 @@ class MedicineReminderModel {
       'nightTime': nightTime,
       'startDate': startDate,
       'durationDays': durationDays,
+      'totalStock': totalStock,
+      'currentStock': currentStock,
+      'lowStockThreshold': lowStockThreshold,
+      'isRefillAlertEnabled': isRefillAlertEnabled ? 1 : 0,
       'isActive': isActive ? 1 : 0,
       'createdAt': createdAt,
     };
@@ -76,6 +88,10 @@ class MedicineReminderModel {
       nightTime: (map['nightTime'] as String?) ?? '09:00 PM',
       startDate: (map['startDate'] as String?) ?? DateTime.now().toIso8601String().split('T')[0],
       durationDays: (map['durationDays'] as int?) ?? 0,
+      totalStock: (map['totalStock'] as int?) ?? 0,
+      currentStock: (map['currentStock'] as int?) ?? 0,
+      lowStockThreshold: (map['lowStockThreshold'] as int?) ?? 2,
+      isRefillAlertEnabled: (map['isRefillAlertEnabled'] as int? ?? 1) == 1,
       isActive: (map['isActive'] as int? ?? 1) == 1,
       createdAt: (map['createdAt'] as String?) ?? DateTime.now().toIso8601String(),
     );
@@ -97,6 +113,10 @@ class MedicineReminderModel {
     String? nightTime,
     String? startDate,
     int? durationDays,
+    int? totalStock,
+    int? currentStock,
+    int? lowStockThreshold,
+    bool? isRefillAlertEnabled,
     bool? isActive,
     String? createdAt,
   }) {
@@ -116,6 +136,10 @@ class MedicineReminderModel {
       nightTime: nightTime ?? this.nightTime,
       startDate: startDate ?? this.startDate,
       durationDays: durationDays ?? this.durationDays,
+      totalStock: totalStock ?? this.totalStock,
+      currentStock: currentStock ?? this.currentStock,
+      lowStockThreshold: lowStockThreshold ?? this.lowStockThreshold,
+      isRefillAlertEnabled: isRefillAlertEnabled ?? this.isRefillAlertEnabled,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -136,4 +160,9 @@ class MedicineReminderModel {
     if (night) list.add('night');
     return list;
   }
+
+  bool get hasStockTracking => totalStock > 0;
+  bool get isLowStock => hasStockTracking && currentStock <= lowStockThreshold && currentStock > 0;
+  bool get isOutOfStock => hasStockTracking && currentStock <= 0;
+  double get stockPercent => totalStock > 0 ? (currentStock / totalStock).clamp(0.0, 1.0) : 1.0;
 }

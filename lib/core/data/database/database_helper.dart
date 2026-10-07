@@ -28,7 +28,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 11,
+      version: 12,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -213,6 +213,20 @@ class DatabaseHelper {
             await db.execute('CREATE INDEX IF NOT EXISTS idx_medicines_generic ON medicines (genericName)');
           } catch (_) {}
         }
+        if (oldVersion < 12) {
+          try {
+            await db.execute('ALTER TABLE medicines ADD COLUMN packaging TEXT');
+          } catch (_) {}
+          try {
+            await db.execute('ALTER TABLE medicine_reminders ADD COLUMN totalStock INTEGER DEFAULT 0');
+            await db.execute('ALTER TABLE medicine_reminders ADD COLUMN currentStock INTEGER DEFAULT 0');
+            await db.execute('ALTER TABLE medicine_reminders ADD COLUMN lowStockThreshold INTEGER DEFAULT 2');
+            await db.execute('ALTER TABLE medicine_reminders ADD COLUMN isRefillAlertEnabled INTEGER DEFAULT 1');
+          } catch (_) {}
+          try {
+            await db.execute('CREATE INDEX IF NOT EXISTS idx_medicines_substitute ON medicines (genericName, dosageForm, strength)');
+          } catch (_) {}
+        }
       },
     );
   }
@@ -296,7 +310,8 @@ class DatabaseHelper {
         manufacturer TEXT,
         strength TEXT,
         dosageForm TEXT,
-        price REAL
+        price REAL,
+        packaging TEXT
       )
     ''');
 
@@ -405,12 +420,17 @@ class DatabaseHelper {
         nightTime TEXT DEFAULT '09:00 PM',
         startDate TEXT NOT NULL,
         durationDays INTEGER DEFAULT 0,
+        totalStock INTEGER DEFAULT 0,
+        currentStock INTEGER DEFAULT 0,
+        lowStockThreshold INTEGER DEFAULT 2,
+        isRefillAlertEnabled INTEGER DEFAULT 1,
         isActive INTEGER DEFAULT 1,
         createdAt TEXT NOT NULL
       )
     ''');
     await db.execute('CREATE INDEX IF NOT EXISTS idx_medicines_name ON medicines (name)');
     await db.execute('CREATE INDEX IF NOT EXISTS idx_medicines_generic ON medicines (genericName)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_medicines_substitute ON medicines (genericName, dosageForm, strength)');
 
     // Medicine Adherence Logs Table
     await db.execute('''

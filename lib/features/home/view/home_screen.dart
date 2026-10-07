@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/home_header.dart';
 import '../widgets/today_medicine_card.dart';
+import '../widgets/medicine_price_shortcut_card.dart';
 import '../widgets/home_vitals_card.dart';
 import '../widgets/featured_tip_card.dart';
 import '../../habit_tracker/widgets/health_habit_home_card.dart';
@@ -26,6 +27,10 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   // Daily Medicine Routine & Adherence Checklist
                   TodayMedicineCard(),
+                  SizedBox(height: 16),
+
+                  // Medicine Price & Generic Alternative Finder Shortcut
+                  MedicinePriceShortcutCard(),
                   SizedBox(height: 20),
 
                   // Daily habits and medicine adherence summary
