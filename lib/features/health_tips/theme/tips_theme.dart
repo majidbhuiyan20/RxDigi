@@ -66,7 +66,7 @@ class TipsTheme {
 
   /// Returns light background tint for category chip/badge
   static Color getLightBg(String key) {
-    return getColor(key).withOpacity(0.10);
+    return getColor(key).withValues(alpha: 0.10);
   }
 
   /// Returns Phosphor IconData for a body part or category
@@ -95,7 +95,7 @@ class TipsTheme {
     } else if (lower.contains('emergency') || lower.contains('aid') || lower.contains('জরুরি')) {
       return PhosphorIconsRegular.firstAid;
     } else if (lower.contains('lifestyle') || lower.contains('diabetes') || lower.contains('জীবনধারা')) {
-      return PhosphorIconsRegular.activity;
+      return PhosphorIconsRegular.scales;
     }
     return PhosphorIconsRegular.heartStraight;
   }

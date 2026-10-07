@@ -1,0 +1,52 @@
+[
+  {
+    "id": "tip_ent_01",
+    "category": "ENT & Oral Care",
+    "category_bn": "কান, নাক, দাঁত ও মুখ",
+    "body_part": "ent",
+    "icon": "smiley",
+    "color": "#0D9488",
+    "read_time": "১ মিনিট",
+    "is_trending": false,
+    "title_bn": "মুখের দুর্গন্ধ দূর করা ও মাড়ির সুরক্ষায় সঠিক নিয়ম",
+    "title_en": "Banish Bad Breath & Protect Gums with Proper Oral Hygiene",
+    "summary_bn": "দাঁত ব্রাশ করার পাশাপাশি জিহ্বা পরিষ্কার ও ডেন্টাল ফ্লসের গুরুত্ব।",
+    "summary_en": "Eliminate halitosis, prevent tartar buildup, and stop gum bleeding naturally.",
+    "quick_hack_bn": "ব্রাশ করার পর জিহ্বার পেছনের অংশ টাং ক্লিনার বা ব্রাশ দিয়ে হালকা পরিষ্কার করুন (দুর্গন্ধের ৮০% উৎস জিহ্বার ব্যাকটেরিয়া!)।",
+    "quick_hack_en": "Gently clean your tongue after brushing; over 80% of odor-causing bacteria thrive on the tongue surface!",
+    "myth_buster_bn": "ভুল ধারণা: কটন বাড দিয়ে কান পরিষ্কার করা নিরাপদ ও ভালো। সত্য: কটন বাড কানের ময়লা আরও ভেতরে ঠেলে দিয়ে পর্দা ফুটো করে ফেলতে পারে!",
+    "myth_buster_en": "Myth: Cotton swabs are safe for ears. Fact: Swabs pack earwax deeper against the eardrum and risk tympanic perforation!",
+    "home_remedy_bn": "দাঁতে শিরশিরানি বা মাড়ির ফোলায় ১ গ্লাস কুসুম গরম পানিতে আধা চামচ লবণ মিশিয়ে ৩০ সেকেন্ড কুলকুচি করুন।",
+    "home_remedy_en": "Rinse mouth for 30 seconds with warm salt water to relieve gum inflammation.",
+    "key_points_bn": [
+      "দিনে ২ বার (সকালের নাস্তার পর এবং রাতে ঘুমানোর আগে) নরম ব্রাশ দিয়ে ২ মিনিট ব্রাশ করুন।",
+      "প্রতি ৩ মাস পর পর টুথব্রাশ পরিবর্তন করুন।",
+      "দাঁতের ফাঁকে খাবার জমলে টুথপিক ব্যবহার না করে ডেন্টাল ফ্লস ব্যবহার করুন।"
+    ],
+    "key_points_en": [
+      "Brush twice daily for full 2 minutes using a soft-bristled brush.",
+      "Replace your toothbrush every 3 months or when bristles flare.",
+      "Use waxed dental floss instead of sharp toothpicks between tight teeth."
+    ],
+    "do_list_bn": [
+      "প্রচুর পানি পান করুন যাতে মুখে লালা (Saliva) শুকিয়ে দুর্গন্ধ না হয়।",
+      "লবঙ্গ বা পুদিনা পাতা চিবিয়ে মুখে প্রাকৃতিক সতেজতা আনতে পারেন।"
+    ],
+    "do_list_en": [
+      "Stay hydrated to maintain adequate saliva flow.",
+      "Chew cloves or fresh mint leaves for natural freshness."
+    ],
+    "dont_list_bn": [
+      "জোরে চেপে চেপে দাঁত ঘষবেন না (এতে দাঁতের এনামেল ক্ষয় হয়ে যায়)।",
+      "কাঁচা তামাক, গুল বা জর্দা কখনো মুখে রাখবেন না।"
+    ],
+    "dont_list_en": [
+      "Do not scrub teeth forcefully with hard bristles.",
+      "Never consume smokeless tobacco, zarda, or gul."
+    ],
+    "when_to_see_doctor_bn": "যদি মাড়ি ফুলে পুঁজ বের হয়, দাঁত নড়বড়ে হয়ে যায় বা মুখের কোনো ঘা ২ সপ্তাহেও না শুকায়, ডেন্টিস্ট দেখান।",
+    "when_to_see_doctor_en": "Visit a dental surgeon if you notice pus discharge, loose teeth, or non-healing mouth ulcers lasting over 14 days.",
+    "disclaimer_bn": "প্রতি ৬ মাসে একবার নিয়মিত ডেন্টাল চেকআপ করান।",
+    "disclaimer_en": "Schedule routine dental prophylaxis every 6 months."
+  }
+]

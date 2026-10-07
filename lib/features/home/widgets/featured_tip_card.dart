@@ -79,10 +79,10 @@ class FeaturedTipCard extends ConsumerWidget {
                     child: Row(
                       children: [
                         _buildLangChip('বাং', isTipBn, () {
-                          if (!isTipBn) ref.read(tipLanguageIsBnProvider.notifier).state = true;
+                          if (!isTipBn) ref.read(tipLanguageIsBnProvider.notifier).setBn(true);
                         }),
                         _buildLangChip('EN', !isTipBn, () {
-                          if (isTipBn) ref.read(tipLanguageIsBnProvider.notifier).state = false;
+                          if (isTipBn) ref.read(tipLanguageIsBnProvider.notifier).setBn(false);
                         }),
                       ],
                     ),

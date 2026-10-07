@@ -1,0 +1,102 @@
+[
+  {
+    "id": "tip_brain_01",
+    "category": "Brain & Sleep",
+    "category_bn": "মাথা, ঘুম ও মন",
+    "body_part": "brain",
+    "icon": "brain",
+    "color": "#4F46E5",
+    "read_time": "১ মিনিট",
+    "is_trending": true,
+    "title_bn": "অনিদ্রা দূর করে দ্রুত গভীর ঘুমের ৪-৭-৮ ব্রিদিং টেকনিক",
+    "title_en": "4-7-8 Breathing Technique for Fast & Deep Sleep",
+    "summary_bn": "বিছানায় যাওয়ার পর ঘুমাতে সমস্যা হলে স্নায়ুতন্ত্রকে শান্ত করে প্রাকৃতিক উপায়ে ঘুমানোর বৈজ্ঞানিক পদ্ধতি।",
+    "summary_en": "A scientifically proven relaxation technique to fall asleep faster without sleeping pills.",
+    "quick_hack_bn": "৪ সেকেন্ড নাক দিয়ে শ্বাস নিন, ৭ সেকেন্ড ধরে রাখুন, এবং ৮ সেকেন্ড মুখ দিয়ে ধীরে ধীরে ছাড়ুন।",
+    "quick_hack_en": "Inhale through nose for 4s, hold for 7s, and exhale slowly through mouth for 8s.",
+    "myth_buster_bn": "ভুল ধারণা: ঘুমাতে যাওয়ার আগে বিছানায় মোবাইল দেখলে ঘুম আসে। সত্য: স্ক্রিনের নীল আলো (Blue Light) মেলাটোনিন হরমোন বন্ধ করে অনিদ্রা সৃষ্টি করে!",
+    "myth_buster_en": "Myth: Browsing phone relaxes you to sleep. Fact: Blue light suppresses melatonin, delaying deep sleep!",
+    "home_remedy_bn": "ঘুমানোর ৩০ মিনিট আগে এক গ্লাস হালকা গরম দুধ অথবা এক কাপ ক্যামোমাইল টি পান করতে পারেন।",
+    "home_remedy_en": "Drink warm milk or chamomile tea 30 minutes before bedtime.",
+    "key_points_bn": [
+      "প্রতিদিন নির্দিষ্ট সময়ে ঘুমাতে যাওয়া এবং ওঠার অভ্যাস করুন।",
+      "ঘুমানোর ঘরের আলো নিভিয়ে সম্পূর্ণ অন্ধকার ও শান্ত রাখুন।",
+      "বিছানায় যাওয়ার অন্তত ১ ঘণ্টা আগে স্মার্টফোন বা ল্যাপটপ দূরে সরিয়ে রাখুন।"
+    ],
+    "key_points_en": [
+      "Keep a consistent sleep-wake schedule even on weekends.",
+      "Keep your bedroom cool, dark, and noise-free.",
+      "Avoid smart screens at least 60 minutes before bedtime."
+    ],
+    "do_list_bn": [
+      "পায়ের তালুতে রাতে সামান্য সরিষার বা নারকেল তেল হালকা মালিশ করুন।",
+      "দিনের বেলা অন্তত ২০ মিনিট রোদে থাকুন যাতে শরীরে প্রাকৃতিক বায়োলজিক্যাল ক্লক ঠিক থাকে।"
+    ],
+    "do_list_en": [
+      "Massage the soles of your feet lightly before sleep.",
+      "Get 20 minutes of morning sunlight to sync your circadian clock."
+    ],
+    "dont_list_bn": [
+      "সন্ধ্যা ৬টার পর চা, কফি বা অতিরিক্ত ক্যাফেইন যুক্ত খাবার গ্রহণ করবেন না।",
+      "ঘুমানোর ঠিক আগে ভারী ব্যায়াম বা মিষ্টি জাতীয় খাবার খাবেন না।"
+    ],
+    "dont_list_en": [
+      "Avoid tea, coffee, or caffeine after 6:00 PM.",
+      "Avoid vigorous workouts or sugary snacks right before bed."
+    ],
+    "when_to_see_doctor_bn": "যদি টানা ৩ সপ্তাহের বেশি অনিদ্রা থাকে বা ঘুমের মধ্যে তীব্র শ্বাসকষ্ট (Sleep Apnea) হয়, বিশেষজ্ঞ দেখান।",
+    "when_to_see_doctor_en": "Seek medical evaluation if severe insomnia persists for over 3 weeks or if you experience sleep apnea.",
+    "disclaimer_bn": "এটি স্বাস্থ্য তথ্য, কোনো সিডেটিভ ওষুধের বিকল্প নয়।",
+    "disclaimer_en": "Educational guidance, not a medical sedative prescription."
+  },
+  {
+    "id": "tip_brain_02",
+    "category": "Brain & Sleep",
+    "category_bn": "মাথা, ঘুম ও মন",
+    "body_part": "brain",
+    "icon": "lightning",
+    "color": "#4F46E5",
+    "read_time": "১ মিনিট",
+    "is_trending": true,
+    "title_bn": "টেনশনজনিত মাথাব্যথা ও মাইগ্রেনের তাৎক্ষণিক প্রতিকার",
+    "title_en": "Immediate Relief for Tension Headache & Migraine",
+    "summary_bn": "হঠাৎ তীব্র মাথাব্যথা বা মাইগ্রেনের আক্রমণ ঘটলে ওষুধ ছাড়াই আরাম পাওয়ার কৌশল।",
+    "summary_en": "Relieve stress-induced headaches and migraine triggers naturally without excess painkillers.",
+    "quick_hack_bn": "ঘাড়ের পেছনে বরফের প্যাক এবং পায়ের নিচে কুসুম গরম পানি রাখুন—রক্ত সঞ্চালন দ্রুত ব্যথামুক্ত করে!",
+    "quick_hack_en": "Place an ice pack behind your neck while dipping feet in warm water to draw blood flow away from the head.",
+    "myth_buster_bn": "ভুল ধারণা: মাথাব্যথা হলেই ঘন ঘন ব্যথানাশক ট্যাবলেট খাওয়া নিরাপদ। সত্য: ঘন ঘন ব্যথানাশক খেলে 'মেডিকেশন ওভারইউজ হেডেক' নামক আরও মারাত্মক দীর্ঘমেয়াদি ব্যথা শুরু হয়!",
+    "myth_buster_en": "Myth: Popping painkillers often is safe. Fact: Frequent NSAIDs cause 'Medication Overuse Headaches'!",
+    "home_remedy_bn": "কপালে ও ঘাড়ে কয়েক ফোঁটা পেপারমিন্ট তেল বা লবঙ্গ তেল মেখে অন্ধকার শান্ত ঘরে কিছুক্ষণ চোখ বন্ধ করে শুয়ে থাকুন।",
+    "home_remedy_en": "Apply diluted peppermint oil on forehead and rest in a dark, quiet room.",
+    "key_points_bn": [
+      "পর্যাপ্ত পানি পান করুন, কারণ প্রায়ই ডিহাইড্রেশন বা পানির অভাবে তীব্র মাথাব্যথা হয়।",
+      "চোখের পাওয়ার ঠিক আছে কি না নিয়মিত পরীক্ষা করান।",
+      "খাবারের সময় ঠিক রাখুন—খালি পেটে থাকলে রক্তে সুগার কমে মাথা ধরে।"
+    ],
+    "key_points_en": [
+      "Drink plenty of water; mild dehydration is a primary headache trigger.",
+      "Check your eyesight regularly for refractive errors.",
+      "Do not skip meals; low blood glucose can trigger migraines."
+    ],
+    "do_list_bn": [
+      "মাথাব্যথা শুরু হলে ধীরে ধীরে গভীর শ্বাস নিন।",
+      "ঘাড় ও কাঁধের পেশিগুলো আলতো করে মালিশ করুন।"
+    ],
+    "do_list_en": [
+      "Practice deep slow belly breathing when a headache begins.",
+      "Gently massage tense neck and shoulder muscles."
+    ],
+    "dont_list_bn": [
+      "মাইগ্রেনের ব্যথায় কড়া আলো বা উচ্চ শব্দে থাকবেন না।",
+      "ডাক্তারের পরামর্শ ছাড়া মাত্রাতিরিক্ত প্যারাসিটামল বা ক্যাফেইন নেবেন না।"
+    ],
+    "dont_list_en": [
+      "Avoid bright strobe lights and loud sounds during an episode.",
+      "Do not overdose on painkillers without medical advice."
+    ],
+    "when_to_see_doctor_bn": "হঠাৎ যদি জীবনের সবচেয়ে তীব্র মাথাব্যথা (Thunderclap headache) হয়, একপাশ অবশ লাগে বা কথা জড়িয়ে যায়, তবে তৎক্ষণাৎ জরুরি বিভাগে যান।",
+    "when_to_see_doctor_en": "Go to the emergency room immediately if you feel a sudden thunderclap headache or numbness in face/arms.",
+    "disclaimer_bn": "জরুরি লক্ষণে দ্রুত হাসপাতালে যোগাযোগ করুন।",
+    "disclaimer_en": "Seek emergency care for sudden stroke-like symptoms."
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "tip_skin_01",
+    "category": "Skin & Face",
+    "category_bn": "ত্বক ও রূপচর্চা",
+    "body_part": "skin",
+    "icon": "drop",
+    "color": "#E11D48",
+    "read_time": "১ মিনিট",
+    "is_trending": true,
+    "title_bn": "ব্রণ ও দাগমুক্ত উজ্জ্বল ত্বকের বৈজ্ঞানিক স্কিনকেয়ার রুটিন",
+    "title_en": "Scientific Skincare Routine for Clear & Glowing Skin",
+    "summary_bn": "মুখে বারবার ব্রণ হওয়া বন্ধ করা এবং দাগ কমানোর সহজ ও নিরাপদ নিয়ম।",
+    "summary_en": "Prevent persistent breakouts, balance sebum, and maintain skin barrier health.",
+    "quick_hack_bn": "ব্রণ উঠলে ভুলেও নখ দিয়ে খোঁচাবেন না বা টিপে পুঁজ বের করবেন না—এতে মুখে স্থায়ী কালো গর্ত ও দাগ তৈরি হয়!",
+    "quick_hack_en": "Never pop or squeeze active pimples; it drives bacteria deeper and causes scarring!",
+    "myth_buster_bn": "ভুল ধারণা: মুখে বারবার সাবান দিয়ে ধুলে তেল কমে ব্রণ ভালো হয়। সত্য: বেশি ফেসওয়াশ বা সাবান দিলে ত্বকের ন্যাচারাল ময়েশ্চার নষ্ট হয়ে উল্টো দ্বিগুণ তেল বের হয়!",
+    "myth_buster_en": "Myth: Washing face repeatedly dries out acne. Fact: Stripping natural oils triggers compensatory excess sebum!",
+    "home_remedy_bn": "ত্বক পরিষ্কার করতে অ্যালোভেরা জেল অথবা বরফের কিউব পরিষ্কার সুতি কাপড়ে পেঁচিয়ে ব্রণের ওপর ১ মিনিট চেপে রাখুন।",
+    "home_remedy_en": "Apply pure aloe vera gel or wrap an ice cube in cotton cloth to calm inflamed blemishes.",
+    "key_points_bn": [
+      "দিনে মাত্র ২ বার (সকালে ও রাতে ঘুমানোর আগে) মাইল্ড ফেসওয়াশ দিয়ে মুখ ধোন।",
+      "রোদে বের হওয়ার ২০ মিনিট আগে অবশ্যই ব্রড-স্পেকট্রাম সানস্ক্রিন (SPF 30+) ব্যবহার করুন।",
+      "বালিশের কভার ও মুখের তোয়ালে প্রতি সপ্তাহে অন্তত ২ বার পরিষ্কার করুন।"
+    ],
+    "key_points_en": [
+      "Wash your face gently twice daily with a mild foaming cleanser.",
+      "Apply broad-spectrum SPF 30+ sunscreen 20 minutes before outdoor exposure.",
+      "Change pillowcases and facial towels at least twice weekly."
+    ],
+    "do_list_bn": [
+      "প্রতিদিন পর্যাপ্ত পানি ও মৌসুমি তাজা ফলমূল খান।",
+      "মেকআপ বা সানস্ক্রিন রাতে ঘুমানোর আগে ভালো করে ক্লিনজার দিয়ে তুলে ফেলুন।"
+    ],
+    "do_list_en": [
+      "Stay hydrated and eat antioxidant-rich seasonal fruits.",
+      "Double cleanse at night to fully remove sunscreen and pollution."
+    ],
+    "dont_list_bn": [
+      "মেয়াদোত্তীর্ণ বা অতিরিক্ত ক্ষতিকর কেমিক্যালযুক্ত ফর্সাকারী ক্রিম মুখে লাগাবেন না।",
+      "নোংরা হাত দিয়ে বারবার মুখে হাত দেওয়া বন্ধ করুন।"
+    ],
+    "dont_list_en": [
+      "Never use unregulated bleaching or mercury fairness creams.",
+      "Avoid touching face throughout the day with unwashed hands."
+    ],
+    "when_to_see_doctor_bn": "যদি মুখে সিস্টিক ব্রণ (বড় ব্যথাযুক্ত গোটা) ছড়িয়ে পড়ে, চর্মরোগ বিশেষজ্ঞের পরামর্শে ওষুধ শুরু করুন।",
+    "when_to_see_doctor_en": "Consult a dermatologist if you have deep cystic acne nodules.",
+    "disclaimer_bn": "চিকিৎসকের প্রেসক্রিপশন ছাড়া স্টেরয়েড ক্রিম ব্যবহার করবেন না।",
+    "disclaimer_en": "Do not apply OTC topical steroid creams on acne."
+  }
+]

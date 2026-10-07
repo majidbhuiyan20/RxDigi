@@ -1,0 +1,52 @@
+[
+  {
+    "id": "tip_feet_01",
+    "category": "Feet & Nails",
+    "category_bn": "হাত, পা ও নখের যত্ন",
+    "body_part": "feet",
+    "icon": "footprints",
+    "color": "#6D28D9",
+    "read_time": "১ মিনিট",
+    "is_trending": false,
+    "title_bn": "ফাটা গোড়ালি নিরাময় ও রাতে পায়ের রগে টান পড়ার সমাধান",
+    "title_en": "Heal Cracked Heels & Relieve Night Leg Muscle Cramps",
+    "summary_bn": "শীত বা গরমে গোড়ালির চামড়া ফাটা এবং রাতে ঘুমানোর সময় পায়ে হঠাৎ তীব্র টান লাগা প্রতিরোধ।",
+    "summary_en": "Deeply moisturize heel fissures and stop nocturnal leg cramps caused by electrolyte depletion.",
+    "quick_hack_bn": "রাতে পায়ে টান পড়লে তৎক্ষণাৎ পায়ের বুড়ো আঙুলটি নিজের শরীরের দিকে টেনে ধরে রাখুন (স্ট্রেচ করুন)।",
+    "quick_hack_en": "When a calf cramp strikes, immediately flex your toes upwards towards your shin to stretch the muscle.",
+    "myth_buster_bn": "ভুল ধারণা: নখে সাদা দাগ পড়া মানেই ক্যালসিয়ামের অভাব। সত্য: বেশিরভাগ ক্ষেত্রে নখে ছোটখাটো আঘাত লাগলে (Micro-trauma) এমন সাদা দাগ তৈরি হয়, যা নখ বাড়লে এমনিতেই মিলিয়ে যায়!",
+    "myth_buster_en": "Myth: White nail spots indicate calcium deficiency. Fact: Most often they are minor trauma marks that grow out naturally!",
+    "home_remedy_bn": "রাতে হালকা গরম পানিতে পা ১০ মিনিট ভিজিয়ে পিউমিস স্টোন দিয়ে পরিষ্কার করে পেট্রোলিয়াম জেলি বা গ্লিসারিন মেখে সুতি মোজা পরে ঘুমান।",
+    "home_remedy_en": "Soak feet in lukewarm water for 10 minutes, apply petroleum jelly, and wear breathable cotton socks overnight.",
+    "key_points_bn": [
+      "রাতে ঘন ঘন পায়ে টান পড়ার প্রধান কারণ ম্যাগনেশিয়াম, পটাশিয়াম বা পানির অভাব।",
+      "খাবারে ডাবের পানি, কলা এবং বাদাম রাখুন।",
+      "গোড়ালি উন্মুক্ত থাকে এমন শক্ত চটি জুতো পরিহার করুন।"
+    ],
+    "key_points_en": [
+      "Frequent nocturnal cramps indicate magnesium, potassium, or fluid imbalance.",
+      "Include green coconut water, bananas, and pumpkin seeds in your diet.",
+      "Avoid walking long distances in unpadded backless flip-flops."
+    ],
+    "do_list_bn": [
+      "গোসল শেষে শরীর ভেজা থাকতেই পায়ের গোড়ালিতে ময়েশ্চারাইজার লাগান।",
+      "ঘুমানোর আগে ২ মিনিট বাছুরের পেশি (Calf muscle) হালকা স্ট্রেচ করুন।"
+    ],
+    "do_list_en": [
+      "Lock in hydration by moisturizing heels while damp right after bath.",
+      "Gently stretch your calf muscles before lying down in bed."
+    ],
+    "dont_list_bn": [
+      "ধারালো ব্লেড বা কাঁচি দিয়ে গোড়ালির মরা চামড়া বা ফাটা অংশ কাটবেন না।",
+      "খালি পায়ে মেঝে বা খসখসে রাস্তায় দীর্ঘক্ষণ হাঁটবেন না।"
+    ],
+    "dont_list_en": [
+      "Never slice thick heel calluses with razors or blades.",
+      "Avoid barefoot walking on dry concrete floors."
+    ],
+    "when_to_see_doctor_bn": "ডায়াবেটিস রোগীর পায়ে যদি কোনো কাটা বা ঘা তৈরি হয়, ১ দিনও অবহেলা না করে তৎক্ষণাৎ ডাক্তারের কাছে যান (Diabetic Foot Ulcer)।",
+    "when_to_see_doctor_en": "Diabetic individuals must see a doctor immediately for any non-healing foot wound or blister.",
+    "disclaimer_bn": "ডায়াবেটিস রোগীদের পায়ের প্রতি বিশেষ যত্নবান হতে হবে।",
+    "disclaimer_en": "Diabetic foot care demands clinical monitoring."
+  }
+]

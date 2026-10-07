@@ -1,0 +1,52 @@
+[
+  {
+    "id": "tip_hair_01",
+    "category": "Hair & Scalp",
+    "category_bn": "চুল ও মাথার ত্বক",
+    "body_part": "hair",
+    "icon": "sparkle",
+    "color": "#9333EA",
+    "read_time": "১ মিনিট",
+    "is_trending": true,
+    "title_bn": "চুল পড়া রোধ ও গোড়া শক্ত করার প্রাকৃতিক উপায়",
+    "title_en": "Natural Ways to Prevent Hair Fall & Strengthen Roots",
+    "summary_bn": "দৈনিক ৫০-১০০টি চুল পড়া স্বাভাবিক, কিন্তু অতিরিক্ত চুল পড়ার কারণ ও স্ক্যাল্প সুস্থ রাখার উপায়।",
+    "summary_en": "Normal shedding vs excessive hair fall: dietary tips and scalp nourishment.",
+    "quick_hack_bn": "ভেজা চুল কখনো জোরে জোরে তোয়ালে দিয়ে ঘষবেন না এবং ভেজা অবস্থায় সরু চিরুনি দিয়ে আঁচড়াবেন না।",
+    "quick_hack_en": "Never rub wet hair violently with coarse towels or comb it while soaking wet.",
+    "myth_buster_bn": "ভুল ধারণা: দামি তেল বা শ্যাম্পু লাগালেই নতুন চুল গজায়। সত্য: চুলের বৃদ্ধি মূলত নির্ভর করে ভেতর থেকে প্রোটিন, আয়রন ও বায়োটিনের যোগানের ওপর!",
+    "myth_buster_en": "Myth: Expensive hair oils grow new follicles. Fact: Hair growth is biologically fueled by internal protein, iron, and biotin!",
+    "home_remedy_bn": "সপ্তাহে ২ দিন স্ক্যাল্পে সামান্য কুসুম গরম খাঁটি নারকেল বা অলিভ তেল আঙুলের ডগা দিয়ে ৫ মিনিট সার্কুলার মোশনে মালিশ করুন।",
+    "home_remedy_en": "Warm pure coconut or olive oil and massage with fingertips for 5 minutes twice weekly.",
+    "key_points_bn": [
+      "প্রতিদিনের খাবারে ডিম, ডাল, বাদাম ও শাকসবজি রাখুন (প্রোটিনের অভাব চুল পড়ার প্রধান কারণ)।",
+      "অতিরিক্ত মানসিক চাপ ও অপর্যাপ্ত ঘুম চুল পড়ার গতি দ্বিগুণ করে দেয়।",
+      "সালফেট ও প্যারাবেন-মুক্ত হালকা শ্যাম্পু সপ্তাহে ২-৩ বার ব্যবহার করুন।"
+    ],
+    "key_points_en": [
+      "Include eggs, lentils, nuts, and greens in your daily diet for adequate keratin and protein.",
+      "Chronic emotional stress accelerates telogen effluvium hair thinning.",
+      "Use mild, sulfate-free shampoos 2-3 times a week."
+    ],
+    "do_list_bn": [
+      "মোটা দাঁতের কাঠের বা প্লাস্টিকের চিরুনি দিয়ে নিচ থেকে ওপরের দিকে চুল জট ছাড়ান।",
+      "রক্তে হিমোগ্লোবিন ও থাইরয়েড লেভেল ঠিক আছে কি না নিশ্চিত হন।"
+    ],
+    "do_list_en": [
+      "Use wide-toothed combs and detangle hair starting from the tips upward.",
+      "Check hemoglobin (iron) and thyroid levels if hair loss is severe."
+    ],
+    "dont_list_bn": [
+      "অতিরিক্ত ড্রায়ার, স্ট্রেটনার বা রাসায়নিক হেয়ার কালার ঘন ঘন ব্যবহার করবেন না।",
+      "খুব শক্ত করে টেনে মাথার চুল বাঁধবেন না (Traction Alopecia হতে পারে)।"
+    ],
+    "dont_list_en": [
+      "Avoid frequent hot blow drying, straightening, or chemical bleaching.",
+      "Avoid tying hair into extremely tight ponytails."
+    ],
+    "when_to_see_doctor_bn": "মাথার কোনো অংশে যদি গোল গোল হয়ে ফাঁকা হয়ে যায় (Alopecia Areata) বা স্ক্যাল্পে ঘা হয়, চর্মরোগ বিশেষজ্ঞ দেখান।",
+    "when_to_see_doctor_en": "Consult a dermatologist if you notice coin-shaped bald patches or scalp lesions.",
+    "disclaimer_bn": "এটি সাধারণ স্বাস্থ্য সচেতনতামূলক তথ্য।",
+    "disclaimer_en": "General wellness information."
+  }
+]

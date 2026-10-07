@@ -1,0 +1,52 @@
+[
+  {
+    "id": "tip_heart_01",
+    "category": "Heart & Blood Pressure",
+    "category_bn": "হৃদযন্ত্র ও রক্তচাপ",
+    "body_part": "heart",
+    "icon": "heartbeat",
+    "color": "#DC2626",
+    "read_time": "১ মিনিট",
+    "is_trending": true,
+    "title_bn": "উচ্চ রক্তচাপ ও ক্ষতিকর কোলেস্টেরল কমানোর সহজ উপায়",
+    "title_en": "Natural Control for High Blood Pressure & LDL Cholesterol",
+    "summary_bn": "রক্তনালী সুস্থ রাখা এবং হার্ট অ্যাটাক ও স্ট্রোকের ঝুঁকি কমানোর জন্য জীবনধারার পরিবর্তন।",
+    "summary_en": "Keep arteries flexible, control hypertension, and reduce stroke risk.",
+    "quick_hack_bn": "খাবারের সাথে আলাদা কাঁচা লবণ খাওয়া আজ থেকেই সম্পূর্ণ বন্ধ করুন (দৈনিক ১ চা-চামচের বেশি নয়)।",
+    "quick_hack_en": "Stop adding extra table salt to your plate; limit daily sodium to under 1 teaspoon.",
+    "myth_buster_bn": "ভুল ধারণা: প্রেশার বাড়লে বা কমলে কেবল মাথা ঘুরালেই প্রেশার বাড়ে। সত্য: হাই প্রেশারকে বলা হয় 'নীরব ঘাতক' (Silent Killer)—লক্ষণ ছাড়াও রক্তচাপ মারাত্মক বাড়তে পারে!",
+    "myth_buster_en": "Myth: You will feel dizzy if BP rises. Fact: High BP is a silent killer and usually shows zero warning symptoms!",
+    "home_remedy_bn": "প্রতিদিন সকালে ১-২ কোয়া কাঁচা রসুন চিবিয়ে কুসুম গরম পানি খান এবং খাবারে ওটস বা ইসুবগুল রাখুন।",
+    "home_remedy_en": "Chew 1 clove of raw garlic with warm water in the morning and eat fiber-rich oats.",
+    "key_points_bn": [
+      "সপ্তাহে অন্তত ৫ দিন ৩০ মিনিট দ্রুত হাঁটার অভ্যাস গড়ে তুলুন।",
+      "ডালডা, ট্রান্সফ্যাট ও অতিরিক্ত লাল মাংস (গরু/খাসি) পরিহার করুন।",
+      "নিয়মিত রক্তচাপ মাপুন এবং প্রেশারের ওষুধ কখনো নিজে নিজে বন্ধ করবেন না।"
+    ],
+    "key_points_en": [
+      "Walk briskly for at least 30 minutes, 5 days a week.",
+      "Cut down trans-fats, processed ghee/dalda, and red meat.",
+      "Check BP regularly and never stop prescribed anti-hypertensives abruptly."
+    ],
+    "do_list_bn": [
+      "পটাশিয়াম সমৃদ্ধ খাবার যেমন কলা, ডাবের পানি ও শসা খান।",
+      "ওজন নিয়ন্ত্রণে রাখুন এবং ধূমপান থেকে সম্পূর্ণ বিরত থাকুন।"
+    ],
+    "do_list_en": [
+      "Eat potassium-rich foods like bananas, green coconut water, and cucumbers.",
+      "Maintain ideal body weight and stop smoking completely."
+    ],
+    "dont_list_bn": [
+      "প্যাকেটজাত চিপস, আচার ও প্রসেসড খাবার অতিরিক্ত খাবেন না।",
+      "মানসিক উত্তেজনার সময় দ্রুত কোনো সিদ্ধান্ত নেওয়া এড়িয়ে চলুন।"
+    ],
+    "dont_list_en": [
+      "Avoid sodium-loaded salted chips, canned items, and pickles.",
+      "Avoid acute emotional bursts or heavy anger spikes."
+    ],
+    "when_to_see_doctor_bn": "বুকে তীব্র চাপ, বাঁ হাত বা চোয়ালে ব্যথা, শ্বাসকষ্ট ও ঠান্ডা ঘাম দেখা দিলে ১ সেকেন্ড দেরি না করে নিকটস্থ হাসপাতালে যান।",
+    "when_to_see_doctor_en": "Rush to the nearest emergency hospital if experiencing retrosternal chest tightness, left arm pain, and cold sweats.",
+    "disclaimer_bn": "উচ্চ রক্তচাপের ওষুধ চিকিৎসকের লিখিত পরামর্শ অনুযায়ী সেবনযোগ্য।",
+    "disclaimer_en": "Take cardiovascular medications strictly as prescribed by your doctor."
+  }
+]

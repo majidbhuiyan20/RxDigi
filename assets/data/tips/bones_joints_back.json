@@ -1,0 +1,52 @@
+[
+  {
+    "id": "tip_bones_01",
+    "category": "Bones & Joints",
+    "category_bn": "হাড়, জয়েন্ট ও কোমর",
+    "body_part": "bones",
+    "icon": "personSimpleWalk",
+    "color": "#475569",
+    "read_time": "১ মিনিট",
+    "is_trending": true,
+    "title_bn": "চেয়ারে বসে কাজের সঠিক ভঙ্গি ও কোমর-ঘাড় ব্যথা প্রতিকার",
+    "title_en": "Ergonomic Desk Posture & Relief for Back and Neck Pain",
+    "summary_bn": "অফিসে বা পড়াশোনায় দীর্ঘক্ষণ বসে থাকলে মেরুদণ্ডের ক্ষয় ও পিঠের ব্যথা প্রতিরোধের উপায়।",
+    "summary_en": "Prevent spine stiffness, disc issues, and chronic lower back pain caused by sitting.",
+    "quick_hack_bn": "প্রতি ৪৫ মিনিট পর পর চেয়ার ছেড়ে উঠে দাঁড়িয়ে ১ মিনিট হাত ও পিঠ পেছনের দিকে স্ট্রেচ করুন।",
+    "quick_hack_en": "Every 45 minutes, stand up and stretch your arms and torso backward for 60 seconds.",
+    "myth_buster_bn": "ভুল ধারণা: কোমর ব্যথা হলেই একটানা নরম বিছানায় শুয়ে বিশ্রাম নিতে হবে। সত্য: দীর্ঘক্ষণ বিছানায় শুয়ে থাকলে মেরুদণ্ডের পেশি আরও দুর্বল হয়ে ব্যথা স্থায়ী হয়ে যায়!",
+    "myth_buster_en": "Myth: Complete bed rest cures back pain. Fact: Prolonged bed rest weakens stabilizing core muscles and delays recovery!",
+    "home_remedy_bn": "তীব্র ব্যথায় প্রথম ৪৮ ঘণ্টা বরফের সেক দিন, এরপর হালকা গরম পানির ভাপ বা হট ওয়াটার ব্যাগ ব্যবহার করুন।",
+    "home_remedy_en": "Apply cold ice compresses for the first 48 hours, followed by gentle moist heat.",
+    "key_points_bn": [
+      "কম্পিউটার মনিটর চোখের সোজাসুজি (Eye level) রাখুন যাতে ঘাড় বাঁকা না করতে হয়।",
+      "বসার সময় পিঠের নিচের অংশে ছোট কুশন সাপোর্ট ব্যবহার করুন।",
+      "ভারী জিনিস তোলার সময় কোমর বাঁকা না করে হাঁটু ভেঙে নিচে বসুন।"
+    ],
+    "key_points_en": [
+      "Position your display screen at eye level to prevent forward neck slump.",
+      "Support your lumbar curve with an ergonomic cushion.",
+      "Bend at your knees rather than your lower back when lifting heavy objects."
+    ],
+    "do_list_bn": [
+      "প্রতিদিন ১০ মিনিট কোর স্ট্রেংথেনিং এক্সারসাইজ বা ব্রিজিং ব্যায়াম করুন।",
+      "হাড় শক্ত রাখতে প্রতিদিন ১৫ মিনিট সকালের মিষ্টি রোদে থাকুন (ভিটামিন-ডি)।"
+    ],
+    "do_list_en": [
+      "Do gentle core strengthening like glute bridges and bird-dogs.",
+      "Get 15 minutes of morning sunlight for natural vitamin D activation."
+    ],
+    "dont_list_bn": [
+      "সোফায় বাঁকা হয়ে বা বিছানায় শুয়ে ল্যাপটপ ব্যবহার করবেন না।",
+      "উঁচু হিল জুতো পরে দীর্ঘক্ষণ হাঁটাচলা করবেন না।"
+    ],
+    "dont_list_en": [
+      "Do not slouch on couches or work on laptops while lying in bed.",
+      "Avoid prolonged walking in unsupportive high-heeled footwear."
+    ],
+    "when_to_see_doctor_bn": "যদি কোমর থেকে ব্যথা পায়ের পাতা পর্যন্ত নেমে যায় (Sciatica) বা পা ঝিমঝিম করে অবশ লাগে, স্পাইন বা ফিজিওথেরাপি বিশেষজ্ঞ দেখান।",
+    "when_to_see_doctor_en": "Seek orthopedic review if pain radiates down into your legs or causes numbness/sciatica.",
+    "disclaimer_bn": "তীব্র ব্যথায় রেজিস্টার্ড ফিজিওথেরাপিস্ট বা চিকিৎসকের শরণাপন্ন হোন।",
+    "disclaimer_en": "Consult a physical therapist for individualized exercises."
+  }
+]

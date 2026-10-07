@@ -1,0 +1,104 @@
+[
+  {
+    "id": "tip_stomach_01",
+    "category": "Digestion & Gas",
+    "category_bn": "পেট, গ্যাস ও হজম",
+    "body_part": "stomach",
+    "icon": "fire",
+    "color": "#EA580C",
+    "read_time": "১ মিনিট",
+    "is_trending": true,
+    "title_bn": "গ্যাস্ট্রিক ও বুক জ্বালাপোড়া দূর করার ৫টি প্রাকৃতিক নিয়ম",
+    "title_en": "5 Natural Ways to Relieve Acidity & Heartburn",
+    "summary_bn": "ওষুধের ওপর অতিনির্ভরশীল না হয়ে খাদ্যাভ্যাস ও সহজ ঘরোয়া উপায়ে পেটের গ্যাস কমান।",
+    "summary_en": "Reduce stomach acidity naturally without over-relying on antacids.",
+    "quick_hack_bn": "খাওয়ার পর পরই শুয়ে না পড়ে ১৫ মিনিট সোজা হয়ে হালকা হাঁটাহাঁটি করুন।",
+    "quick_hack_en": "Never lie down immediately after a meal; take a light 15-minute upright stroll.",
+    "myth_buster_bn": "ভুল ধারণা: গ্যাস্ট্রিক হলে ঠান্ডা দুধ খাওয়া ভালো। সত্য: সাময়িক আরাম দিলেও দুধের ফ্যাট পরে দ্বিগুণ এসিড তৈরি করে!",
+    "myth_buster_en": "Myth: Cold milk cures acidity. Fact: While it gives instant relief, milk fat triggers rebound acid secretion later!",
+    "home_remedy_bn": "এক কাপ কুসুম গরম পানিতে আধা ইঞ্চি আদা থেঁতো করে অথবা সামান্য মৌরি (মৌরি দানা) চিবিয়ে খান।",
+    "home_remedy_en": "Drink warm water infused with crushed ginger or chew a pinch of fennel seeds.",
+    "key_points_bn": [
+      "একবারে বেশি না খেয়ে অল্প অল্প করে বারবার খান।",
+      "খাওয়ার মাঝে অতিরিক্ত পানি না খেয়ে খাওয়ার ৩০ মিনিট পর পানি পান করুন।",
+      "অতিরিক্ত ভাজাপোড়া, অতিরিক্ত তেল ও কোমল পানীয় পরিহার করুন।"
+    ],
+    "key_points_en": [
+      "Eat smaller, frequent meals rather than large heavy meals.",
+      "Avoid drinking too much water during meals; hydrate 30 minutes after eating.",
+      "Limit deep-fried foods and carbonated fizzy drinks."
+    ],
+    "do_list_bn": [
+      "রাতে ঘুমানোর অন্তত ২ ঘণ্টা আগে রাতের খাবার শেষ করুন।",
+      "ঘুমানোর সময় মাথার দিকটা শরীর থেকে ৪-৬ ইঞ্চি উঁচু রাখুন।",
+      "প্রতিদিন পর্যাপ্ত আঁশযুক্ত (ফাইবার) খাবার ও শাকসবজি খান।"
+    ],
+    "do_list_en": [
+      "Finish dinner at least 2 hours before going to bed.",
+      "Elevate your head by 4-6 inches while sleeping.",
+      "Include fiber-rich greens and veggies in your daily diet."
+    ],
+    "dont_list_bn": [
+      "খালি পেটে দীর্ঘক্ষণ চা বা কফি পান করবেন না।",
+      "ভারী খাবার খেয়েই সোফায় বা বিছানায় গা এলিয়ে দেবেন না।"
+    ],
+    "dont_list_en": [
+      "Do not drink strong tea or coffee on an empty stomach.",
+      "Do not slouch or lie down immediately after heavy meals."
+    ],
+    "when_to_see_doctor_bn": "যদি কালো পায়খানা হয়, রক্তবমি হয় বা খাবার গিলতে কষ্ট হয়, তবে দ্রুত ডাক্তারের পরামর্শ নিন।",
+    "when_to_see_doctor_en": "Seek immediate medical care if you observe dark black stools, vomiting blood, or difficulty swallowing.",
+    "disclaimer_bn": "এটি সাধারণ স্বাস্থ্য সচেতনতামূলক তথ্য, রেজিস্টার্ড চিকিৎসকের পরামর্শের বিকল্প নয়।",
+    "disclaimer_en": "This is general health awareness information, not a substitute for clinical advice."
+  },
+  {
+    "id": "tip_stomach_02",
+    "category": "Digestion & Gas",
+    "category_bn": "পেট, গ্যাস ও হজম",
+    "body_part": "stomach",
+    "icon": "drop",
+    "color": "#EA580C",
+    "read_time": "১ মিনিট",
+    "is_trending": true,
+    "title_bn": "কোষ্ঠকাঠিন্য থেকে মুক্তির সহজ ডায়েট ও অভ্যাস",
+    "title_en": "Effective Ways to Relieve Constipation Naturally",
+    "summary_bn": "প্রতিদিন পেট পরিষ্কার রাখা এবং পাইলস বা ফিশার প্রতিরোধে সহজ খাদ্যাভ্যাস।",
+    "summary_en": "Keep bowel movements smooth and prevent piles or anal fissures naturally.",
+    "quick_hack_bn": "সকালে ঘুম থেকে উঠে খালি পেটে ১ গ্লাস কুসুম গরম পানি পানের অভ্যাস করুন।",
+    "quick_hack_en": "Drink a glass of warm water on an empty stomach right after waking up.",
+    "myth_buster_bn": "ভুল ধারণা: শুধু শাকসবজি খেলেই কোষ্ঠকাঠিন্য সারে। সত্য: ফাইবার বাড়ালে সেই সাথে প্রচুর পানিও খেতে হয়, নইলে মল আরও শক্ত হতে পারে!",
+    "myth_buster_en": "Myth: Only eating fiber cures it. Fact: Fiber without adequate water intake can actually harden stool!",
+    "home_remedy_bn": "রাতে ভিজিয়ে রাখা ১ চামচ ইসবগুলের ভুসি বা ৩-৪টি পাকা পেঁপে/আলুবোখারা খান।",
+    "home_remedy_en": "Consume soaked isabgol (psyllium husk) or ripe papaya slices.",
+    "key_points_bn": [
+      "দিনে অন্তত আড়াই থেকে তিন লিটার পানি পান করুন।",
+      "খাবারে লাল চাল, ওটস, পেঁপে, আপেল ও শসা রাখুন।",
+      "টয়লেটে মোবাইল ব্যবহার করবেন না এবং অতিরিক্ত চাপ প্রয়োগ এড়িয়ে চলুন।"
+    ],
+    "key_points_en": [
+      "Drink at least 2.5 to 3 liters of water throughout the day.",
+      "Eat fiber-rich brown rice, oats, ripe papaya, and apples.",
+      "Avoid straining or scrolling smartphones on the toilet seat."
+    ],
+    "do_list_bn": [
+      "প্রতিদিন ২০-৩০ মিনিট দ্রুত হাঁটার অভ্যাস গড়ে তুলুন।",
+      "টয়লেটে বসার সময় পায়ের নিচে ছোট টুল দিয়ে স্কোয়াট পজিশন তৈরি করুন।"
+    ],
+    "do_list_en": [
+      "Walk briskly for 20-30 minutes daily to stimulate bowel movement.",
+      "Use a small footstool to simulate a squatting posture on western toilets."
+    ],
+    "dont_list_bn": [
+      "প্রস্রাব বা মলের বেগ ইচ্ছাকৃতভাবে আটকে রাখবেন না।",
+      "ডাক্তারের পরামর্শ ছাড়া নিয়মিত লেক্সেটিভ সিরাপ খাবেন না।"
+    ],
+    "dont_list_en": [
+      "Never suppress natural urge to defecate.",
+      "Do not take OTC laxatives chronically without doctor's advice."
+    ],
+    "when_to_see_doctor_bn": "যদি মলের সাথে টাটকা রক্ত যায় বা হঠাৎ পেটে তীব্র ব্যথা শুরু হয়, অবিলম্বে ডাক্তার দেখান।",
+    "when_to_see_doctor_en": "Consult a doctor immediately if you experience rectal bleeding or severe sudden abdominal cramps.",
+    "disclaimer_bn": "এটি সচেতনতামূলক তথ্য, রেজিস্টার্ড চিকিৎসকের পরামর্শের বিকল্প নয়।",
+    "disclaimer_en": "General informational guide, not a prescription."
+  }
+]

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../provider/health_tips_provider.dart';
+import '../theme/tips_theme.dart';
 import '../widgets/health_tips_header.dart';
-import '../widgets/category_filter_bar.dart';
+import '../widgets/daily_health_hack_banner.dart';
+import '../widgets/trending_topics_bar.dart';
+import '../widgets/body_part_filter_bar.dart';
 import '../widgets/health_tip_list_card.dart';
 import '../widgets/tips_empty_state.dart';
-import '../../../app/app_colors.dart';
-import '../models/health_tip_model.dart';
-import 'health_tip_detail_screen.dart';
 
 class HealthTipsScreen extends ConsumerStatefulWidget {
   const HealthTipsScreen({super.key});
@@ -29,15 +29,15 @@ class _HealthTipsScreenState extends ConsumerState<HealthTipsScreen> {
   @override
   Widget build(BuildContext context) {
     final isBn = ref.watch(tipLanguageIsBnProvider);
-    final selectedCategory = ref.watch(selectedTipCategoryProvider);
+    final selectedBodyPart = ref.watch(selectedBodyPartProvider);
     final tipsAsync = ref.watch(healthTipsListProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: Column(
           children: [
-            // 1. Search & Language Header
+            // 1. Header with search, bookmarks, and language switch
             HealthTipsHeader(
               searchController: _searchController,
               searchQuery: _searchQuery,
@@ -52,64 +52,111 @@ class _HealthTipsScreenState extends ConsumerState<HealthTipsScreen> {
               },
             ),
 
-            // 2. Category Filter Bar
-            tipsAsync.when(
-              data: (tips) => CategoryFilterBar(tips: tips, isBn: isBn),
-              loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
-            ),
-
-            // 3. Tips List
+            // 2. Main Content
             Expanded(
               child: tipsAsync.when(
                 data: (allTips) {
                   final filteredTips = allTips.where((tip) {
-                    final matchesCategory = selectedCategory == null || tip.category == selectedCategory;
-                    if (!matchesCategory) return false;
+                    // Body part filter
+                    if (selectedBodyPart != null && tip.bodyPart != selectedBodyPart) {
+                      return false;
+                    }
 
-                    if (_searchQuery.isEmpty) return true;
-                    final title = tip.getTitle(isBn).toLowerCase();
-                    final summary = tip.getSummary(isBn).toLowerCase();
-                    final category = tip.getCategory(isBn).toLowerCase();
-                    return title.contains(_searchQuery) ||
-                        summary.contains(_searchQuery) ||
-                        category.contains(_searchQuery);
+                    // Search query filter
+                    if (_searchQuery.isNotEmpty) {
+                      final title = tip.getTitle(isBn).toLowerCase();
+                      final summary = tip.getSummary(isBn).toLowerCase();
+                      final cat = tip.getCategory(isBn).toLowerCase();
+                      final hack = tip.getQuickHack(isBn).toLowerCase();
+                      final myth = tip.getMythBuster(isBn).toLowerCase();
+                      final remedy = tip.getHomeRemedy(isBn).toLowerCase();
+
+                      return title.contains(_searchQuery) ||
+                          summary.contains(_searchQuery) ||
+                          cat.contains(_searchQuery) ||
+                          hack.contains(_searchQuery) ||
+                          myth.contains(_searchQuery) ||
+                          remedy.contains(_searchQuery);
+                    }
+
+                    return true;
                   }).toList();
 
-                  if (filteredTips.isEmpty) {
-                    return TipsEmptyState(isBn: isBn);
-                  }
+                  final isSearching = _searchQuery.isNotEmpty;
 
                   return ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                    padding: const EdgeInsets.only(bottom: 110),
+                    physics: const BouncingScrollPhysics(),
                     children: [
-                      _buildOfflineSummary(allTips, isBn),
-                      if (_searchQuery.isEmpty && selectedCategory == null) ...[
-                        const SizedBox(height: 14),
-                        _buildDailyFocusCard(filteredTips.first, isBn),
+                      // When not searching: show daily banner, trending pain points, and body navigator
+                      if (!isSearching) ...[
+                        const DailyHealthHackBanner(),
+                        const SizedBox(height: 6),
+                        const TrendingTopicsBar(),
+                        const SizedBox(height: 6),
+                        const BodyPartFilterBar(),
+                        const SizedBox(height: 10),
                       ],
-                      const SizedBox(height: 22),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            isBn ? 'আপনার জন্য টিপস' : 'For your wellbeing',
-                            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF17252A)),
-                          ),
-                          Text(
-                            '${filteredTips.length} ${isBn ? 'টি' : 'tips'}',
-                            style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w600),
-                          ),
-                        ],
+
+                      // Results header count
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              isSearching
+                                  ? (isBn ? 'অনুসন্ধানের ফলাফল' : 'Search Results')
+                                  : (selectedBodyPart != null
+                                      ? (isBn ? 'নির্বাচিত ক্যাটাগরি' : 'Selected Category')
+                                      : (isBn ? 'সকল স্বাস্থ্য নির্দেশিকা' : 'All Health Guides')),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1E293B),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: TipsTheme.primary.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                '${filteredTips.length} ${isBn ? 'টি টিপস' : 'tips'}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: TipsTheme.primary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 10),
-                      ...filteredTips.map((tip) => HealthTipListCard(tip: tip, isBn: isBn)),
+
+                      // Tips list or empty state
+                      if (filteredTips.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 40),
+                          child: TipsEmptyState(isBn: isBn),
+                        )
+                      else
+                        ...filteredTips.map((tip) => HealthTipListCard(tip: tip)),
                     ],
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, _) => Center(
-                  child: Text('Error loading tips: $err'),
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(40.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                error: (e, _) => Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text('Error loading tips: $e'),
+                  ),
                 ),
               ),
             ),
@@ -117,94 +164,5 @@ class _HealthTipsScreenState extends ConsumerState<HealthTipsScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildOfflineSummary(List<HealthTipModel> tips, bool isBn) {
-    final categories = tips.map((tip) => tip.category).toSet().length;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFDDECE8)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: const Color(0xFFE5F4F0), borderRadius: BorderRadius.circular(11)),
-            child: const Icon(Icons.wifi_off_rounded, size: 18, color: AppColors.primaryColor),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              isBn ? 'ইন্টারনেট ছাড়াই স্বাস্থ্য টিপস পড়ুন' : 'Wellness guidance, always available offline',
-              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Color(0xFF31534E)),
-            ),
-          ),
-          Text('$categories ${isBn ? 'ক্যাটাগরি' : 'categories'}', style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDailyFocusCard(HealthTipModel tip, bool isBn) {
-    final color = _parseColor(tip.color);
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.94, end: 1),
-      duration: const Duration(milliseconds: 450),
-      curve: Curves.easeOutBack,
-      builder: (context, scale, child) => Transform.scale(scale: scale, child: child),
-      child: GestureDetector(
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => HealthTipDetailScreen(tip: tip))),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [BoxShadow(color: color.withValues(alpha: 0.25), blurRadius: 18, offset: const Offset(0, 8))],
-          ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), shape: BoxShape.circle), child: Icon(_getIconData(tip.icon), color: Colors.white, size: 24)),
-              const SizedBox(width: 12),
-              Expanded(child: Text(isBn ? 'আজকের স্বাস্থ্য ফোকাস' : 'TODAY\'S HEALTH FOCUS', style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.6))),
-              const Icon(Icons.arrow_outward_rounded, color: Colors.white, size: 20),
-            ]),
-            const SizedBox(height: 18),
-            Text(tip.getTitle(isBn), maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 21, height: 1.2, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(tip.getSummary(isBn), maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.35)),
-            const SizedBox(height: 16),
-            Row(children: [
-              Text(tip.getCategory(isBn), style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-              const Spacer(),
-              Text(isBn ? 'বিস্তারিত পড়ুন' : 'Read the guide', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-            ]),
-          ]),
-        ),
-      ),
-    );
-  }
-
-  IconData _getIconData(String iconName) {
-    switch (iconName) {
-      case 'favorite': return Icons.favorite_rounded;
-      case 'water_drop': return Icons.water_drop_rounded;
-      case 'shield': return Icons.shield_rounded;
-      case 'restaurant': return Icons.restaurant_rounded;
-      case 'medical_services': return Icons.medical_services_rounded;
-      case 'bug_report': return Icons.coronavirus_rounded;
-      case 'bedtime': return Icons.bedtime_rounded;
-      default: return Icons.health_and_safety_rounded;
-    }
-  }
-
-  Color _parseColor(String hex) {
-    try {
-      return Color(int.parse(hex.replaceFirst('#', '0xFF')));
-    } catch (_) {
-      return AppColors.primaryColor;
-    }
   }
 }

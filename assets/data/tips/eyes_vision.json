@@ -1,0 +1,52 @@
+[
+  {
+    "id": "tip_eyes_01",
+    "category": "Eyes & Vision",
+    "category_bn": "চোখের যত্ন",
+    "body_part": "eyes",
+    "icon": "eye",
+    "color": "#0284C7",
+    "read_time": "১ মিনিট",
+    "is_trending": true,
+    "title_bn": "মোবাইল ও কম্পিউটারে চোখের ক্ষতি বাঁচাতে ২০-২০-২০ নিয়ম",
+    "title_en": "Protect Eyes from Screen Strain with the 20-20-20 Rule",
+    "summary_bn": "দীর্ঘক্ষণ স্ক্রিনের দিকে তাকিয়ে থাকলে ড্রাই আইজ, চোখ লাল হওয়া ও ঘোলাটে দৃষ্টি প্রতিরোধ করার নিয়ম।",
+    "summary_en": "Prevent digital eye strain, redness, and blurry vision during prolonged screen time.",
+    "quick_hack_bn": "প্রতি ২০ মিনিট পর পর ২০ সেকেন্ডের জন্য ২০ ফুট দূরের কোনো বস্তুর দিকে তাকান।",
+    "quick_hack_en": "Every 20 minutes, look at an object 20 feet away for 20 seconds.",
+    "myth_buster_bn": "ভুল ধারণা: স্ক্রিন দেখলে চোখ নষ্ট হয়ে যায় কিন্তু ব্লু-কাট চশমা পরলে যতখুশি দেখা যায়। সত্য: মূল ক্ষতি হয় ঘন ঘন পলক না ফেলা এবং ফোকাল ট্রেইনের কারণে, কেবল চশমা চোখের ক্লান্তি থামাতে পারে না!",
+    "myth_buster_en": "Myth: Blue cut glasses allow unlimited screen time. Fact: Lack of blinking causes dryness, which glasses cannot stop!",
+    "home_remedy_bn": "চোখ ক্লান্ত লাগলে দুই হাতের তালু একসাথে ঘষে গরম করে চোখের ওপর আলতোভাবে রাখুন (Palming)।",
+    "home_remedy_en": "Rub your palms together until warm, then cup them gently over closed eyes (palming technique).",
+    "key_points_bn": [
+      "স্ক্রিন দেখার সময় সচেতনভাবে মিনিটে ১৫-২০ বার চোখের পলক ফেলুন।",
+      "কম্পিউটার বা ফোনের ব্রাইটনেস রুমের আলোর সাথে সামঞ্জস্যপূর্ণ রাখুন।",
+      "চোখ থেকে মোবাইল অন্তত ১৬-১৮ ইঞ্চি দূরে রাখুন।"
+    ],
+    "key_points_en": [
+      "Blink intentionally 15-20 times per minute while reading screens.",
+      "Match device display brightness to ambient room lighting.",
+      "Keep phones at least 16-18 inches away from your eyes."
+    ],
+    "do_list_bn": [
+      "রাত জেগে অন্ধকারে সম্পূর্ণ উজ্জ্বল আলোতে মোবাইল ব্যবহার করা বন্ধ করুন।",
+      "ভিটামিন-এ ও ওমেগা-৩ সমৃদ্ধ ছোট মাছ, গাজর ও পালংশাক খাদ্যতালিকায় রাখুন।"
+    ],
+    "do_list_en": [
+      "Avoid scrolling high-brightness screens in pitch-dark rooms.",
+      "Eat vitamin A and omega-3 rich small fish, carrots, and leafy greens."
+    ],
+    "dont_list_bn": [
+      "চোখ চুলকালে বা খচখচ করলে হাত দিয়ে জোরে ঘষবেন না।",
+      "ডাক্তারের পরামর্শ ছাড়া কোনো স্টেরয়েড চোখের ড্রপ ব্যবহার করবেন না।"
+    ],
+    "dont_list_en": [
+      "Do not rub itchy eyes vigorously with bare fingers.",
+      "Never use OTC steroid eye drops without an ophthalmologist's prescription."
+    ],
+    "when_to_see_doctor_bn": "যদি হঠাৎ দৃষ্টিশক্তি কমে যায়, চোখে তীব্র ব্যথা হয় বা চোখে আলোর ঝলকানি (Flash) দেখা যায়, অবিলম্বে চক্ষু বিশেষজ্ঞ দেখান।",
+    "when_to_see_doctor_en": "Seek emergency ophthalmology care if you experience sudden vision loss, severe pain, or light flashes.",
+    "disclaimer_bn": "এটি তথ্যমূলক গাইড, বিশেষজ্ঞ চিকিৎসকের প্রেসক্রিপশনের বিকল্প নয়।",
+    "disclaimer_en": "Awareness guide, not a medical diagnosis."
+  }
+]

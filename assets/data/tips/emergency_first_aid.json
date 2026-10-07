@@ -1,0 +1,52 @@
+[
+  {
+    "id": "tip_emergency_01",
+    "category": "First Aid & Emergency",
+    "category_bn": "জরুরি প্রাথমিক চিকিৎসা",
+    "body_part": "emergency",
+    "icon": "firstAid",
+    "color": "#B91C1C",
+    "read_time": "১ মিনিট",
+    "is_trending": true,
+    "title_bn": "আগুনে হাত পুড়ে গেলে টুথপেস্ট নয়—সঠিক ১০ মিনিটের পানির নিয়ম",
+    "title_en": "Burn First Aid: Run Cool Water, Never Apply Toothpaste!",
+    "summary_bn": "হঠাৎ রান্নাঘরে বা গরম পানিতে চামড়া পুড়ে গেলে ফোস্কা ও সংক্রমণ প্রতিরোধের জীবনরক্ষাকারী উপায়।",
+    "summary_en": "Immediate evidence-based steps for thermal scalds and burns to prevent scarring and infection.",
+    "quick_hack_bn": "পোড়া জায়গায় তৎক্ষণাৎ স্বাভাবিক কলের ঠান্ডা পানির নিচে টানা ১০ থেকে ১৫ মিনিট ধরে রাখুন।",
+    "quick_hack_en": "Immediately hold the burn under running cool tap water continuously for 10-15 minutes.",
+    "myth_buster_bn": "ভুল ধারণা: পুড়ে গেলে টুথপেস্ট, ডিমের সাদা অংশ বা মাখন লাগানো ভালো। সত্য: এগুলো ত্বকের ভেতরে তাপ আটকে দেয় এবং মারাত্মক ব্যাকটেরিয়াল ইনফেকশন ঘটায়!",
+    "myth_buster_en": "Myth: Apply toothpaste or raw eggs to burns. Fact: These trap residual heat inside deeper tissues and trigger severe microbial infections!",
+    "home_remedy_bn": "পানি ঢালার পর ক্ষতস্থানটি পরিষ্কার জীবাণুমুক্ত গজ বা পাতলা সুতি কাপড় দিয়ে আলতো করে ঢেকে রাখুন; কোনো রাসায়নিক বা বরফ লাগাবেন না।",
+    "home_remedy_en": "After running cool water, cover the burn loosely with sterile non-stick dressing; never apply direct ice.",
+    "key_points_bn": [
+      "পোড়া অংশে ভুলেও সরাসরি বরফ ঘষবেন না (বরফ দিলে রক্তনালী জমে টিস্যু ধ্বংস হতে পারে)।",
+      "পোড়ার ফলে ফোস্কা উঠলে তা কখনোই সুই বা হাত দিয়ে ফাটাবেন না।",
+      "পোড়া স্থানে আংটি, ঘড়ি বা আঁটসাঁট কাপড় থাকলে দ্রুত আলতোভাবে খুলে ফেলুন।"
+    ],
+    "key_points_en": [
+      "Never apply raw ice directly on burns as extreme cold produces frostbite tissue ischemia.",
+      "Never pop or lance thermal blisters.",
+      "Quickly and gently remove tight jewelry, watches, or restrictive clothing before edema sets in."
+    ],
+    "do_list_bn": [
+      "পানির নিচে অন্তত ১০ মিনিট রাখুন যতক্ষণ না জ্বালাপোড়া শান্ত হয়।",
+      "সিলভার সালফাডায়াজিন (Silver Sulfadiazine) বা চিকিৎসকের নির্দেশিত বার্ন অয়েন্টমেন্ট লাগান।"
+    ],
+    "do_list_en": [
+      "Keep under running tap water for a full 10-15 minutes.",
+      "Apply medical burn cream like silver sulfadiazine if skin remains intact."
+    ],
+    "dont_list_bn": [
+      "পোড়া ক্ষতে তুলো (Cotton) দেবেন না (তুলোর আঁশ ক্ষতে আটকে যায়)।",
+      "পোড়া স্থানে চুন, মাটি বা পোড়া তেল লাগাবেন না।"
+    ],
+    "dont_list_en": [
+      "Never put fluffy cotton wool directly over raw burn wounds.",
+      "Do not smear ink, lime, or kerosene on burns."
+    ],
+    "when_to_see_doctor_bn": "যদি মুখ, চোখ, যৌনাঙ্গ পুড়ে যায়, পোড়া অংশ হাতের তালুর চেয়ে বড় হয় বা চামড়া সাদা/কালো হয়ে যায়, তৎক্ষণাৎ বার্ন ইউনিটে যান।",
+    "when_to_see_doctor_en": "Go immediately to a burn emergency center if burns affect face, hands, or exceed the size of the patient's palm.",
+    "disclaimer_bn": "রাসায়নিক বা বৈদ্যুতিক পোড়ায় অবিলম্বে হাসপাতালে জরুরি চিকিৎসা নিন।",
+    "disclaimer_en": "Electrical and chemical burns require emergent clinical management."
+  }
+]

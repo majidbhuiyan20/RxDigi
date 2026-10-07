@@ -1,0 +1,52 @@
+[
+  {
+    "id": "tip_lifestyle_01",
+    "category": "Lifestyle & Diabetes",
+    "category_bn": "জীবনধারা ও ডায়াবেটিস",
+    "body_part": "lifestyle",
+    "icon": "activity",
+    "color": "#059669",
+    "read_time": "১ মিনিট",
+    "is_trending": true,
+    "title_bn": "খাওয়ার পর ব্লাড সুগার স্পাইক ঠেকানোর ১০ মিনিটের হাঁটা ট্রিক",
+    "title_en": "Prevent Post-Meal Blood Sugar Spikes with a 10-Minute Walk",
+    "summary_bn": "ভাত বা ভারী খাবারের পর রক্তে হঠাৎ গ্লুকোজ বেড়ে যাওয়া আটকানোর সহজ ও বৈজ্ঞানিক কৌশল।",
+    "summary_en": "Scientifically lower postprandial glucose surges and insulin resistance naturally.",
+    "quick_hack_bn": "খাবার শেষ করার ১৫ মিনিটের মাথায় মাত্র ১০ মিনিট সোজা হয়ে হালকা গতিতে হাঁটাহাঁটি করুন।",
+    "quick_hack_en": "Take a gentle 10-minute stroll within 15-30 minutes after completing a carb-heavy meal.",
+    "myth_buster_bn": "ভুল ধারণা: ডায়াবেটিস হলে মিষ্টি ছাড়া অন্য যে কোনো খাবার যতখুশি খাওয়া যায়। সত্য: অতিরিক্ত সাদা ভাত, আলু বা ময়দা শরীরে গিয়ে দ্রুত চিনিতে রূপান্তরিত হয় এবং সুগার বাড়িয়ে দেয়!",
+    "myth_buster_en": "Myth: Only sugar raises glucose. Fact: Excess white rice, refined flour, and potatoes convert directly into glucose inside the bloodstream!",
+    "home_remedy_bn": "ভারী খাবারের আগে ১ চামচ অ্যাপেল সিডার ভিনেগার অথবা ১ গ্লাস সাধারণ পানিতে সামান্য দারুচিনি গুঁড়ো মিশিয়ে পান করতে পারেন।",
+    "home_remedy_en": "Drink a glass of water with diluted apple cider vinegar or cinnamon powder prior to carb-rich meals.",
+    "key_points_bn": [
+      "খাবার খাওয়ার ক্রম মেনে চলুন: প্রথমে সালাদ/সবজি, এরপর মাছ/মাংস/ডিম, এবং সবশেষে ভাত বা রুটি খান।",
+      "ফাইবার ও প্রোটিন আগে খেলে পেটের পরিপাক ধীর হয় এবং রক্তে সুগার হঠাৎ বাড়ে না।",
+      "প্রতিদিন পর্যাপ্ত ৮ ঘণ্টা ঘুম নিশ্চিত করুন; অপর্যাপ্ত ঘুম ইনসুলিন রেজিস্ট্যান্স তৈরি করে।"
+    ],
+    "key_points_en": [
+      "Follow optimal food sequencing: fiber (greens) first, protein second, and carbs last.",
+      "Pre-loading fiber blunts glycemic response significantly.",
+      "Prioritize 7-8 hours of quality sleep to prevent morning cortisol-induced hyperglycemia."
+    ],
+    "do_list_bn": [
+      "প্রতিদিনের খাবারের প্লেটের অর্ধেক অংশ রাখুন রঙিন শাকসবজি ও সালাদ দিয়ে।",
+      "রক্তে সুগারের মাত্রা নিয়মিত গ্লুকোমিটার দিয়ে মেপে রেকর্ড রাখুন।"
+    ],
+    "do_list_en": [
+      "Fill half of your meal plate with colorful vegetables and raw salad.",
+      "Log your fasting and post-prandial blood sugar readings consistently."
+    ],
+    "dont_list_bn": [
+      "খাওয়ার পরপরই শুয়ে পড়বেন না বা একটানা বসে থাকবেন না।",
+      "প্যাকেটজাত ফলের জুস বা কোমল পানীয় খাবেন না (এতে ফ্রুক্টোজ সুগার মারাত্মক বাড়ে)।"
+    ],
+    "dont_list_en": [
+      "Avoid sedentary lounging immediately after eating lunch or dinner.",
+      "Avoid commercial packaged fruit juices laden with hidden sugars."
+    ],
+    "when_to_see_doctor_bn": "ব্লাড সুগার খুব বেশি কমে গেলে (কাঁপাকাঁপি, প্রচণ্ড ঘাম, মাথা ঘোরা - Hypoglycemia) তৎক্ষণাৎ চিনি/মিষ্টি খেয়ে চিকিৎসকের সাথে কথা বলুন।",
+    "when_to_see_doctor_en": "If experiencing hypoglycemia (sweating, intense tremors, disorientation), immediately consume quick glucose and consult your endocrinologist.",
+    "disclaimer_bn": "ইনসুলিন বা ডায়াবেটিসের ওষুধ অবশ্যই রেজিস্টার্ড চিকিৎসকের প্রেসক্রিপশন অনুযায়ী চলবে।",
+    "disclaimer_en": "Adjust diabetic medication doses only under clinical supervision."
+  }
+]

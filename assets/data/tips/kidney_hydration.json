@@ -1,0 +1,52 @@
+[
+  {
+    "id": "tip_kidney_01",
+    "category": "Kidneys & Hydration",
+    "category_bn": "কিডনি ও পানি পান",
+    "body_part": "kidneys",
+    "icon": "dropHalfBottom",
+    "color": "#0891B2",
+    "read_time": "১ মিনিট",
+    "is_trending": false,
+    "title_bn": "কিডনি সুস্থ রাখা ও পাথরের ঝুঁকি কমানোর সঠিক হাইড্রেশন গাইড",
+    "title_en": "Keep Kidneys Healthy & Prevent Stones with Optimal Hydration",
+    "summary_bn": "ওজন ও আবহাওয়া অনুযায়ী দৈনিক কতটুকু পানি পান করা উচিত এবং প্রস্রাবের রঙের সংকেত।",
+    "summary_en": "Prevent renal calculi (stones) and urinary tract infections through balanced hydration.",
+    "quick_hack_bn": "প্রস্রাবের রঙ হালকা স্বচ্ছ বা খড়ের মতো হলুদ হলে আপনার শরীর হাইড্রেটেড, গাঢ় হলুদ মানেই পানি কম!",
+    "quick_hack_en": "Check urine color: pale straw yellow means well-hydrated; dark amber signifies dehydration!",
+    "myth_buster_bn": "ভুল ধারণা: যত বেশি পানি খাওয়া যায় কিডনি তত ভালো থাকে। সত্য: অতিরিক্ত অপ্রয়োজনীয় পানি পান করলে রক্তে সোডিয়াম বিপজ্জনকভাবে কমে যেতে পারে (Hyponatremia)!",
+    "myth_buster_en": "Myth: Drinking excessive water is always better. Fact: Overhydration can cause dangerous hyponatremia (water intoxication)!",
+    "home_remedy_bn": "প্রতিদিন এক গ্লাস পানিতে সামান্য লেবুর রস মিশিয়ে পান করুন—লেবুর সাইট্রেট কিডনিতে ক্যালসিয়াম পাথর জমতে বাধা দেয়।",
+    "home_remedy_en": "Drink fresh lemon water daily; natural citrate inhibits calcium stone crystallization.",
+    "key_points_bn": [
+      "সাধারণ অবস্থায় একজন প্রাপ্তবয়স্ক মানুষের দৈনিক ২ থেকে ৩ লিটার পানি পান করা প্রয়োজন।",
+      "অতিরিক্ত কোমল পানীয় ও এনার্জি ড্রিংক কিডনির ফিল্ট্রেশন ক্ষমতার মারাত্মক ক্ষতি করে।",
+      "লবণাক্ত খাবার ও প্রসেসড মাংস অতিরিক্ত খেলে কিডনিতে অক্সালেট পাথর বাড়ে।"
+    ],
+    "key_points_en": [
+      "An average adult requires approximately 2 to 3 liters of fluids daily.",
+      "Carbonated soda and energy drinks increase nephrotoxic stress.",
+      "High dietary sodium accelerates renal calcium excretion."
+    ],
+    "do_list_bn": [
+      "প্রস্রাবের বেগ হলে কখনোই দীর্ঘক্ষণ চেপে রাখবেন না।",
+      "গরমে বা ঘাম বেশি হলে পানির সাথে একটু স্যালাইন বা ডাবের পানি যোগ করুন।"
+    ],
+    "do_list_en": [
+      "Never hold your urine for prolonged intervals.",
+      "Replenish lost electrolytes with coconut water or oral saline during heatwaves."
+    ],
+    "dont_list_bn": [
+      "ব্যথা হলেই নিজে নিজে ঘন ঘন পেইনকিলার (NSAID) সেবন করবেন না (কিডনি বিকল হওয়ার অন্যতম বড় কারণ)।",
+      "অতিরিক্ত ভিটামিন-সি সাপ্লিমেন্ট দীর্ঘমেয়াদে খাবেন না।"
+    ],
+    "dont_list_en": [
+      "Do not self-prescribe NSAID painkillers repeatedly (major trigger for kidney damage).",
+      "Avoid megadoses of synthetic Vitamin C tablets without indication."
+    ],
+    "when_to_see_doctor_bn": "কোমরের একপাশে তীব্র অসহ্য ব্যথা, প্রস্রাবের সাথে রক্ত বা প্রস্রাবে তীব্র জ্বালাপোড়া ও জ্বর থাকলে দ্রুত ইউরোলজি বিশেষজ্ঞ দেখান।",
+    "when_to_see_doctor_en": "Seek urgent medical attention for severe flank pain, hematuria (blood in urine), or burning micturition with fever.",
+    "disclaimer_bn": "কিডনি রোগী বা হার্ট ফেইলিওরের রোগীরা চিকিৎসকের নির্দিষ্ট পানি মেপে পান করবেন।",
+    "disclaimer_en": "Patients with kidney disease or heart failure must follow strict fluid restriction as advised by their nephrologist."
+  }
+]

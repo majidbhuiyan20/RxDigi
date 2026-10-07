@@ -60,8 +60,8 @@ class CategoryFilterBar extends ConsumerWidget {
                 ),
               ),
               onSelected: (selected) {
-                ref.read(selectedTipCategoryProvider.notifier).state =
-                    (cat == 'All') ? null : cat;
+                ref.read(selectedTipCategoryProvider.notifier).select(
+                    (cat == 'All') ? null : cat);
               },
             ),
           );

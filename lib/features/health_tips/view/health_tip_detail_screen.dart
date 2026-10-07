@@ -1,357 +1,537 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../../app/app_colors.dart';
 import '../models/health_tip_model.dart';
 import '../provider/health_tips_provider.dart';
+import '../theme/tips_theme.dart';
 
 class HealthTipDetailScreen extends ConsumerWidget {
   final HealthTipModel tip;
 
   const HealthTipDetailScreen({super.key, required this.tip});
 
-  IconData _getIconData(String iconName) {
-    switch (iconName) {
-      case 'favorite':
-        return Icons.favorite_rounded;
-      case 'water_drop':
-        return Icons.water_drop_rounded;
-      case 'shield':
-        return Icons.shield_rounded;
-      case 'restaurant':
-        return Icons.restaurant_rounded;
-      case 'medical_services':
-        return Icons.medical_services_rounded;
-      case 'bug_report':
-        return Icons.coronavirus_rounded;
-      case 'bedtime':
-        return Icons.bedtime_rounded;
-      default:
-        return Icons.health_and_safety_rounded;
-    }
-  }
-
-  Color _parseColor(String hex) {
-    try {
-      return Color(int.parse(hex.replaceFirst('#', '0xFF')));
-    } catch (_) {
-      return AppColors.primaryColor;
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isBn = ref.watch(tipLanguageIsBnProvider);
-    final themeColor = _parseColor(tip.color);
+    final bookmarkedIds = ref.watch(bookmarkedTipIdsProvider).value ?? [];
+    final isBookmarked = bookmarkedIds.contains(tip.id);
+
+    final catColor = TipsTheme.getColor(tip.bodyPart.isNotEmpty ? tip.bodyPart : tip.category);
+    final catIcon = TipsTheme.getIcon(tip.bodyPart.isNotEmpty ? tip.bodyPart : tip.category);
+
+    final hack = tip.getQuickHack(isBn);
+    final myth = tip.getMythBuster(isBn);
+    final remedy = tip.getHomeRemedy(isBn);
+    final keyPoints = tip.getKeyPoints(isBn);
+    final dos = tip.getDos(isBn);
+    final donts = tip.getDonts(isBn);
+    final doctorAlert = tip.getWhenToSeeDoctor(isBn);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: Text(
           tip.getCategory(isBn),
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF0F172A),
+        elevation: 0,
         actions: [
-          GestureDetector(
-            onTap: () {
-              ref.read(tipLanguageIsBnProvider.notifier).state = !isBn;
-            },
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: themeColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: themeColor.withValues(alpha: 0.4)),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.translate, size: 16, color: themeColor),
-                  const SizedBox(width: 4),
-                  Text(
-                    isBn ? 'EN' : 'বাং',
-                    style: TextStyle(
-                      color: themeColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Bookmark toggle
           IconButton(
-            icon: const Icon(Icons.share_outlined),
+            icon: Icon(
+              isBookmarked ? PhosphorIconsFill.bookmarkSimple : PhosphorIconsRegular.bookmarkSimple,
+              color: isBookmarked ? TipsTheme.primary : const Color(0xFF475569),
+            ),
             onPressed: () {
-              final shareText = '''
-${tip.getTitle(isBn)}
-
-${tip.getSummary(isBn)}
-
-Key Points:
-${tip.getKeyPoints(isBn).map((p) => '• $p').join('\n')}
-
-${tip.getDisclaimer(isBn)}
-Shared via RxDigi
-''';
-              Share.share(shareText);
+              HapticFeedback.selectionClick();
+              ref.read(bookmarkedTipIdsProvider.notifier).toggle(tip.id);
             },
+          ),
+          // Language toggle
+          IconButton(
+            icon: const Icon(PhosphorIconsRegular.translate, color: Color(0xFF475569)),
+            onPressed: () {
+              HapticFeedback.selectionClick();
+              ref.read(tipLanguageIsBnProvider.notifier).toggle();
+            },
+          ),
+          // Share
+          IconButton(
+            icon: const Icon(PhosphorIconsRegular.shareNetwork, color: Color(0xFF475569)),
+            onPressed: () => _shareTip(tip, isBn),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: themeColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(16),
+            // 1. Hero Title & Category Header Card
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.025),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
                   ),
-                  child: Icon(_getIconData(tip.icon), color: themeColor, size: 28),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: themeColor,
+                          color: catColor.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          tip.getCategory(isBn),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(catIcon, size: 14, color: catColor),
+                            const SizedBox(width: 5),
+                            Text(
+                              tip.getCategory(isBn),
+                              style: TextStyle(
+                                color: catColor,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        isBn ? 'স্বাস্থ্য সুরক্ষা গাইড' : 'Preventive Wellness Guide',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w500,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(PhosphorIconsRegular.clock, size: 12, color: Color(0xFF64748B)),
+                            const SizedBox(width: 4),
+                            Text(
+                              tip.readTime,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Color(0xFF64748B),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Text(
-              tip.getTitle(isBn),
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                height: 1.3,
-                color: Color(0xFF1A1C1E),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                  const SizedBox(height: 12),
+                  Text(
+                    tip.getTitle(isBn),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0F172A),
+                      height: 1.35,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    tip.getSummary(isBn),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF475569),
+                      height: 1.45,
+                    ),
                   ),
                 ],
               ),
-              child: Text(
-                tip.getSummary(isBn),
-                style: TextStyle(
-                  fontSize: 14,
-                  height: 1.5,
-                  color: Colors.grey.shade800,
+            ),
+            const SizedBox(height: 14),
+
+            // 2. Quick 1-Minute Hack (if available)
+            if (hack.isNotEmpty) ...[
+              _buildSectionBox(
+                icon: PhosphorIconsFill.lightning,
+                iconColor: TipsTheme.quickHackColor,
+                bgColor: TipsTheme.quickHackBg,
+                borderColor: TipsTheme.quickHackBorder,
+                title: isBn ? '১ মিনিটের জরুরি হ্যাক' : '1-Minute Quick Hack',
+                titleColor: TipsTheme.quickHackColor,
+                content: hack,
+              ),
+              const SizedBox(height: 14),
+            ],
+
+            // 3. Myth Buster vs Fact (if available)
+            if (myth.isNotEmpty) ...[
+              _buildSectionBox(
+                icon: PhosphorIconsFill.shieldWarning,
+                iconColor: TipsTheme.mythColor,
+                bgColor: TipsTheme.mythBg,
+                borderColor: TipsTheme.mythBorder,
+                title: isBn ? 'ভুল ধারণা বনাম আসল সত্য' : 'Myth vs Medical Fact',
+                titleColor: TipsTheme.mythColor,
+                content: myth,
+              ),
+              const SizedBox(height: 14),
+            ],
+
+            // 4. Kitchen / Home Remedy (if available)
+            if (remedy.isNotEmpty) ...[
+              _buildSectionBox(
+                icon: PhosphorIconsFill.plant,
+                iconColor: TipsTheme.remedyColor,
+                bgColor: TipsTheme.remedyBg,
+                borderColor: TipsTheme.remedyBorder,
+                title: isBn ? 'ঘরোয়া প্রাকৃতিক সমাধান' : 'Natural Home Remedy',
+                titleColor: TipsTheme.remedyColor,
+                content: remedy,
+              ),
+              const SizedBox(height: 14),
+            ],
+
+            // 5. Key Highlights
+            if (keyPoints.isNotEmpty) ...[
+              _buildCardSection(
+                title: isBn ? 'মূল শিক্ষণীয় বিষয়' : 'Key Highlights',
+                icon: PhosphorIconsBold.listChecks,
+                iconColor: TipsTheme.primary,
+                child: Column(
+                  children: keyPoints.map((point) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 9),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 4),
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: TipsTheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              point,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF334155),
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              isBn ? 'প্রধান করণীয় ও স্বাস্থ্যবিধি' : 'Key Recommendations',
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1C1E),
+              const SizedBox(height: 14),
+            ],
+
+            // 6. Do's and Don'ts Grid/List
+            if (dos.isNotEmpty || donts.isNotEmpty) ...[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Do's
+                  if (dos.isNotEmpty)
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: TipsTheme.doBg,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: TipsTheme.doBorder),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(PhosphorIconsFill.checkCircle, size: 16, color: TipsTheme.doColor),
+                                const SizedBox(width: 5),
+                                Text(
+                                  isBn ? 'যা করবেন' : 'Do\'s',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: TipsTheme.doColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            ...dos.map((item) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 6),
+                                  child: Text(
+                                    '• $item',
+                                    style: const TextStyle(
+                                      fontSize: 11.5,
+                                      color: Color(0xFF065F46),
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                )),
+                          ],
+                        ),
+                      ),
+                    ),
+                  if (dos.isNotEmpty && donts.isNotEmpty) const SizedBox(width: 10),
+
+                  // Don'ts
+                  if (donts.isNotEmpty)
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: TipsTheme.dontBg,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: TipsTheme.dontBorder),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(PhosphorIconsFill.xCircle, size: 16, color: TipsTheme.dontColor),
+                                const SizedBox(width: 5),
+                                Text(
+                                  isBn ? 'ভুলেও নয়' : 'Don\'ts',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: TipsTheme.dontColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            ...donts.map((item) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 6),
+                                  child: Text(
+                                    '• $item',
+                                    style: const TextStyle(
+                                      fontSize: 11.5,
+                                      color: Color(0xFF991B1B),
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                )),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            ...tip.getKeyPoints(isBn).map((point) {
-              return Container(
-                margin: const EdgeInsets.only(bottom: 10),
+              const SizedBox(height: 14),
+            ],
+
+            // 7. When to See a Doctor (Red Flag Warning)
+            if (doctorAlert.isNotEmpty) ...[
+              Container(
+                width: double.infinity,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.grey.shade200),
+                  color: TipsTheme.doctorWarningBg,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: TipsTheme.doctorWarningBorder),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 2),
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: themeColor.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.check, size: 14, color: themeColor),
-                    ),
-                    const SizedBox(width: 12),
+                    const Icon(PhosphorIconsFill.warningOctagon, size: 20, color: TipsTheme.doctorWarningColor),
+                    const SizedBox(width: 10),
                     Expanded(
-                      child: Text(
-                        point,
-                        style: TextStyle(
-                          fontSize: 13.5,
-                          height: 1.45,
-                          color: Colors.grey.shade800,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isBn ? 'কখন অবশ্যই ডাক্তার দেখাবেন?' : 'When to Consult a Doctor?',
+                            style: const TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.bold,
+                              color: TipsTheme.doctorWarningColor,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            doctorAlert,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF881337),
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              );
-            }),
-            const SizedBox(height: 20),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE8F5E9),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFA5D6A7)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.check_circle_outline, color: Color(0xFF2E7D32), size: 18),
-                            const SizedBox(width: 6),
-                            Text(
-                              isBn ? 'যা করবেন' : 'Do\'s',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF2E7D32),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        ...tip.getDos(isBn).map((item) => Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: Text(
-                            '• $item',
-                            style: const TextStyle(fontSize: 12, height: 1.35, color: Color(0xFF1B5E20)),
-                          ),
-                        )),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFEBEE),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFEF9A9A)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.cancel_outlined, color: Color(0xFFC62828), size: 18),
-                            const SizedBox(width: 6),
-                            Text(
-                              isBn ? 'যা করবেন না' : 'Don\'ts',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFC62828),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        ...tip.getDonts(isBn).map((item) => Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: Text(
-                            '• $item',
-                            style: const TextStyle(fontSize: 12, height: 1.35, color: Color(0xFFB71C1C)),
-                          ),
-                        )),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF8E1),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFFFE082)),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.info_outline_rounded, color: Color(0xFFF57F17), size: 22),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isBn ? 'মেডিকেল ডিসক্লেইমার' : 'Medical Disclaimer',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                            color: Color(0xFFE65100),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          tip.getDisclaimer(isBn),
-                          style: TextStyle(
-                            fontSize: 12,
-                            height: 1.4,
-                            color: Colors.brown.shade800,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 16),
+            ],
+
+            // 8. Share Action Button
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: TipsTheme.primary,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+                onPressed: () => _shareTip(tip, isBn),
+                icon: const Icon(PhosphorIconsBold.shareNetwork, size: 18),
+                label: Text(
+                  isBn ? 'এই টিপসটি বন্ধুদের সাথে শেয়ার করুন' : 'Share this Tip with Friends',
+                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 9. Disclaimer
+            Center(
+              child: Text(
+                tip.getDisclaimer(isBn),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey.shade500,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildSectionBox({
+    required IconData icon,
+    required Color iconColor,
+    required Color bgColor,
+    required Color borderColor,
+    required String title,
+    required Color titleColor,
+    required String content,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 16, color: iconColor),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: titleColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            content,
+            style: const TextStyle(
+              fontSize: 12.5,
+              color: Color(0xFF1E293B),
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCardSection({
+    required String title,
+    required IconData icon,
+    required Color iconColor,
+    required Widget child,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: iconColor),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0F172A),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          child,
+        ],
+      ),
+    );
+  }
+
+  void _shareTip(HealthTipModel tip, bool isBn) {
+    HapticFeedback.lightImpact();
+    final buffer = StringBuffer();
+    buffer.writeln('🌟 ${tip.getTitle(isBn)}');
+    buffer.writeln();
+    buffer.writeln(tip.getSummary(isBn));
+    buffer.writeln();
+    if (tip.getQuickHack(isBn).isNotEmpty) {
+      buffer.writeln('⚡ হ্যাক: ${tip.getQuickHack(isBn)}');
+      buffer.writeln();
+    }
+    if (tip.getMythBuster(isBn).isNotEmpty) {
+      buffer.writeln('🚫 ভুল ধারণা বনাম সত্য: ${tip.getMythBuster(isBn)}');
+      buffer.writeln();
+    }
+    buffer.writeln('📱 RxDigi হেলথ অ্যাপ থেকে শেয়ারকৃত।');
+
+    Share.share(buffer.toString());
   }
 }
