@@ -33,6 +33,10 @@ class TodayMedicineCard extends ConsumerWidget {
               totalTodayDoses++;
               if (adherenceMap['${r.id}_noon'] == true) takenTodayDoses++;
             }
+            if (r.evening) {
+              totalTodayDoses++;
+              if (adherenceMap['${r.id}_evening'] == true) takenTodayDoses++;
+            }
             if (r.night) {
               totalTodayDoses++;
               if (adherenceMap['${r.id}_night'] == true) takenTodayDoses++;
@@ -147,6 +151,7 @@ class TodayMedicineCard extends ConsumerWidget {
               else ...[
                 _buildSlotSection(context, ref, SlotStyle.morning, isBn ? 'সকাল' : 'Morning', reminders, adherenceMap, isBn),
                 _buildSlotSection(context, ref, SlotStyle.noon, isBn ? 'দুপুর' : 'Noon', reminders, adherenceMap, isBn),
+                _buildSlotSection(context, ref, SlotStyle.evening, isBn ? 'সন্ধ্যা' : 'Evening', reminders, adherenceMap, isBn),
                 _buildSlotSection(context, ref, SlotStyle.night, isBn ? 'রাত' : 'Night', reminders, adherenceMap, isBn),
 
                 const SizedBox(height: 6),
@@ -234,6 +239,7 @@ class TodayMedicineCard extends ConsumerWidget {
     final slotMeds = reminders.where((r) {
       if (slotKey == 'morning') return r.morning;
       if (slotKey == 'noon') return r.noon;
+      if (slotKey == 'evening') return r.evening;
       if (slotKey == 'night') return r.night;
       return false;
     }).toList();
@@ -262,7 +268,9 @@ class TodayMedicineCard extends ConsumerWidget {
                 ? med.morningTime
                 : slotKey == 'noon'
                     ? med.noonTime
-                    : med.nightTime;
+                    : slotKey == 'evening'
+                        ? med.eveningTime
+                        : med.nightTime;
 
             return Container(
               margin: const EdgeInsets.only(bottom: 6),

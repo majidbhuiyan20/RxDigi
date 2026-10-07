@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prescripto/app/app_colors.dart';
-import 'package:prescripto/app/app_routes.dart';
 import 'package:prescripto/core/data/providers/doctor_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {

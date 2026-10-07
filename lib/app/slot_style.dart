@@ -12,6 +12,7 @@ class SlotStyle {
 
   static final morning = SlotStyle('morning', PhosphorIconsRegular.sunHorizon, const Color(0xFFF59E0B));
   static final noon = SlotStyle('noon', PhosphorIconsRegular.sun, const Color(0xFFEA580C));
+  static final evening = SlotStyle('evening', PhosphorIconsRegular.cloudSun, const Color(0xFFD97706));
   static final night = SlotStyle('night', PhosphorIconsRegular.moonStars, const Color(0xFF4F46E5));
 
   static SlotStyle of(String key) {
@@ -20,6 +21,8 @@ class SlotStyle {
         return morning;
       case 'noon':
         return noon;
+      case 'evening':
+        return evening;
       default:
         return night;
     }

@@ -123,11 +123,15 @@ class MedicineReminderCard extends ConsumerWidget {
                 if (reminder.morning)
                   _buildSlotBadge(SlotStyle.morning, isBn ? 'সকাল' : 'Morning', reminder.morningTime, reminder.isActive),
                 if (reminder.noon) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   _buildSlotBadge(SlotStyle.noon, isBn ? 'দুপুর' : 'Noon', reminder.noonTime, reminder.isActive),
                 ],
+                if (reminder.evening) ...[
+                  const SizedBox(width: 6),
+                  _buildSlotBadge(SlotStyle.evening, isBn ? 'সন্ধ্যা' : 'Evening', reminder.eveningTime, reminder.isActive),
+                ],
                 if (reminder.night) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   _buildSlotBadge(SlotStyle.night, isBn ? 'রাত' : 'Night', reminder.nightTime, reminder.isActive),
                 ],
                 const Spacer(),

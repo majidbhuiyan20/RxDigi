@@ -154,22 +154,44 @@ class MedicineRepository extends BaseRepository<MedicineModel> {
   }
 
   Future<List<MedicineModel>> searchMedicines(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return [];
+
     try {
       final db = await _databaseHelper.database;
-      // Search by name (prioritizing starts-with), genericName, and manufacturer
-      // Using rawQuery because query() doesn't support parameters in orderBy
-      final result = await db.rawQuery('''
+
+      // 1. Fast prefix match on indexed 'name' column (sub-millisecond)
+      final prefixResults = await db.rawQuery('''
+        SELECT * FROM medicines 
+        WHERE name LIKE ? 
+        ORDER BY name ASC 
+        LIMIT 30
+      ''', ['$trimmed%']);
+
+      if (prefixResults.length >= 15) {
+        return prefixResults.map((map) => MedicineModel.fromMap(map)).toList();
+      }
+
+      // 2. If fewer prefix matches, search broader (name contains or generic contains)
+      final broadResults = await db.rawQuery('''
         SELECT * FROM medicines 
         WHERE name LIKE ? OR genericName LIKE ? OR manufacturer LIKE ?
-        ORDER BY CASE WHEN name LIKE ? THEN 0 ELSE 1 END, name ASC
-        LIMIT 50
+        ORDER BY 
+          CASE 
+            WHEN name LIKE ? THEN 0 
+            WHEN genericName LIKE ? THEN 1
+            ELSE 2 
+          END, 
+          name ASC
+        LIMIT 40
       ''', [
-        '%$query%', // For name LIKE
-        '%$query%', // For genericName LIKE
-        '%$query%', // For manufacturer LIKE
-        '$query%'   // For the CASE WHEN (starts with)
+        '%$trimmed%',
+        '%$trimmed%',
+        '%$trimmed%',
+        '$trimmed%',
+        '$trimmed%',
       ]);
-      return result.map((map) => MedicineModel.fromMap(map)).toList();
+      return broadResults.map((map) => MedicineModel.fromMap(map)).toList();
     } catch (e) {
       print('Error searching medicines: $e');
       return [];

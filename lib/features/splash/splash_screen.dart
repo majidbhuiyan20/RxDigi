@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:prescripto/app/app_colors.dart';
 import 'package:prescripto/app/app_routes.dart';
-import 'package:prescripto/app/app_text_style.dart';
-import 'package:prescripto/core/data/providers/doctor_provider.dart';
 import 'package:prescripto/core/data/providers/medicine_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {

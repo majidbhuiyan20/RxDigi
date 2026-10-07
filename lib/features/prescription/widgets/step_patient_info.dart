@@ -24,7 +24,6 @@ class _StepPatientInfoState extends ConsumerState<StepPatientInfo> {
   String _selectedGender = 'Male';
 
   List<PatientModel> _searchResults = [];
-  bool _isSearching = false;
   bool _isNewPatient = true;
 
   @override
@@ -90,8 +89,6 @@ class _StepPatientInfoState extends ConsumerState<StepPatientInfo> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedPatient = ref.watch(prescriptionProvider).patient;
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(

@@ -28,7 +28,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 10,
+      version: 11,
       onCreate: _onCreate,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -202,6 +202,16 @@ class DatabaseHelper {
               UNIQUE(habitId, date)
             )
           ''');
+        }
+        if (oldVersion < 11) {
+          try {
+            await db.execute('ALTER TABLE medicine_reminders ADD COLUMN evening INTEGER DEFAULT 0');
+            await db.execute('ALTER TABLE medicine_reminders ADD COLUMN eveningTime TEXT DEFAULT "06:00 PM"');
+          } catch (_) {}
+          try {
+            await db.execute('CREATE INDEX IF NOT EXISTS idx_medicines_name ON medicines (name)');
+            await db.execute('CREATE INDEX IF NOT EXISTS idx_medicines_generic ON medicines (genericName)');
+          } catch (_) {}
         }
       },
     );
@@ -387,16 +397,20 @@ class DatabaseHelper {
         instructions TEXT,
         morning INTEGER DEFAULT 0,
         noon INTEGER DEFAULT 0,
+        evening INTEGER DEFAULT 0,
         night INTEGER DEFAULT 0,
-        morningTime TEXT DEFAULT '08:00',
-        noonTime TEXT DEFAULT '13:00',
-        nightTime TEXT DEFAULT '20:00',
+        morningTime TEXT DEFAULT '08:00 AM',
+        noonTime TEXT DEFAULT '01:30 PM',
+        eveningTime TEXT DEFAULT '06:00 PM',
+        nightTime TEXT DEFAULT '09:00 PM',
         startDate TEXT NOT NULL,
         durationDays INTEGER DEFAULT 0,
         isActive INTEGER DEFAULT 1,
         createdAt TEXT NOT NULL
       )
     ''');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_medicines_name ON medicines (name)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_medicines_generic ON medicines (genericName)');
 
     // Medicine Adherence Logs Table
     await db.execute('''

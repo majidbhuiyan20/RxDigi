@@ -9,6 +9,22 @@ import '../../../core/data/providers/medicine_provider.dart';
 import '../models/medicine_reminder_model.dart';
 import '../provider/medicine_reminder_provider.dart';
 
+class DosePreset {
+  final String label;
+  final bool morning;
+  final bool noon;
+  final bool evening;
+  final bool night;
+
+  const DosePreset({
+    required this.label,
+    required this.morning,
+    required this.noon,
+    required this.evening,
+    required this.night,
+  });
+}
+
 class AddReminderSheet extends ConsumerStatefulWidget {
   const AddReminderSheet({super.key});
 
@@ -34,15 +50,17 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
 
   bool _morning = true;
   bool _noon = false;
+  bool _evening = false;
   bool _night = true;
 
   TimeOfDay _morningTime = const TimeOfDay(hour: 8, minute: 0);
   TimeOfDay _noonTime = const TimeOfDay(hour: 13, minute: 30);
+  TimeOfDay _eveningTime = const TimeOfDay(hour: 18, minute: 0);
   TimeOfDay _nightTime = const TimeOfDay(hour: 21, minute: 0);
 
   int _durationDays = 0; // 0 = Ongoing
 
-  final List<String> _forms = ['Tablet', 'Capsule', 'Syrup', 'Drop', 'Injection', 'Cream'];
+  final List<String> _forms = ['Tablet', 'Capsule', 'Syrup', 'Drop', 'Injection', 'Cream', 'Ointment', 'Suspension'];
   final List<String> _instructionOptions = [
     'After Meal',
     'Before Meal',
@@ -50,17 +68,20 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
     'Empty Stomach',
   ];
 
-  // Quick dose patterns: morning + noon + night
-  final List<List<int>> _dosePatterns = const [
-    [1, 0, 0],
-    [0, 0, 1],
-    [1, 0, 1],
-    [1, 1, 1],
-    [0, 1, 0],
-    [0, 1, 1],
+  // Quick dose patterns (including Bangladeshi 4-part prescribing standards)
+  final List<DosePreset> _presets = const [
+    DosePreset(label: '1 + 0 + 1', morning: true, noon: false, evening: false, night: true),
+    DosePreset(label: '1 + 1 + 1', morning: true, noon: true, evening: false, night: true),
+    DosePreset(label: '1 + 0 + 0', morning: true, noon: false, evening: false, night: false),
+    DosePreset(label: '0 + 0 + 1', morning: false, noon: false, evening: false, night: true),
+    DosePreset(label: '1 + 1 + 1 + 1', morning: true, noon: true, evening: true, night: true),
+    DosePreset(label: '0 + 1 + 0', morning: false, noon: true, evening: false, night: false),
+    DosePreset(label: '1 + 0 + 1 + 0', morning: true, noon: false, evening: true, night: false),
+    DosePreset(label: '0 + 0 + 1 + 1', morning: false, noon: false, evening: true, night: true),
   ];
 
   List<MedicineModel> _suggestions = [];
+  bool _isSearching = false;
   Timer? _debounce;
 
   @override
@@ -74,14 +95,21 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
   void _onNameChanged(String value) {
     _debounce?.cancel();
     final q = value.trim();
-    if (q.length < 2) {
-      setState(() => _suggestions = []);
+    if (q.isEmpty) {
+      setState(() {
+        _suggestions = [];
+        _isSearching = false;
+      });
       return;
     }
-    _debounce = Timer(const Duration(milliseconds: 250), () async {
+    setState(() => _isSearching = true);
+    _debounce = Timer(const Duration(milliseconds: 200), () async {
       final results = await ref.read(medicineRepositoryProvider).searchMedicines(q);
       if (!mounted) return;
-      setState(() => _suggestions = results);
+      setState(() {
+        _suggestions = results;
+        _isSearching = false;
+      });
     });
   }
 
@@ -100,6 +128,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
       _strengthController.text = m.strength ?? '';
       _dosageForm = matched;
       _suggestions = [];
+      _isSearching = false;
     });
   }
 
@@ -115,7 +144,9 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
         ? _morningTime
         : slot == 'noon'
             ? _noonTime
-            : _nightTime;
+            : slot == 'evening'
+                ? _eveningTime
+                : _nightTime;
 
     final picked = await showTimePicker(
       context: context,
@@ -126,6 +157,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
       setState(() {
         if (slot == 'morning') _morningTime = picked;
         if (slot == 'noon') _noonTime = picked;
+        if (slot == 'evening') _eveningTime = picked;
         if (slot == 'night') _nightTime = picked;
       });
     }
@@ -140,9 +172,9 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
       return;
     }
 
-    if (!_morning && !_noon && !_night) {
+    if (!_morning && !_noon && !_evening && !_night) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Select at least one schedule time (Morning, Noon, or Night)')),
+        const SnackBar(content: Text('Select at least one schedule time (Morning, Noon, Evening, or Night)')),
       );
       return;
     }
@@ -154,9 +186,11 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
       instructions: _instructions,
       morning: _morning,
       noon: _noon,
+      evening: _evening,
       night: _night,
       morningTime: _formatTimeOfDay(_morningTime),
       noonTime: _formatTimeOfDay(_noonTime),
+      eveningTime: _formatTimeOfDay(_eveningTime),
       nightTime: _formatTimeOfDay(_nightTime),
       startDate: getTodayDateString(),
       durationDays: _durationDays,
@@ -215,7 +249,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                     color: AppColors.primaryColor.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.alarm_add_rounded, color: AppColors.primaryColor, size: 24),
+                  child: Icon(PhosphorIconsRegular.alarm, color: AppColors.primaryColor, size: 24),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -227,7 +261,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        isBn ? 'সঠিক সময়ে ঔষধ খাওয়ার নোটিফিকেশন সেট করুন' : 'Track schedule & daily adherence',
+                        isBn ? 'ঔষধের নাম খুঁজুন এবং গ্রহণের সময়সূচী নির্বাচন করুন' : 'Search 21,000+ medicines & schedule doses',
                         style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
                     ],
@@ -239,12 +273,23 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
 
-            // Medicine Name Field
-            Text(
-              isBn ? 'ঔষধের নাম' : 'Medicine Name',
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            // Medicine Name Field (with instant 21k search)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  isBn ? 'ঔষধের নাম (Medicine Name)' : 'Medicine Name',
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+                if (_isSearching)
+                  const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+              ],
             ),
             const SizedBox(height: 6),
             TextField(
@@ -252,7 +297,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
               onChanged: _onNameChanged,
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
-                hintText: isBn ? 'ঔষধের নাম লিখুন (যেমন: Napa)' : 'Type medicine name (e.g. Napa)',
+                hintText: isBn ? 'ঔষধের নাম লিখুন (যেমন: Napa, Seclo, Maxpro)' : 'Type medicine name (e.g. Napa, Seclo)',
                 prefixIcon: Icon(PhosphorIconsRegular.magnifyingGlass, color: AppColors.primaryColor),
                 suffixIcon: _nameController.text.isEmpty
                     ? null
@@ -260,40 +305,93 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                         icon: const Icon(Icons.close_rounded, size: 18),
                         onPressed: () {
                           _nameController.clear();
-                          setState(() => _suggestions = []);
+                          setState(() {
+                            _suggestions = [];
+                            _isSearching = false;
+                          });
                         },
                       ),
               ),
             ),
+
+            // Suggestions List Dropdown
             if (_suggestions.isNotEmpty)
               Container(
-                margin: const EdgeInsets.only(top: 6),
-                constraints: const BoxConstraints(maxHeight: 220),
+                margin: const EdgeInsets.only(top: 8),
+                constraints: const BoxConstraints(maxHeight: 230),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.primaryColor.withOpacity(0.3)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  itemCount: _suggestions.length,
-                  separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey.shade100),
-                  itemBuilder: (context, i) {
-                    final m = _suggestions[i];
-                    final sub = [m.strength, m.dosageForm, m.genericName]
-                        .where((e) => e != null && e.trim().isNotEmpty)
-                        .join(' • ');
-                    return ListTile(
-                      dense: true,
-                      title: Text(m.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                      subtitle: sub.isEmpty
-                          ? null
-                          : Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11.5)),
-                      trailing: Icon(PhosphorIconsRegular.plusCircle, color: AppColors.primaryColor, size: 20),
-                      onTap: () => _selectMedicine(m),
-                    );
-                  },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    itemCount: _suggestions.length,
+                    separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey.shade100),
+                    itemBuilder: (context, i) {
+                      final m = _suggestions[i];
+                      return ListTile(
+                        dense: true,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                        title: Row(
+                          children: [
+                            Text(
+                              m.name,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                            if (m.dosageForm != null && m.dosageForm!.isNotEmpty) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  m.dosageForm!,
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.primaryColor),
+                                ),
+                              ),
+                            ],
+                            if (m.strength != null && m.strength!.isNotEmpty) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.blueGrey.shade50,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  m.strength!,
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.blueGrey.shade700),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        subtitle: Text(
+                          [m.genericName, m.manufacturer]
+                              .where((e) => e != null && e.trim().isNotEmpty)
+                              .join(' • '),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
+                        ),
+                        trailing: Icon(PhosphorIconsRegular.plusCircle, color: AppColors.primaryColor, size: 22),
+                        onTap: () => _selectMedicine(m),
+                      );
+                    },
+                  ),
                 ),
               ),
             const SizedBox(height: 16),
@@ -312,7 +410,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                       ),
                       const SizedBox(height: 6),
                       DropdownButtonFormField<String>(
-                        value: _dosageForm,
+                        value: _forms.contains(_dosageForm) ? _dosageForm : _forms.first,
                         decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12)),
                         items: _forms.map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
                         onChanged: (val) {
@@ -329,7 +427,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isBn ? 'মাত্রা' : 'Strength',
+                        isBn ? 'মাত্রা (Strength)' : 'Strength',
                         style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                       ),
                       const SizedBox(height: 6),
@@ -346,23 +444,37 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
             ),
             const SizedBox(height: 20),
 
-            // Schedule / Times of Day
-            Text(
-              isBn ? 'গ্রহণের সময়সূচী (Schedule)' : 'Times of Day',
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            // Dose Pattern Selection (e.g. 1+0+1, 1+1+1, 1+1+1+1)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  isBn ? 'গ্রহণের সময়সূচী (Dose Pattern)' : 'Dose Pattern (Schedule)',
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+                Text(
+                  '${_morning ? '1' : '0'}+${_noon ? '1' : '0'}+${_evening ? '1' : '0'}+${_night ? '1' : '0'}',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5, color: AppColors.primaryColor),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
+
+            // Preset Chips Row
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: _dosePatterns.map((p) {
-                final selected = _morning == (p[0] == 1) && _noon == (p[1] == 1) && _night == (p[2] == 1);
+              children: _presets.map((p) {
+                final selected = _morning == p.morning &&
+                    _noon == p.noon &&
+                    _evening == p.evening &&
+                    _night == p.night;
                 return ChoiceChip(
-                  label: Text(p.join(' + ')),
+                  label: Text(p.label),
                   selected: selected,
                   showCheckmark: false,
                   selectedColor: AppColors.primaryColor,
-                  backgroundColor: Colors.white,
+                  backgroundColor: Colors.grey.shade50,
                   labelStyle: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
@@ -370,14 +482,17 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                   ),
                   side: BorderSide(color: selected ? AppColors.primaryColor : Colors.grey.shade300),
                   onSelected: (_) => setState(() {
-                    _morning = p[0] == 1;
-                    _noon = p[1] == 1;
-                    _night = p[2] == 1;
+                    _morning = p.morning;
+                    _noon = p.noon;
+                    _evening = p.evening;
+                    _night = p.night;
                   }),
                 );
               }).toList(),
             ),
             const SizedBox(height: 12),
+
+            // 4 Slot Toggles: Morning, Noon, Evening, Night
             Row(
               children: [
                 _buildScheduleSlot(
@@ -396,6 +511,15 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                   timeText: _formatTimeOfDay(_noonTime),
                   onToggle: () => setState(() => _noon = !_noon),
                   onPickTime: () => _pickTime('noon'),
+                ),
+                const SizedBox(width: 8),
+                _buildScheduleSlot(
+                  title: isBn ? 'সন্ধ্যা' : 'Evening',
+                  style: SlotStyle.evening,
+                  isSelected: _evening,
+                  timeText: _formatTimeOfDay(_eveningTime),
+                  onToggle: () => setState(() => _evening = !_evening),
+                  onPickTime: () => _pickTime('evening'),
                 ),
                 const SizedBox(width: 8),
                 _buildScheduleSlot(
@@ -505,10 +629,10 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
         onTap: onToggle,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.primaryColor.withOpacity(0.08) : Colors.grey.shade50,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isSelected ? AppColors.primaryColor : Colors.grey.shade200,
               width: isSelected ? 1.6 : 1,
@@ -516,13 +640,15 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
           ),
           child: Column(
             children: [
-              Icon(style.icon, size: 26, color: isSelected ? style.color : Colors.grey.shade400),
+              Icon(style.icon, size: 24, color: isSelected ? style.color : Colors.grey.shade400),
               const SizedBox(height: 4),
               Text(
                 title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 13,
+                  fontSize: 12,
                   color: isSelected ? AppColors.primaryColor : Colors.grey.shade700,
                 ),
               ),
@@ -530,7 +656,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
               InkWell(
                 onTap: isSelected ? onPickTime : onToggle,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                   decoration: BoxDecoration(
                     color: isSelected ? Colors.white : Colors.transparent,
                     borderRadius: BorderRadius.circular(6),
@@ -538,7 +664,7 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                   child: Text(
                     timeText,
                     style: TextStyle(
-                      fontSize: 10.5,
+                      fontSize: 9.5,
                       fontWeight: FontWeight.w600,
                       color: isSelected ? AppColors.primaryColor : Colors.grey.shade500,
                     ),

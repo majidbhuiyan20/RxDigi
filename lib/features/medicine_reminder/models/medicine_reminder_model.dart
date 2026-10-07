@@ -6,9 +6,11 @@ class MedicineReminderModel {
   final String instructions;
   final bool morning;
   final bool noon;
+  final bool evening;
   final bool night;
   final String morningTime;
   final String noonTime;
+  final String eveningTime;
   final String nightTime;
   final String startDate;
   final int durationDays; // 0 = ongoing/continuous
@@ -23,9 +25,11 @@ class MedicineReminderModel {
     this.instructions = 'After Meal',
     this.morning = true,
     this.noon = false,
+    this.evening = false,
     this.night = true,
     this.morningTime = '08:00 AM',
     this.noonTime = '01:30 PM',
+    this.eveningTime = '06:00 PM',
     this.nightTime = '09:00 PM',
     required this.startDate,
     this.durationDays = 0,
@@ -42,9 +46,11 @@ class MedicineReminderModel {
       'instructions': instructions,
       'morning': morning ? 1 : 0,
       'noon': noon ? 1 : 0,
+      'evening': evening ? 1 : 0,
       'night': night ? 1 : 0,
       'morningTime': morningTime,
       'noonTime': noonTime,
+      'eveningTime': eveningTime,
       'nightTime': nightTime,
       'startDate': startDate,
       'durationDays': durationDays,
@@ -62,9 +68,11 @@ class MedicineReminderModel {
       instructions: (map['instructions'] as String?) ?? 'After Meal',
       morning: (map['morning'] as int? ?? 0) == 1,
       noon: (map['noon'] as int? ?? 0) == 1,
+      evening: (map['evening'] as int? ?? 0) == 1,
       night: (map['night'] as int? ?? 0) == 1,
       morningTime: (map['morningTime'] as String?) ?? '08:00 AM',
       noonTime: (map['noonTime'] as String?) ?? '01:30 PM',
+      eveningTime: (map['eveningTime'] as String?) ?? '06:00 PM',
       nightTime: (map['nightTime'] as String?) ?? '09:00 PM',
       startDate: (map['startDate'] as String?) ?? DateTime.now().toIso8601String().split('T')[0],
       durationDays: (map['durationDays'] as int?) ?? 0,
@@ -81,9 +89,11 @@ class MedicineReminderModel {
     String? instructions,
     bool? morning,
     bool? noon,
+    bool? evening,
     bool? night,
     String? morningTime,
     String? noonTime,
+    String? eveningTime,
     String? nightTime,
     String? startDate,
     int? durationDays,
@@ -98,9 +108,11 @@ class MedicineReminderModel {
       instructions: instructions ?? this.instructions,
       morning: morning ?? this.morning,
       noon: noon ?? this.noon,
+      evening: evening ?? this.evening,
       night: night ?? this.night,
       morningTime: morningTime ?? this.morningTime,
       noonTime: noonTime ?? this.noonTime,
+      eveningTime: eveningTime ?? this.eveningTime,
       nightTime: nightTime ?? this.nightTime,
       startDate: startDate ?? this.startDate,
       durationDays: durationDays ?? this.durationDays,
@@ -110,6 +122,9 @@ class MedicineReminderModel {
   }
 
   String get scheduleDosePattern {
+    if (evening) {
+      return '${morning ? '1' : '0'} + ${noon ? '1' : '0'} + ${evening ? '1' : '0'} + ${night ? '1' : '0'}';
+    }
     return '${morning ? '1' : '0'} + ${noon ? '1' : '0'} + ${night ? '1' : '0'}';
   }
 
@@ -117,6 +132,7 @@ class MedicineReminderModel {
     final list = <String>[];
     if (morning) list.add('morning');
     if (noon) list.add('noon');
+    if (evening) list.add('evening');
     if (night) list.add('night');
     return list;
   }

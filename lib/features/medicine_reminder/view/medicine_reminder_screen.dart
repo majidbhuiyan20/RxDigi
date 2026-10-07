@@ -62,6 +62,10 @@ class MedicineReminderScreen extends ConsumerWidget {
                 totalDosesToday++;
                 if (adherenceMap['${r.id}_noon'] == true) takenTodayDoses++;
               }
+              if (r.evening) {
+                totalDosesToday++;
+                if (adherenceMap['${r.id}_evening'] == true) takenTodayDoses++;
+              }
               if (r.night) {
                 totalDosesToday++;
                 if (adherenceMap['${r.id}_night'] == true) takenTodayDoses++;
