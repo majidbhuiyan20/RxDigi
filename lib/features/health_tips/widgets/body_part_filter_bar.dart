@@ -94,42 +94,8 @@ class BodyPartFilterBar extends ConsumerWidget {
     final isBn = ref.watch(tipLanguageIsBnProvider);
     final selectedBodyPart = ref.watch(selectedBodyPartProvider);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                isBn ? 'অঙ্গভিত্তিক গাইড (মাথা থেকে পা)' : 'Head-to-Toe Body Navigator',
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF475569),
-                ),
-              ),
-              if (selectedBodyPart != null)
-                GestureDetector(
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    ref.read(selectedBodyPartProvider.notifier).select(null);
-                  },
-                  child: Text(
-                    isBn ? 'ফিল্টার মুছুন' : 'Reset',
-                    style: const TextStyle(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w600,
-                      color: TipsTheme.primary,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 38,
+    return SizedBox(
+      height: 38,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
@@ -184,8 +150,7 @@ class BodyPartFilterBar extends ConsumerWidget {
               );
             },
           ),
-        ),
-      ],
-    );
+        );
   }
 }
+

@@ -247,100 +247,115 @@ class HealthTipDetailScreen extends ConsumerWidget {
               const SizedBox(height: 14),
             ],
 
-            // 6. Do's and Don'ts Grid/List
-            if (dos.isNotEmpty || donts.isNotEmpty) ...[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Do's
-                  if (dos.isNotEmpty)
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: TipsTheme.doBg,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: TipsTheme.doBorder),
+            // 6. Do's and Don'ts Stacked
+            if (dos.isNotEmpty) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: TipsTheme.doBg,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: TipsTheme.doBorder),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(PhosphorIconsFill.checkCircle, size: 18, color: TipsTheme.doColor),
+                        const SizedBox(width: 8),
+                        Text(
+                          isBn ? 'যা করবেন (করণীয়)' : 'Do\'s (Recommended)',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: TipsTheme.doColor,
+                          ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(PhosphorIconsFill.checkCircle, size: 16, color: TipsTheme.doColor),
-                                const SizedBox(width: 5),
-                                Text(
-                                  isBn ? 'যা করবেন' : 'Do\'s',
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ...dos.map((item) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 4, right: 8),
+                                child: Icon(PhosphorIconsFill.check, size: 14, color: TipsTheme.doColor),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  item,
                                   style: const TextStyle(
                                     fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    color: TipsTheme.doColor,
+                                    color: Color(0xFF065F46),
+                                    height: 1.4,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            ...dos.map((item) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 6),
-                                  child: Text(
-                                    '• $item',
-                                    style: const TextStyle(
-                                      fontSize: 11.5,
-                                      color: Color(0xFF065F46),
-                                      height: 1.35,
-                                    ),
-                                  ),
-                                )),
-                          ],
-                        ),
-                      ),
-                    ),
-                  if (dos.isNotEmpty && donts.isNotEmpty) const SizedBox(width: 10),
+                              ),
+                            ],
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
 
-                  // Don'ts
-                  if (donts.isNotEmpty)
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: TipsTheme.dontBg,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: TipsTheme.dontBorder),
+            if (donts.isNotEmpty) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: TipsTheme.dontBg,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: TipsTheme.dontBorder),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(PhosphorIconsFill.xCircle, size: 18, color: TipsTheme.dontColor),
+                        const SizedBox(width: 8),
+                        Text(
+                          isBn ? 'ভুলেও যা করবেন না (বর্জনীয়)' : 'Don\'ts (Avoid)',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: TipsTheme.dontColor,
+                          ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(PhosphorIconsFill.xCircle, size: 16, color: TipsTheme.dontColor),
-                                const SizedBox(width: 5),
-                                Text(
-                                  isBn ? 'ভুলেও নয়' : 'Don\'ts',
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ...donts.map((item) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 4, right: 8),
+                                child: Icon(PhosphorIconsFill.x, size: 14, color: TipsTheme.dontColor),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  item,
                                   style: const TextStyle(
                                     fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    color: TipsTheme.dontColor,
+                                    color: Color(0xFF991B1B),
+                                    height: 1.4,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            ...donts.map((item) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 6),
-                                  child: Text(
-                                    '• $item',
-                                    style: const TextStyle(
-                                      fontSize: 11.5,
-                                      color: Color(0xFF991B1B),
-                                      height: 1.35,
-                                    ),
-                                  ),
-                                )),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
+                              ),
+                            ],
+                          ),
+                        )),
+                  ],
+                ),
               ),
               const SizedBox(height: 14),
             ],

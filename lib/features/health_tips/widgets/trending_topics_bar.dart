@@ -71,39 +71,14 @@ class TrendingTopicsBar extends ConsumerWidget {
     final isBn = ref.watch(tipLanguageIsBnProvider);
     final selectedBodyPart = ref.watch(selectedBodyPartProvider);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Row(
-            children: [
-              const Icon(
-                PhosphorIconsFill.flame,
-                size: 16,
-                color: Color(0xFFEA580C),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                isBn ? 'সবচেয়ে সাধারণ সমস্যাগুলো' : 'Most Common Health Concerns',
-                style: const TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 6),
-        SizedBox(
-          height: 40,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemCount: _commonPainPoints.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+    return SizedBox(
+      height: 38,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: _commonPainPoints.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final item = _commonPainPoints[index];
               final String id = item['id'];
@@ -164,8 +139,7 @@ class TrendingTopicsBar extends ConsumerWidget {
               );
             },
           ),
-        ),
-      ],
-    );
+        );
   }
 }
+

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../app/app_colors.dart';
 import '../models/vital_log_model.dart';
 import '../provider/vitals_provider.dart';
+import '../widgets/vital_trend_chart.dart';
 import 'add_vital_sheet.dart';
 
 class VitalsScreen extends ConsumerStatefulWidget {
@@ -90,13 +91,37 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
                   );
                 }
 
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, index) {
-                    final item = filtered[index];
-                    return _buildVitalCard(item);
-                  },
+                return ListView(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
+                  children: [
+                    VitalTrendChart(logs: list, vitalType: _selectedFilter),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'পরিমাপের হিস্ট্রি (Measurement Logs)',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1E293B),
+                            ),
+                          ),
+                          Text(
+                            '${filtered.length} টি রেকর্ড',
+                            style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ...filtered.map(
+                      (item) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _buildVitalCard(item),
+                      ),
+                    ),
+                  ],
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),

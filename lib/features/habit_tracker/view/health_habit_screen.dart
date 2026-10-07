@@ -54,10 +54,13 @@ class _HealthHabitScreenState extends ConsumerState<HealthHabitScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text('Error: $error')),
         data: (habits) {
+          final selectedDate = ref.watch(selectedHabitDateProvider);
+          final completedAsync = ref.watch(completedHabitIdsForSelectedDateProvider);
           final completed = completedAsync.value ?? <int>{};
           final counts = countsAsync.value ?? <String, int>{};
           final progress = habits.isEmpty ? 0.0 : (completed.length / habits.length);
           final streak = _calculateStreak(counts);
+          final isSelectedToday = habitDateString(selectedDate) == habitDateString(DateTime.now());
 
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
@@ -67,8 +70,57 @@ class _HealthHabitScreenState extends ConsumerState<HealthHabitScreen> {
               const SizedBox(height: 16),
 
               // 2. 7-Day Consistency Dot Matrix
-              _buildWeeklyDotMatrix(isBn, counts, habits.length),
-              const SizedBox(height: 20),
+              _buildWeeklyDotMatrix(isBn, counts, habits.length, selectedDate),
+              const SizedBox(height: 16),
+
+              // Past date indicator banner
+              if (!isSelectedToday)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFBFDBFE)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(PhosphorIconsRegular.calendarCheck, size: 18, color: Color(0xFF2563EB)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          isBn
+                              ? 'তারিখ: ${selectedDate.day}/${selectedDate.month} এর রেকর্ড দেখা হচ্ছে'
+                              : 'Viewing logs for ${selectedDate.day}/${selectedDate.month}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1E40AF),
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => ref.read(selectedHabitDateProvider.notifier).resetToToday(),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFF93C5FD)),
+                          ),
+                          child: Text(
+                            isBn ? 'আজকে ফিরুন' : 'Today',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2563EB),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
               // 3. Interactive Water Intake Tracker (8 Glasses)
               _buildWaterTrackerCard(isBn),
@@ -79,7 +131,9 @@ class _HealthHabitScreenState extends ConsumerState<HealthHabitScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    isBn ? 'আজকের স্বাস্থ্য কর্মসূচি' : "Today's Wellness Tasks",
+                    isSelectedToday
+                        ? (isBn ? 'আজকের স্বাস্থ্য কর্মসূচি' : "Today's Wellness Tasks")
+                        : (isBn ? 'ঐ দিনের স্বাস্থ্য কর্মসূচি' : "Day's Wellness Tasks"),
                     style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
                   ),
                   Container(
@@ -231,7 +285,7 @@ class _HealthHabitScreenState extends ConsumerState<HealthHabitScreen> {
   }
 
   // ─── 2. 7-Day Consistency Dot Matrix ───
-  Widget _buildWeeklyDotMatrix(bool isBn, Map<String, int> counts, int totalHabits) {
+  Widget _buildWeeklyDotMatrix(bool isBn, Map<String, int> counts, int totalHabits, DateTime selectedDate) {
     final today = DateTime.now();
 
     return Container(
@@ -242,7 +296,7 @@ class _HealthHabitScreenState extends ConsumerState<HealthHabitScreen> {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -255,12 +309,12 @@ class _HealthHabitScreenState extends ConsumerState<HealthHabitScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                isBn ? 'গত ৭ দিনের ধারাবাহিকতা (Streak)' : '7-Day Habit Consistency',
+                isBn ? 'গত ৭ দিনের ধারাবাহিকতা ও তারিখ নির্বাচন' : '7-Day Consistency & Date Selector',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: Color(0xFF1E293B)),
               ),
               Text(
-                isBn ? 'প্রতিদিনের রেকর্ড' : 'Daily Logs',
-                style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                isBn ? 'তারিখে ট্যাপ করুন' : 'Tap to view day',
+                style: const TextStyle(fontSize: 11, color: AppColors.primaryColor, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -272,47 +326,67 @@ class _HealthHabitScreenState extends ConsumerState<HealthHabitScreen> {
               final dateStr = habitDateString(date);
               final count = counts[dateStr] ?? 0;
               final isToday = index == 6;
-              final isDone = totalHabits > 0 && count >= (totalHabits * 0.6);
+              final isSelected = habitDateString(date) == habitDateString(selectedDate);
+              final isDone = totalHabits > 0 && count >= totalHabits;
+              final isPartial = totalHabits > 0 && count > 0 && count < totalHabits;
 
-              return Column(
-                children: [
-                  Text(
-                    _dayLabel(date.weekday, isBn),
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
-                      color: isToday ? AppColors.primaryColor : Colors.grey.shade600,
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  ref.read(selectedHabitDateProvider.notifier).selectDate(date);
+                },
+                child: Column(
+                  children: [
+                    Text(
+                      _dayLabel(date.weekday, isBn),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        color: isSelected ? AppColors.primaryColor : Colors.grey.shade600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: isDone
-                          ? const Color(0xFF10B981)
-                          : isToday
-                              ? AppColors.primaryColor.withOpacity(0.12)
-                              : Colors.grey.shade100,
-                      shape: BoxShape.circle,
-                      border: isToday
-                          ? Border.all(color: AppColors.primaryColor, width: 2)
-                          : null,
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: isDone
+                            ? const Color(0xFF10B981)
+                            : (isPartial
+                                ? const Color(0xFFF59E0B)
+                                : (isSelected
+                                    ? AppColors.primaryColor.withValues(alpha: 0.15)
+                                    : Colors.grey.shade100)),
+                        shape: BoxShape.circle,
+                        border: isSelected
+                            ? Border.all(color: AppColors.primaryColor, width: 2.2)
+                            : (isToday ? Border.all(color: const Color(0xFF94A3B8), width: 1.2) : null),
+                      ),
+                      child: Center(
+                        child: isDone
+                            ? const Icon(Icons.check, size: 16, color: Colors.white)
+                            : (isPartial
+                                ? Text(
+                                    '$count',
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    '${date.day}',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: isSelected ? AppColors.primaryColor : Colors.grey.shade500,
+                                    ),
+                                  )),
+                      ),
                     ),
-                    child: Center(
-                      child: isDone
-                          ? const Icon(Icons.check, size: 16, color: Colors.white)
-                          : Text(
-                              '${date.day}',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: isToday ? AppColors.primaryColor : Colors.grey.shade500,
-                              ),
-                            ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               );
             }),
           ),

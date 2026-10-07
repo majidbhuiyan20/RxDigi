@@ -686,14 +686,19 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
             children: report.dailyStats.map((stat) {
               final isToday = stat.dateString == getTodayDateString();
               Color dotColor;
-              if (stat.isNoMeds) {
-                dotColor = const Color(0xFFE2E8F0);
+              Widget? iconChild;
+              if (stat.isNoMeds || stat.totalScheduled == 0) {
+                dotColor = const Color(0xFF94A3B8);
+                iconChild = const Icon(PhosphorIconsBold.minus, size: 9, color: Color(0xFF94A3B8));
               } else if (stat.isFull) {
                 dotColor = const Color(0xFF10B981); // Green
+                iconChild = Icon(PhosphorIconsBold.check, size: 12, color: dotColor);
               } else if (stat.isPartial) {
                 dotColor = const Color(0xFFF59E0B); // Amber
+                iconChild = null;
               } else {
                 dotColor = const Color(0xFFEF4444); // Red missed
+                iconChild = Icon(PhosphorIconsBold.x, size: 10, color: dotColor);
               }
 
               return Column(
@@ -702,20 +707,14 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: dotColor.withOpacity(0.18),
+                      color: dotColor.withValues(alpha: 0.18),
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isToday ? const Color(0xFF0F766E) : dotColor,
                         width: isToday ? 2 : 1.2,
                       ),
                     ),
-                    child: Center(
-                      child: stat.isFull
-                          ? Icon(PhosphorIconsBold.check, size: 12, color: dotColor)
-                          : (stat.isMissed
-                              ? Icon(PhosphorIconsBold.x, size: 10, color: dotColor)
-                              : null),
-                    ),
+                    child: Center(child: iconChild),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -733,14 +732,15 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
           const SizedBox(height: 8),
 
           // Legend
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 10,
+            runSpacing: 4,
             children: [
               _buildLegendDot(const Color(0xFF10B981), isBn ? 'গৃহীত' : 'Taken'),
-              const SizedBox(width: 12),
               _buildLegendDot(const Color(0xFFF59E0B), isBn ? 'আংশিক' : 'Partial'),
-              const SizedBox(width: 12),
               _buildLegendDot(const Color(0xFFEF4444), isBn ? 'মিসড' : 'Missed'),
+              _buildLegendDot(const Color(0xFF94A3B8), isBn ? 'শুরু হয়নি' : 'Not started'),
             ],
           ),
         ],

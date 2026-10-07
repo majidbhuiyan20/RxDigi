@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../provider/health_tips_provider.dart';
 import '../theme/tips_theme.dart';
 import '../widgets/health_tips_header.dart';
@@ -19,6 +21,7 @@ class HealthTipsScreen extends ConsumerStatefulWidget {
 class _HealthTipsScreenState extends ConsumerState<HealthTipsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  int _categoryTab = 0; // 0: Trending, 1: Body Navigator
 
   @override
   void dispose() {
@@ -88,38 +91,186 @@ class _HealthTipsScreenState extends ConsumerState<HealthTipsScreen> {
                     padding: const EdgeInsets.only(bottom: 110),
                     physics: const BouncingScrollPhysics(),
                     children: [
-                      // When not searching: show daily banner, trending pain points, and body navigator
+                      // When not searching: show daily banner, tab switcher, and category chips
                       if (!isSearching) ...[
                         const DailyHealthHackBanner(),
                         const SizedBox(height: 6),
-                        const TrendingTopicsBar(),
-                        const SizedBox(height: 6),
-                        const BodyPartFilterBar(),
+                        // Segmented Tab Switcher
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Container(
+                            height: 42,
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: const Color(0xFFE2E8F0)),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () {
+                                      HapticFeedback.selectionClick();
+                                      setState(() => _categoryTab = 0);
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      decoration: BoxDecoration(
+                                        color: _categoryTab == 0 ? Colors.white : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(11),
+                                        boxShadow: _categoryTab == 0
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.black.withValues(alpha: 0.06),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 1.5),
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            PhosphorIconsFill.flame,
+                                            size: 15,
+                                            color: _categoryTab == 0 ? const Color(0xFFEA580C) : const Color(0xFF64748B),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            isBn ? 'জনপ্রিয় সমস্যা' : 'Trending Issues',
+                                            style: TextStyle(
+                                              fontSize: 12.5,
+                                              fontWeight: _categoryTab == 0 ? FontWeight.bold : FontWeight.w600,
+                                              color: _categoryTab == 0 ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () {
+                                      HapticFeedback.selectionClick();
+                                      setState(() => _categoryTab = 1);
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      decoration: BoxDecoration(
+                                        color: _categoryTab == 1 ? Colors.white : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(11),
+                                        boxShadow: _categoryTab == 1
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.black.withValues(alpha: 0.06),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 1.5),
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            PhosphorIconsFill.squaresFour,
+                                            size: 15,
+                                            color: _categoryTab == 1 ? TipsTheme.primary : const Color(0xFF64748B),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            isBn ? 'অঙ্গভিত্তিক গাইড' : 'Body Navigator',
+                                            style: TextStyle(
+                                              fontSize: 12.5,
+                                              fontWeight: _categoryTab == 1 ? FontWeight.bold : FontWeight.w600,
+                                              color: _categoryTab == 1 ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 10),
+                        if (_categoryTab == 0)
+                          const TrendingTopicsBar()
+                        else
+                          const BodyPartFilterBar(),
+                        const SizedBox(height: 8),
                       ],
 
-                      // Results header count
+                      // Results header count with reset filter
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              isSearching
-                                  ? (isBn ? 'অনুসন্ধানের ফলাফল' : 'Search Results')
-                                  : (selectedBodyPart != null
-                                      ? (isBn ? 'নির্বাচিত ক্যাটাগরি' : 'Selected Category')
-                                      : (isBn ? 'সকল স্বাস্থ্য নির্দেশিকা' : 'All Health Guides')),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1E293B),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      isSearching
+                                          ? (isBn ? 'অনুসন্ধানের ফলাফল' : 'Search Results')
+                                          : (selectedBodyPart != null
+                                              ? (isBn ? 'ফিল্টার করা টিপস' : 'Filtered Tips')
+                                              : (isBn ? 'সকল স্বাস্থ্য নির্দেশিকা' : 'All Health Guides')),
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF1E293B),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (selectedBodyPart != null) ...[
+                                    const SizedBox(width: 8),
+                                    GestureDetector(
+                                      onTap: () {
+                                        HapticFeedback.lightImpact();
+                                        ref.read(selectedBodyPartProvider.notifier).select(null);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(PhosphorIconsBold.x, size: 10, color: Colors.red),
+                                            const SizedBox(width: 3),
+                                            Text(
+                                              isBn ? 'মুছুন' : 'Clear',
+                                              style: const TextStyle(
+                                                fontSize: 10.5,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
                               decoration: BoxDecoration(
-                                color: TipsTheme.primary.withOpacity(0.08),
+                                color: TipsTheme.primary.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(

@@ -12,13 +12,29 @@ final activeHealthHabitsProvider = FutureProvider<List<HealthHabitModel>>((ref) 
   return ref.watch(healthHabitRepositoryProvider).getActiveHabits();
 });
 
+class SelectedHabitDateNotifier extends Notifier<DateTime> {
+  @override
+  DateTime build() => DateTime.now();
+
+  void selectDate(DateTime date) => state = date;
+  void resetToToday() => state = DateTime.now();
+}
+
+final selectedHabitDateProvider =
+    NotifierProvider<SelectedHabitDateNotifier, DateTime>(SelectedHabitDateNotifier.new);
+
 final todayCompletedHabitIdsProvider = FutureProvider<Set<int>>((ref) async {
   return ref.watch(healthHabitRepositoryProvider).getCompletedHabitIds(habitDateString(DateTime.now()));
 });
 
+final completedHabitIdsForSelectedDateProvider = FutureProvider<Set<int>>((ref) async {
+  final selectedDate = ref.watch(selectedHabitDateProvider);
+  return ref.watch(healthHabitRepositoryProvider).getCompletedHabitIds(habitDateString(selectedDate));
+});
+
 final weeklyHabitCountsProvider = FutureProvider<Map<String, int>>((ref) async {
   final today = DateTime.now();
-  final dates = List.generate(7, (index) => habitDateString(today.subtract(Duration(days: 6 - index))));
+  final dates = List.generate(14, (index) => habitDateString(today.subtract(Duration(days: 13 - index))));
   return ref.watch(healthHabitRepositoryProvider).getDailyCompletedCounts(dates);
 });
 
@@ -27,9 +43,10 @@ class HealthHabitNotifier extends Notifier<void> {
   void build() {}
 
   Future<void> toggle(int habitId, bool completed) async {
+    final selectedDate = ref.read(selectedHabitDateProvider);
     await ref.read(healthHabitRepositoryProvider).setCompleted(
           habitId: habitId,
-          date: habitDateString(DateTime.now()),
+          date: habitDateString(selectedDate),
           completed: !completed,
         );
     _invalidate();
@@ -48,6 +65,7 @@ class HealthHabitNotifier extends Notifier<void> {
   void _invalidate() {
     ref.invalidate(activeHealthHabitsProvider);
     ref.invalidate(todayCompletedHabitIdsProvider);
+    ref.invalidate(completedHabitIdsForSelectedDateProvider);
     ref.invalidate(weeklyHabitCountsProvider);
   }
 }
@@ -60,10 +78,11 @@ final medicineAdherenceSummaryProvider = FutureProvider<Map<String, int>>((ref) 
   var total = 0;
   var taken = 0;
   for (final reminder in reminders) {
-    if (reminder.id == null) continue;
     for (final slot in reminder.activeSlots) {
       total++;
-      if (adherence['${reminder.id}_$slot'] == true) taken++;
+      if (adherence['${reminder.id}_$slot'] == true) {
+        taken++;
+      }
     }
   }
   return {'taken': taken, 'total': total};

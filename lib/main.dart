@@ -4,6 +4,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prescripto/app/app.dart';
+import 'core/services/notification_service.dart';
 import 'firebase_options.dart';
 import 'l10n/local_provider.dart';
 
@@ -17,6 +18,11 @@ Future<void> main() async {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+
+      // Initialize local notifications & alarms
+      final notificationService = NotificationService();
+      await notificationService.initialize();
+      await notificationService.requestPermissions();
 
       FlutterError.onError =
           FirebaseCrashlytics.instance.recordFlutterFatalError;

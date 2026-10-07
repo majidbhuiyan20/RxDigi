@@ -100,3 +100,4 @@ class TipsTheme {
     return PhosphorIconsRegular.heartStraight;
   }
 }
+

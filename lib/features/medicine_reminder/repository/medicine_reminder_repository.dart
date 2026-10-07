@@ -132,21 +132,12 @@ class MedicineReminderRepository {
 
   Future<WeeklyAdherenceReport> getWeeklyAdherenceReport() async {
     final db = await _dbHelper.database;
-    final activeMeds = await getActiveReminders();
-
-    // Calculate total scheduled doses in a normal day
-    int dailyScheduledCount = 0;
-    for (final med in activeMeds) {
-      if (med.morning) dailyScheduledCount++;
-      if (med.noon) dailyScheduledCount++;
-      if (med.evening) dailyScheduledCount++;
-      if (med.night) dailyScheduledCount++;
-    }
+    final allMeds = await getAllReminders();
 
     final now = DateTime.now();
     final List<DailyAdherenceStat> dailyStats = [];
-    int totalScheduled7Days = 0;
-    int totalTaken7Days = 0;
+    int totalScheduledActiveDays = 0;
+    int totalTakenActiveDays = 0;
 
     const bnDayNames = ['সোম', 'মঙ্গল', 'বুধ', 'বৃহঃ', 'শুক্র', 'শনি', 'রবি'];
     const enDayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -154,6 +145,27 @@ class MedicineReminderRepository {
     for (int i = 6; i >= 0; i--) {
       final date = now.subtract(Duration(days: i));
       final dateStr = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+      // For this specific date, calculate how many doses were actually scheduled
+      int scheduledForDay = 0;
+      for (final med in allMeds) {
+        // If the date is BEFORE the medicine was started, do not schedule
+        if (dateStr.compareTo(med.startDate) < 0) {
+          continue;
+        }
+        // If durationDays > 0, check if past end date
+        if (med.durationDays > 0) {
+          final start = DateTime.tryParse(med.startDate);
+          if (start != null) {
+            final end = start.add(Duration(days: med.durationDays));
+            if (date.isAfter(end)) continue;
+          }
+        }
+        if (med.morning) scheduledForDay++;
+        if (med.noon) scheduledForDay++;
+        if (med.evening) scheduledForDay++;
+        if (med.night) scheduledForDay++;
+      }
 
       final countResult = await db.rawQuery(
         'SELECT COUNT(*) as count FROM medicine_adherence_logs WHERE date = ? AND isTaken = 1',
@@ -165,9 +177,10 @@ class MedicineReminderRepository {
       final dayNameBn = bnDayNames[weekdayIndex];
       final dayNameEn = enDayNames[weekdayIndex];
 
-      final scheduledForDay = dailyScheduledCount;
-      totalScheduled7Days += scheduledForDay;
-      totalTaken7Days += takenCount;
+      if (scheduledForDay > 0) {
+        totalScheduledActiveDays += scheduledForDay;
+        totalTakenActiveDays += takenCount;
+      }
 
       dailyStats.add(DailyAdherenceStat(
         date: date,
@@ -184,20 +197,28 @@ class MedicineReminderRepository {
       final stat = dailyStats[i];
       if (stat.totalScheduled > 0 && stat.totalTaken >= stat.totalScheduled) {
         streak++;
-      } else if (i == dailyStats.length - 1) {
+      } else if (i == dailyStats.length - 1 && stat.totalScheduled > 0) {
+        if (stat.totalTaken > 0) streak++;
+        continue;
+      } else if (stat.totalScheduled == 0) {
+        // Days before user began tracking do not break the streak
         continue;
       } else {
         break;
       }
     }
 
-    final rate = totalScheduled7Days > 0 ? (totalTaken7Days / totalScheduled7Days) : 0.0;
-    final missed = totalScheduled7Days > totalTaken7Days ? (totalScheduled7Days - totalTaken7Days) : 0;
+    final rate = totalScheduledActiveDays > 0
+        ? (totalTakenActiveDays / totalScheduledActiveDays).clamp(0.0, 1.0)
+        : 1.0;
+    final missed = totalScheduledActiveDays > totalTakenActiveDays
+        ? (totalScheduledActiveDays - totalTakenActiveDays)
+        : 0;
 
     return WeeklyAdherenceReport(
       adherenceRate: rate,
-      totalTaken: totalTaken7Days,
-      totalScheduled: totalScheduled7Days,
+      totalTaken: totalTakenActiveDays,
+      totalScheduled: totalScheduledActiveDays,
       currentStreak: streak,
       missedDoses: missed,
       dailyStats: dailyStats,

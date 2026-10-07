@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/services/notification_service.dart';
 import '../models/medicine_reminder_model.dart';
 import '../models/medicine_adherence_model.dart';
 import '../repository/medicine_reminder_repository.dart';
@@ -45,7 +46,11 @@ class MedicineReminderNotifier extends Notifier<void> {
 
   Future<void> addReminder(MedicineReminderModel reminder) async {
     final repo = ref.read(medicineReminderRepoProvider);
-    await repo.insertReminder(reminder);
+    final id = await repo.insertReminder(reminder);
+    final savedReminder = reminder.copyWith(id: id);
+    if (savedReminder.isActive) {
+      await NotificationService().scheduleMedicineReminder(savedReminder);
+    }
     ref.invalidate(activeRemindersProvider);
     ref.invalidate(allRemindersProvider);
     ref.invalidate(todayAdherenceMapProvider);
@@ -55,6 +60,15 @@ class MedicineReminderNotifier extends Notifier<void> {
   Future<void> toggleReminderActive(int id, bool isActive) async {
     final repo = ref.read(medicineReminderRepoProvider);
     await repo.toggleReminderActive(id, isActive);
+    if (isActive) {
+      final all = await repo.getAllReminders();
+      final match = all.where((r) => r.id == id).firstOrNull;
+      if (match != null) {
+        await NotificationService().scheduleMedicineReminder(match);
+      }
+    } else {
+      await NotificationService().cancelMedicineReminders(id);
+    }
     ref.invalidate(activeRemindersProvider);
     ref.invalidate(allRemindersProvider);
     ref.invalidate(todayAdherenceMapProvider);
@@ -63,6 +77,7 @@ class MedicineReminderNotifier extends Notifier<void> {
 
   Future<void> deleteReminder(int id) async {
     final repo = ref.read(medicineReminderRepoProvider);
+    await NotificationService().cancelMedicineReminders(id);
     await repo.deleteReminder(id);
     ref.invalidate(activeRemindersProvider);
     ref.invalidate(allRemindersProvider);
@@ -89,6 +104,17 @@ class MedicineReminderNotifier extends Notifier<void> {
     // Automatically update remaining medicine stock
     if (becomingTaken) {
       await repo.decrementStock(reminderId);
+      final all = await repo.getAllReminders();
+      final match = all.where((r) => r.id == reminderId).firstOrNull;
+      if (match != null &&
+          match.isRefillAlertEnabled &&
+          match.hasStockTracking &&
+          match.currentStock <= match.lowStockThreshold) {
+        await NotificationService().showRefillAlert(
+          medicineName: match.medicineName,
+          remainingStock: match.currentStock,
+        );
+      }
     } else {
       await repo.incrementStock(reminderId);
     }
