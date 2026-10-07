@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../widgets/home_header.dart';
+import '../widgets/quick_actions_row.dart';
 import '../widgets/today_medicine_card.dart';
-import '../widgets/medicine_price_shortcut_card.dart';
+import '../../habit_tracker/widgets/health_habit_home_card.dart';
 import '../widgets/home_vitals_card.dart';
 import '../widgets/featured_tip_card.dart';
-import '../../habit_tracker/widgets/health_habit_home_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,42 +13,41 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: Color(0xFFF8F9FD),
-      body: Column(
-        children: [
-          // ─── 1. Welcoming Header (Greeting & Settings) ───
-          HomeHeader(),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // ─── 1. Modern Welcoming Header (Greeting, Search Bar, Settings) ───
+            HomeHeader(),
 
-          // ─── 2. Scrollable Body ───
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            // ─── 2. Scrollable Dashboard Body ───
+            Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Daily Medicine Routine & Adherence Checklist
+                  // ─── 4 Quick Actions Row (Medicines, Reminder, Vitals, Rx) ───
+                  QuickActionsRow(),
+                  SizedBox(height: 18),
+
+                  // ─── Daily Medicine Routine & Adherence Checklist ───
                   TodayMedicineCard(),
-                  SizedBox(height: 16),
+                  SizedBox(height: 18),
 
-                  // Medicine Price & Generic Alternative Finder Shortcut
-                  MedicinePriceShortcutCard(),
-                  SizedBox(height: 20),
-
-                  // Daily habits and medicine adherence summary
+                  // ─── Daily Health Habits & Interactive Streak Tracker ───
                   HealthHabitHomeCard(),
-                  SizedBox(height: 20),
+                  SizedBox(height: 18),
 
-                  // Personal Health Vitals (BP, Sugar, Weight)
+                  // ─── Personal Health Vitals (BP, Sugar, Weight) ───
                   HomeVitalsCard(),
-                  SizedBox(height: 20),
+                  SizedBox(height: 18),
 
-                  // Daily Featured Bilingual Health Tip
+                  // ─── Daily Featured Bilingual Health Tip ───
                   FeaturedTipCard(),
-                  SizedBox(height: 30),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

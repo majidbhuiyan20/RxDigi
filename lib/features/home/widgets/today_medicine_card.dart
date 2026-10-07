@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
 import '../../../app/slot_style.dart';
 import '../../medicine_reminder/models/medicine_reminder_model.dart';
@@ -50,11 +51,12 @@ class TodayMedicineCard extends ConsumerWidget {
         return Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.grey.shade100, width: 1.2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
+                color: Colors.black.withOpacity(0.035),
+                blurRadius: 14,
                 offset: const Offset(0, 4),
               ),
             ],
@@ -73,14 +75,23 @@ class TodayMedicineCard extends ConsumerWidget {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: AppColors.primaryColor.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(Icons.alarm_on_rounded, color: AppColors.primaryColor, size: 20),
+                        child: const Icon(
+                          PhosphorIconsFill.bellRinging,
+                          color: AppColors.primaryColor,
+                          size: 20,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        isBn ? 'আজকের ঔষধের তালিকা' : "Today's Medicine Routine",
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        isBn ? 'আজকের ঔষধের রুটিন' : "Today's Medicine Routine",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                          color: Color(0xFF1E293B),
+                          letterSpacing: -0.2,
+                        ),
                       ),
                     ],
                   ),
@@ -88,20 +99,20 @@ class TodayMedicineCard extends ConsumerWidget {
                     onTap: () => AddReminderSheet.show(context),
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
                         color: AppColors.primaryColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.add, size: 16, color: AppColors.primaryColor),
+                          const Icon(PhosphorIconsBold.plus, size: 14, color: AppColors.primaryColor),
                           const SizedBox(width: 4),
                           Text(
                             isBn ? 'যোগ করুন' : 'Add',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: AppColors.primaryColor,
-                              fontSize: 12,
+                              fontSize: 11.5,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -111,7 +122,7 @@ class TodayMedicineCard extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
 
               // Progress Bar
               if (totalTodayDoses > 0) ...[
@@ -122,23 +133,27 @@ class TodayMedicineCard extends ConsumerWidget {
                       isBn
                           ? '$totalTodayDoses টির মধ্যে $takenTodayDoses টি সম্পন্ন'
                           : '$takenTodayDoses of $totalTodayDoses doses taken',
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w600),
                     ),
                     Text(
                       '$percent%',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: percent == 100 ? const Color(0xFF16A34A) : AppColors.primaryColor,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 7),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(6),
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 6,
-                    backgroundColor: Colors.grey.shade100,
+                    backgroundColor: const Color(0xFFF1F5F9),
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      percent == 100 ? Colors.green : AppColors.primaryColor,
+                      percent == 100 ? const Color(0xFF16A34A) : AppColors.primaryColor,
                     ),
                   ),
                 ),
@@ -156,15 +171,33 @@ class TodayMedicineCard extends ConsumerWidget {
 
                 const SizedBox(height: 6),
                 Center(
-                  child: TextButton.icon(
-                    onPressed: () => Navigator.push(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const MedicineReminderScreen()),
                     ),
-                    icon: Icon(Icons.format_list_bulleted_rounded, size: 16, color: AppColors.primaryColor),
-                    label: Text(
-                      isBn ? 'সকল ঔষধের সময়সূচী দেখুন' : 'Manage All Medications',
-                      style: TextStyle(fontSize: 12.5, color: AppColors.primaryColor, fontWeight: FontWeight.bold),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            PhosphorIconsRegular.calendarBlank,
+                            size: 15,
+                            color: AppColors.primaryColor,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            isBn ? 'সকল ঔষধের সময়সূচী দেখুন' : 'Manage All Medications',
+                            style: const TextStyle(
+                              fontSize: 12.5,
+                              color: AppColors.primaryColor,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -185,40 +218,53 @@ class TodayMedicineCard extends ConsumerWidget {
 
   Widget _buildNoRemindersCard(BuildContext context, bool isBn) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
-          Icon(Icons.medication_outlined, size: 40, color: Colors.grey.shade400),
-          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(
+              color: Color(0xFFE0F2FE),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(PhosphorIconsRegular.pill, size: 28, color: Color(0xFF0284C7)),
+          ),
+          const SizedBox(height: 10),
           Text(
-            isBn ? 'আজকের জন্য কোনো ঔষধ যোগ করা নেই' : 'No medications scheduled today',
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
+            isBn ? 'আজকের জন্য কোনো ঔষধ নির্ধারিত নেই' : 'No medications scheduled today',
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+              color: Color(0xFF1E293B),
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             isBn
-                ? 'আপনার নিয়মিত ঔষধের রিমাইন্ডার সেট করে দৈনিক গ্রহণ নিশ্চিত করুন।'
+                ? 'আপনার নিয়মিত ঔষধের রিমাইন্ডার সেট করে দৈনিক সুস্থতা বজায় রাখুন।'
                 : 'Add your regular tablets, syrups or vitamins to track daily intake.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
+            style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, height: 1.4),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           ElevatedButton.icon(
             onPressed: () => AddReminderSheet.show(context),
-            icon: const Icon(Icons.add, size: 16, color: Colors.white),
+            icon: const Icon(PhosphorIconsBold.plus, size: 15, color: Colors.white),
             label: Text(
-              isBn ? 'মেডিসিন রিমাইন্ডার সেট করুন' : 'Add Medication Reminder',
+              isBn ? 'মেডিসিন রিমাইন্ডার যোগ করুন' : 'Add Medication Reminder',
               style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             ),
           ),
         ],
@@ -308,7 +354,7 @@ class TodayMedicineCard extends ConsumerWidget {
                         ),
                       ),
                       child: isTaken
-                          ? const Icon(Icons.check, size: 16, color: Colors.white)
+                          ? const Icon(PhosphorIconsBold.check, size: 14, color: Colors.white)
                           : null,
                     ),
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../vitals/provider/vitals_provider.dart';
 import '../../vitals/view/vitals_screen.dart';
 import '../../vitals/view/add_vital_sheet.dart';
@@ -17,11 +18,12 @@ class HomeVitalsCard extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.grey.shade100, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.035),
+            blurRadius: 14,
             offset: const Offset(0, 4),
           ),
         ],
@@ -39,15 +41,24 @@ class HomeVitalsCard extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE53935).withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
+                      color: const Color(0xFFEF4444).withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.favorite_rounded, color: Color(0xFFE53935), size: 20),
+                    child: const Icon(
+                      PhosphorIconsFill.heartStraight,
+                      color: Color(0xFFEF4444),
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    isBn ? 'স্বাস্থ্য পরিমাপক (My Vitals)' : 'My Health Vitals',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    isBn ? 'স্বাস্থ্য পরিমাপক (Vitals)' : 'My Health Vitals',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      color: Color(0xFF1E293B),
+                      letterSpacing: -0.2,
+                    ),
                   ),
                 ],
               ),
@@ -55,20 +66,20 @@ class HomeVitalsCard extends ConsumerWidget {
                 onTap: () => AddVitalSheet.show(context),
                 borderRadius: BorderRadius.circular(20),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE53935).withOpacity(0.1),
+                    color: const Color(0xFFEF4444).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.add, size: 16, color: Color(0xFFE53935)),
+                      const Icon(PhosphorIconsBold.plus, size: 14, color: Color(0xFFEF4444)),
                       const SizedBox(width: 4),
                       Text(
-                        isBn ? 'পরিমাপ করুন' : 'Log Vital',
+                        isBn ? 'লগ করুন' : 'Log Vital',
                         style: const TextStyle(
-                          color: Color(0xFFE53935),
-                          fontSize: 12,
+                          color: Color(0xFFEF4444),
+                          fontSize: 11.5,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -78,15 +89,15 @@ class HomeVitalsCard extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
 
           // 3 Vitals Cards in a Row
           Row(
             children: [
               _buildVitalCard(
                 title: isBn ? 'রক্তচাপ (BP)' : 'Blood Pressure',
-                icon: Icons.speed_rounded,
-                color: const Color(0xFFE53935),
+                icon: PhosphorIconsRegular.heartbeat,
+                color: const Color(0xFFEF4444),
                 value: latestBp?.displayValue ?? '--/--',
                 unit: 'mmHg',
                 category: latestBp?.category ?? (isBn ? 'লগ নেই' : 'No log'),
@@ -95,8 +106,8 @@ class HomeVitalsCard extends ConsumerWidget {
               const SizedBox(width: 10),
               _buildVitalCard(
                 title: isBn ? 'সুগার (Sugar)' : 'Blood Sugar',
-                icon: Icons.water_drop_rounded,
-                color: const Color(0xFFFB8C00),
+                icon: PhosphorIconsRegular.drop,
+                color: const Color(0xFFF59E0B),
                 value: latestSugar?.displayValue ?? '--',
                 unit: 'mmol/L',
                 category: latestSugar?.category ?? (isBn ? 'লগ নেই' : 'No log'),
@@ -105,8 +116,8 @@ class HomeVitalsCard extends ConsumerWidget {
               const SizedBox(width: 10),
               _buildVitalCard(
                 title: isBn ? 'ওজন (Weight)' : 'Weight',
-                icon: Icons.monitor_weight_outlined,
-                color: const Color(0xFF00897B),
+                icon: PhosphorIconsRegular.scales,
+                color: const Color(0xFF0D9488),
                 value: latestWeight?.displayValue ?? '--',
                 unit: 'kg',
                 category: latestWeight?.category ?? (isBn ? 'লগ নেই' : 'No log'),
@@ -114,16 +125,35 @@ class HomeVitalsCard extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Center(
-            child: TextButton(
-              onPressed: () => Navigator.push(
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (c) => const VitalsScreen()),
               ),
-              child: Text(
-                isBn ? 'সকল হিস্টোরি ও গ্রাফ দেখুন →' : 'View History & Charts →',
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF00897B)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      isBn ? 'সকল হিস্টোরি ও গ্রাফ দেখুন' : 'View History & Charts',
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0D9488),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      PhosphorIconsBold.arrowRight,
+                      size: 13,
+                      color: Color(0xFF0D9488),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -142,56 +172,91 @@ class HomeVitalsCard extends ConsumerWidget {
     required VoidCallback onTap,
   }) {
     return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.06),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withOpacity(0.2)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(height: 6),
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: color,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: color.withOpacity(0.18), width: 1.1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: color, size: 18),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              Text(
-                unit,
-                style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
-              ),
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  category,
+                const SizedBox(height: 8),
+                Text(
+                  title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: color),
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade700,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          color: Color(0xFF1E293B),
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ),
+                    if (value != '--' && value != '--/--') ...[
+                      const SizedBox(width: 2),
+                      Text(
+                        unit,
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    category,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

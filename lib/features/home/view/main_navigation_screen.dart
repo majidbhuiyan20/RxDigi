@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:prescripto/app/app_colors.dart';
 import 'package:prescripto/features/home/view/home_screen.dart';
 import 'package:prescripto/features/medicine_reminder/view/medicine_reminder_screen.dart';
@@ -55,28 +56,28 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
               unselectedLabelTextStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
               destinations: [
                 NavigationRailDestination(
-                  icon: const Icon(Icons.home_outlined),
-                  selectedIcon: const Icon(Icons.home_rounded),
+                  icon: const Icon(PhosphorIconsRegular.house),
+                  selectedIcon: const Icon(PhosphorIconsFill.house),
                   label: Text(isBn ? 'হোম' : 'Home'),
                 ),
                 NavigationRailDestination(
-                  icon: const Icon(Icons.alarm_outlined),
-                  selectedIcon: const Icon(Icons.alarm_rounded),
+                  icon: const Icon(PhosphorIconsRegular.alarm),
+                  selectedIcon: const Icon(PhosphorIconsFill.alarm),
                   label: Text(isBn ? 'রিমাইন্ডার' : 'Reminder'),
                 ),
                 NavigationRailDestination(
-                  icon: const Icon(Icons.lightbulb_outline_rounded),
-                  selectedIcon: const Icon(Icons.lightbulb_rounded),
+                  icon: const Icon(PhosphorIconsRegular.lightbulb),
+                  selectedIcon: const Icon(PhosphorIconsFill.lightbulb),
                   label: Text(isBn ? 'টিপস' : 'Health Tips'),
                 ),
                 NavigationRailDestination(
-                  icon: const Icon(Icons.assignment_outlined),
-                  selectedIcon: const Icon(Icons.assignment_rounded),
+                  icon: const Icon(PhosphorIconsRegular.fileText),
+                  selectedIcon: const Icon(PhosphorIconsFill.fileText),
                   label: Text(isBn ? 'প্রেসক্রিপশন' : 'Rx Studio'),
                 ),
                 NavigationRailDestination(
-                  icon: const Icon(Icons.settings_outlined),
-                  selectedIcon: const Icon(Icons.settings_rounded),
+                  icon: const Icon(PhosphorIconsRegular.gear),
+                  selectedIcon: const Icon(PhosphorIconsFill.gear),
                   label: Text(isBn ? 'সেটিংস' : 'Settings'),
                 ),
               ],
@@ -114,11 +115,11 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildNavItem(0, Icons.home_outlined, Icons.home_rounded, isBn ? 'হোম' : 'Home'),
-            _buildNavItem(1, Icons.alarm_outlined, Icons.alarm_rounded, isBn ? 'রিমাইন্ডার' : 'Routine'),
-            _buildNavItem(2, Icons.lightbulb_outline_rounded, Icons.lightbulb_rounded, isBn ? 'টিপস' : 'Tips'),
-            _buildNavItem(3, Icons.assignment_outlined, Icons.assignment_rounded, isBn ? 'প্রেসক্রিপশন' : 'Rx Studio'),
-            _buildNavItem(4, Icons.settings_outlined, Icons.settings_rounded, isBn ? 'সেটিংস' : 'Settings'),
+            _buildNavItem(0, PhosphorIconsRegular.house, PhosphorIconsFill.house, isBn ? 'হোম' : 'Home'),
+            _buildNavItem(1, PhosphorIconsRegular.alarm, PhosphorIconsFill.alarm, isBn ? 'রিমাইন্ডার' : 'Routine'),
+            _buildNavItem(2, PhosphorIconsRegular.lightbulb, PhosphorIconsFill.lightbulb, isBn ? 'টিপস' : 'Tips'),
+            _buildNavItem(3, PhosphorIconsRegular.fileText, PhosphorIconsFill.fileText, isBn ? 'প্রেসক্রিপশন' : 'Rx Studio'),
+            _buildNavItem(4, PhosphorIconsRegular.gear, PhosphorIconsFill.gear, isBn ? 'সেটিংস' : 'Settings'),
           ],
         ),
       ),

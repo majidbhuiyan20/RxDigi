@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
+import '../models/health_habit_model.dart';
 import '../provider/health_habit_provider.dart';
 import '../view/health_habit_screen.dart';
 
@@ -12,48 +14,319 @@ class HealthHabitHomeCard extends ConsumerWidget {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
     final habitsAsync = ref.watch(activeHealthHabitsProvider);
     final completedAsync = ref.watch(todayCompletedHabitIdsProvider);
-    final medicineAsync = ref.watch(medicineAdherenceSummaryProvider);
+    final countsAsync = ref.watch(weeklyHabitCountsProvider);
 
     return habitsAsync.when(
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
       data: (habits) {
+        if (habits.isEmpty) return const SizedBox.shrink();
+
         final completed = completedAsync.value ?? <int>{};
-        final progress = habits.isEmpty ? 0.0 : completed.length / habits.length;
-        final medicine = medicineAsync.value ?? {'taken': 0, 'total': 0};
-        final medicineTotal = medicine['total'] ?? 0;
-        final medicineTaken = medicine['taken'] ?? 0;
+        final counts = countsAsync.value ?? <String, int>{};
+        final progress = completed.length / habits.length;
+        final percent = (progress * 100).toInt();
+        final streak = _calculateStreak(counts);
+
+        // Display up to 3 most relevant habits on home
+        final displayHabits = habits.take(3).toList();
+
         return Container(
-          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(22),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.grey.shade100, width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.035),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: AppColors.primaryColor.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.checklist_rounded, color: AppColors.primaryColor, size: 20)),
-              const SizedBox(width: 10),
-              Expanded(child: Text(isBn ? 'দৈনিক স্বাস্থ্য রুটিন' : 'Daily Health Routine', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
-              TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HealthHabitScreen())), child: Text(isBn ? 'দেখুন' : 'View')),
-            ]),
-            const SizedBox(height: 12),
-            Row(children: [
-              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(6), child: LinearProgressIndicator(value: progress, minHeight: 8, backgroundColor: Colors.grey.shade100, valueColor: const AlwaysStoppedAnimation(AppColors.primaryColor)))),
-              const SizedBox(width: 10),
-              Text('${completed.length}/${habits.length}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor)),
-            ]),
-            const SizedBox(height: 10),
-            Row(children: [
-              const Icon(Icons.medication_outlined, size: 17, color: Color(0xFFE65100)),
-              const SizedBox(width: 6),
-              Text(isBn ? 'ওষুধ: $medicineTaken/$medicineTotal' : 'Medicine: $medicineTaken/$medicineTotal', style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
-              const Spacer(),
-              TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HealthHabitScreen())), child: Text(isBn ? 'Routine খুলুন' : 'Open routine')),
-            ]),
-          ]),
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. Header with Streak Badge & View All
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(9),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981).withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          PhosphorIconsRegular.sparkle,
+                          color: Color(0xFF059669),
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isBn ? 'দৈনিক স্বাস্থ্য রুটিন' : 'Daily Health Habits',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          Text(
+                            isBn
+                                ? '${habits.length}টির মধ্যে ${completed.length}টি সম্পন্ন ($percent%)'
+                                : '${completed.length} of ${habits.length} done ($percent%)',
+                            style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  // Streak Badge
+                  if (streak > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFF59E0B), Color(0xFFEA580C)],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(PhosphorIconsFill.fire, color: Colors.white, size: 13),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$streak ${isBn ? "দিনের স্ট্রিক" : "d streak"}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              // 2. Slim Curved Progress Bar
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 7,
+                  backgroundColor: Colors.grey.shade100,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    percent == 100 ? const Color(0xFF10B981) : AppColors.primaryColor,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // 3. Interactive Habit Rows (1-Tap Completion Right on Home!)
+              ...displayHabits.map((habit) {
+                final isDone = completed.contains(habit.id);
+                final color = _parseColor(habit.color);
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  decoration: BoxDecoration(
+                    color: isDone ? const Color(0xFFF0FDF4) : const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isDone ? const Color(0xFF86EFAC) : Colors.grey.shade200,
+                      width: 1,
+                    ),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: () {
+                        if (habit.id != null) {
+                          ref.read(healthHabitNotifierProvider.notifier).toggle(habit.id!, isDone);
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        child: Row(
+                          children: [
+                            // Interactive Checkbox Circle
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: isDone ? const Color(0xFF10B981) : Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isDone ? const Color(0xFF10B981) : Colors.grey.shade400,
+                                  width: 2,
+                                ),
+                              ),
+                              child: isDone
+                                  ? const Icon(PhosphorIconsBold.check, size: 14, color: Colors.white)
+                                  : null,
+                            ),
+                            const SizedBox(width: 12),
+
+                            // Icon Avatar
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: color.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                _habitIcon(habit.icon),
+                                color: color,
+                                size: 16,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+
+                            // Title
+                            Expanded(
+                              child: Text(
+                                _localizedTitle(habit.title, isBn),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: isDone ? TextDecoration.lineThrough : null,
+                                  color: isDone ? Colors.grey.shade500 : const Color(0xFF1E293B),
+                                ),
+                              ),
+                            ),
+
+                            // Category Tag
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200.withOpacity(0.6),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                _localizedCategory(habit.category, isBn),
+                                style: TextStyle(fontSize: 9.5, color: Colors.grey.shade700, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+
+              // 4. Footer Link to Full Routine Screen
+              const SizedBox(height: 6),
+              Center(
+                child: TextButton.icon(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HealthHabitScreen()),
+                  ),
+                  icon: const Icon(PhosphorIconsRegular.arrowRight, size: 15, color: AppColors.primaryColor),
+                  label: Text(
+                    isBn ? 'সম্পূর্ণ রুটিন ও সাপ্তাহিক ট্র্যাকার দেখুন' : 'View Full Routine & Weekly Analytics',
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
+  }
+
+  int _calculateStreak(Map<String, int> counts) {
+    var streak = 0;
+    final today = DateTime.now();
+    for (var index = 0; index < 7; index++) {
+      final key = habitDateString(today.subtract(Duration(days: index)));
+      if ((counts[key] ?? 0) > 0) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  String _localizedTitle(String title, bool isBn) {
+    if (!isBn) return title;
+    final l = title.toLowerCase();
+    if (l.contains('water')) return 'পর্যাপ্ত পানি পান (৮ গ্লাস)';
+    if (l.contains('walk')) return '৩০ মিনিট হাঁটা বা ব্যায়াম';
+    if (l.contains('sleep')) return '৭-৮ ঘণ্টা পরিমিত ঘুম';
+    if (l.contains('bp') || l.contains('sugar')) return 'রক্তচাপ বা ডায়াবেটিস মাপা';
+    if (l.contains('meal')) return 'পুষ্টিকর সুষম খাবার গ্রহণ';
+    if (l.contains('medicine')) return 'সময়মত ওষুধ গ্রহণ';
+    if (l.contains('smoking')) return 'ধূমপান ও অতিরিক্ত চিনি বর্জন';
+    return title;
+  }
+
+  String _localizedCategory(String category, bool isBn) {
+    if (!isBn) return category;
+    switch (category.toLowerCase()) {
+      case 'nutrition':
+        return 'পুষ্টি';
+      case 'exercise':
+        return 'ব্যায়াম';
+      case 'sleep':
+        return 'ঘুম';
+      case 'vitals':
+        return 'ভাইটালস';
+      case 'medicine':
+        return 'ওষুধ';
+      case 'wellness':
+        return 'স্বাস্থ্য';
+      default:
+        return category;
+    }
+  }
+
+  IconData _habitIcon(String icon) {
+    switch (icon) {
+      case 'water_drop':
+      case 'water':
+        return PhosphorIconsRegular.drop;
+      case 'directions_walk':
+      case 'walk':
+        return PhosphorIconsRegular.footprints;
+      case 'bedtime':
+      case 'sleep':
+        return PhosphorIconsRegular.moonStars;
+      case 'monitor_heart':
+      case 'vitals':
+        return PhosphorIconsRegular.heartbeat;
+      case 'restaurant':
+      case 'food':
+        return PhosphorIconsRegular.forkKnife;
+      case 'medication':
+      case 'medicine':
+        return PhosphorIconsRegular.pill;
+      default:
+        return PhosphorIconsRegular.checkCircle;
+    }
+  }
+
+  Color _parseColor(String hex) {
+    try {
+      return Color(int.parse(hex.replaceFirst('#', '0xFF')));
+    } catch (_) {
+      return AppColors.primaryColor;
+    }
   }
 }

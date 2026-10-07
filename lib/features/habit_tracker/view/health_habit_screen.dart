@@ -1,37 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
 import '../models/health_habit_model.dart';
 import '../provider/health_habit_provider.dart';
 
-class HealthHabitScreen extends ConsumerWidget {
+class HealthHabitScreen extends ConsumerStatefulWidget {
   const HealthHabitScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HealthHabitScreen> createState() => _HealthHabitScreenState();
+}
+
+class _HealthHabitScreenState extends ConsumerState<HealthHabitScreen> {
+  // Local water glasses state (1 to 8)
+  int _waterGlasses = 5;
+
+  @override
+  Widget build(BuildContext context) {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
     final habitsAsync = ref.watch(activeHealthHabitsProvider);
     final completedAsync = ref.watch(todayCompletedHabitIdsProvider);
     final countsAsync = ref.watch(weeklyHabitCountsProvider);
-    final medicineAsync = ref.watch(medicineAdherenceSummaryProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
-        title: Text(isBn ? 'দৈনিক স্বাস্থ্য রুটিন' : 'Daily Health Routine', style: const TextStyle(fontWeight: FontWeight.bold)),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: Text(
+          isBn ? 'দৈনিক স্বাস্থ্য রুটিন' : 'Daily Health Habits',
+          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+        ),
+        iconTheme: const IconThemeData(color: Colors.black87),
         actions: [
           IconButton(
             tooltip: isBn ? 'নতুন অভ্যাস যোগ করুন' : 'Add custom habit',
             onPressed: () => _showAddHabitSheet(context, ref, isBn),
-            icon: const Icon(Icons.add_circle_outline_rounded),
+            icon: const Icon(PhosphorIconsRegular.plusCircle, size: 24, color: AppColors.primaryColor),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddHabitSheet(context, ref, isBn),
         backgroundColor: AppColors.primaryColor,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: Text(isBn ? 'অভ্যাস যোগ করুন' : 'Add Habit', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        icon: const Icon(PhosphorIconsRegular.plus, color: Colors.white),
+        label: Text(
+          isBn ? 'নতুন অভ্যাস' : 'Add Habit',
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
       body: habitsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -39,33 +56,59 @@ class HealthHabitScreen extends ConsumerWidget {
         data: (habits) {
           final completed = completedAsync.value ?? <int>{};
           final counts = countsAsync.value ?? <String, int>{};
-          final medicine = medicineAsync.value ?? {'taken': 0, 'total': 0};
-          final habitProgress = habits.isEmpty ? 0.0 : completed.length / habits.length;
+          final progress = habits.isEmpty ? 0.0 : (completed.length / habits.length);
           final streak = _calculateStreak(counts);
 
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
             children: [
-              _buildProgressHeader(context, isBn, completed.length, habits.length, habitProgress, streak),
+              // 1. Hero Ring Progress Header
+              _buildHeroHeader(isBn, completed.length, habits.length, progress, streak),
               const SizedBox(height: 16),
-              _buildMedicineSummary(isBn, medicine),
+
+              // 2. 7-Day Consistency Dot Matrix
+              _buildWeeklyDotMatrix(isBn, counts, habits.length),
               const SizedBox(height: 20),
+
+              // 3. Interactive Water Intake Tracker (8 Glasses)
+              _buildWaterTrackerCard(isBn),
+              const SizedBox(height: 20),
+
+              // 4. Section Title
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(isBn ? 'আজকের অভ্যাস' : "Today's habits", style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-                  Text('${completed.length}/${habits.length}', style: TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.bold)),
+                  Text(
+                    isBn ? 'আজকের স্বাস্থ্য কর্মসূচি' : "Today's Wellness Tasks",
+                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${completed.length}/${habits.length} ${isBn ? "সম্পন্ন" : "done"}',
+                      style: const TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
+
+              // 5. Habits List
               if (habits.isEmpty)
                 _buildEmptyState(context, ref, isBn)
               else
-                ...habits.map((habit) => _buildHabitTile(context, ref, habit, completed.contains(habit.id), isBn)),
-              const SizedBox(height: 20),
-              _buildWeeklyChart(isBn, habits.length, counts),
-              const SizedBox(height: 20),
-              _buildMissedHistory(isBn, habits.length, counts),
+                ...habits.map((habit) {
+                  final isDone = completed.contains(habit.id);
+                  return _buildHabitCard(context, ref, habit, isDone, isBn);
+                }),
+
+              const SizedBox(height: 24),
+              // 6. Motivation Card
+              _buildMotivationBanner(isBn, progress),
             ],
           );
         },
@@ -73,65 +116,336 @@ class HealthHabitScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProgressHeader(BuildContext context, bool isBn, int completed, int total, double progress, int streak) {
-    final percent = (progress * 100).round();
+  // ─── 1. Hero Ring Progress Header ───
+  Widget _buildHeroHeader(bool isBn, int completed, int total, double progress, int streak) {
+    final percent = (progress * 100).toInt();
+
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.primaryColor,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [BoxShadow(color: AppColors.primaryColor.withOpacity(0.2), blurRadius: 14, offset: const Offset(0, 6))],
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF0F766E), // Deep Teal
+            Color(0xFF0D9488),
+            Color(0xFF14B8A6),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F766E).withOpacity(0.28),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         children: [
+          // Circular Progress Indicator
           SizedBox(
-            width: 82,
-            height: 82,
+            width: 80,
+            height: 80,
             child: Stack(
               alignment: Alignment.center,
               children: [
-                CircularProgressIndicator(value: progress, strokeWidth: 8, backgroundColor: Colors.white24, valueColor: const AlwaysStoppedAnimation(Colors.white)),
-                Text('$percent%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 8,
+                  backgroundColor: Colors.white.withOpacity(0.2),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                  strokeCap: StrokeCap.round,
+                ),
+                Text(
+                  '$percent%',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                  ),
+                ),
               ],
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 18),
+
+          // Details & Streak
           Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(isBn ? 'আজকের অগ্রগতি' : "Today's progress", style: const TextStyle(color: Colors.white70, fontSize: 13)),
-              const SizedBox(height: 4),
-              Text('$completed/$total ${isBn ? 'সম্পন্ন' : 'completed'}', style: const TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              Row(children: [
-                const Icon(Icons.local_fire_department_rounded, color: Colors.amber, size: 18),
-                const SizedBox(width: 4),
-                Text('$streak ${isBn ? 'দিনের streak' : 'day streak'}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-              ]),
-            ]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isBn ? 'আজকের অগ্রগতি' : "Today's Progress",
+                      style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13, fontWeight: FontWeight.w500),
+                    ),
+                    if (streak > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF59E0B),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(PhosphorIconsFill.fire, color: Colors.white, size: 12),
+                            const SizedBox(width: 3),
+                            Text(
+                              '$streak d',
+                              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$completed/$total ${isBn ? "কাজ সম্পন্ন" : "tasks completed"}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  percent == 100
+                      ? (isBn ? 'দারুণ! আজকের সব স্বাস্থ্য লক্ষ্য পূরণ হয়েছে 🎉' : 'Awesome! All wellness goals achieved today 🎉')
+                      : (isBn ? 'সুস্থ থাকতে প্রতিদিনের রুটিন বজায় রাখুন' : 'Stay consistent to build a healthier life'),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 11.5,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMedicineSummary(bool isBn, Map<String, int> medicine) {
-    final total = medicine['total'] ?? 0;
-    final taken = medicine['taken'] ?? 0;
-    final percent = total == 0 ? 0 : (taken / total * 100).round();
+  // ─── 2. 7-Day Consistency Dot Matrix ───
+  Widget _buildWeeklyDotMatrix(bool isBn, Map<String, int> counts, int totalHabits) {
+    final today = DateTime.now();
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
-      child: Row(children: [
-        const Icon(Icons.medication_rounded, color: Color(0xFFE65100)),
-        const SizedBox(width: 10),
-        Expanded(child: Text(isBn ? 'আজকের ওষুধ গ্রহণ' : "Today's medicine adherence", style: const TextStyle(fontWeight: FontWeight.w600))),
-        Text('$taken/$total  $percent%', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFE65100))),
-      ]),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                isBn ? 'গত ৭ দিনের ধারাবাহিকতা (Streak)' : '7-Day Habit Consistency',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: Color(0xFF1E293B)),
+              ),
+              Text(
+                isBn ? 'প্রতিদিনের রেকর্ড' : 'Daily Logs',
+                style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(7, (index) {
+              final date = today.subtract(Duration(days: 6 - index));
+              final dateStr = habitDateString(date);
+              final count = counts[dateStr] ?? 0;
+              final isToday = index == 6;
+              final isDone = totalHabits > 0 && count >= (totalHabits * 0.6);
+
+              return Column(
+                children: [
+                  Text(
+                    _dayLabel(date.weekday, isBn),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
+                      color: isToday ? AppColors.primaryColor : Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: isDone
+                          ? const Color(0xFF10B981)
+                          : isToday
+                              ? AppColors.primaryColor.withOpacity(0.12)
+                              : Colors.grey.shade100,
+                      shape: BoxShape.circle,
+                      border: isToday
+                          ? Border.all(color: AppColors.primaryColor, width: 2)
+                          : null,
+                    ),
+                    child: Center(
+                      child: isDone
+                          ? const Icon(Icons.check, size: 16, color: Colors.white)
+                          : Text(
+                              '${date.day}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: isToday ? AppColors.primaryColor : Colors.grey.shade500,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildHabitTile(BuildContext context, WidgetRef ref, HealthHabitModel habit, bool completed, bool isBn) {
+  // ─── 3. Interactive Water Intake Tracker ───
+  Widget _buildWaterTrackerCard(bool isBn) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFE0F2FE), // Light sky blue
+            const Color(0xFFF0F9FF),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFBAE6FD)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0284C7),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(PhosphorIconsRegular.drop, color: Colors.white, size: 18),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isBn ? 'পানি পানের ট্র্যাকার (Water Tracker)' : 'Daily Water Hydration',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0369A1)),
+                      ),
+                      Text(
+                        isBn ? 'দৈনিক লক্ষ্য: ৮ গ্লাস (২ লিটার)' : 'Daily target: 8 glasses (2.0 L)',
+                        style: TextStyle(fontSize: 11, color: Colors.blueGrey.shade600),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0284C7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '$_waterGlasses / 8',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // 8 Interactive Glasses
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(8, (i) {
+              final isFilled = i < _waterGlasses;
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (_waterGlasses == i + 1) {
+                      _waterGlasses = i; // untap
+                    } else {
+                      _waterGlasses = i + 1;
+                    }
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 34,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: isFilled ? const Color(0xFF0284C7) : Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isFilled ? const Color(0xFF0369A1) : const Color(0xFFBAE6FD),
+                      width: 1.5,
+                    ),
+                    boxShadow: isFilled
+                        ? [BoxShadow(color: const Color(0xFF0284C7).withOpacity(0.3), blurRadius: 6, offset: const Offset(0, 2))]
+                        : null,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isFilled ? PhosphorIconsFill.drop : PhosphorIconsRegular.drop,
+                        size: 16,
+                        color: isFilled ? Colors.white : Colors.grey.shade400,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${i + 1}',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          color: isFilled ? Colors.white : Colors.grey.shade400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── 4. Habit Tile ───
+  Widget _buildHabitCard(BuildContext context, WidgetRef ref, HealthHabitModel habit, bool completed, bool isBn) {
     final color = _parseColor(habit.color);
+
     return Dismissible(
       key: ValueKey(habit.id),
       direction: DismissDirection.endToStart,
@@ -140,65 +454,188 @@ class HealthHabitScreen extends ConsumerWidget {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.only(right: 20),
         alignment: Alignment.centerRight,
-        decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(16)),
-        child: const Icon(Icons.delete_outline, color: Colors.red),
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: const Icon(PhosphorIconsRegular.trash, color: Colors.red),
       ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: completed ? color.withOpacity(0.5) : Colors.grey.shade200)),
-        child: ListTile(
-          onTap: () => ref.read(healthHabitNotifierProvider.notifier).toggle(habit.id!, completed),
-          leading: CircleAvatar(backgroundColor: color.withOpacity(0.12), child: Icon(_habitIcon(habit.icon), color: color, size: 21)),
-          title: Text(habit.title, style: TextStyle(fontWeight: FontWeight.w600, decoration: completed ? TextDecoration.lineThrough : null)),
-          subtitle: Text('${habit.category}${habit.reminderTime == null ? '' : '  •  ${habit.reminderTime}'}', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-          trailing: Checkbox(value: completed, activeColor: color, onChanged: (_) => ref.read(healthHabitNotifierProvider.notifier).toggle(habit.id!, completed)),
+        decoration: BoxDecoration(
+          color: completed ? const Color(0xFFF0FDF4) : Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: completed ? const Color(0xFF86EFAC) : Colors.grey.shade200,
+            width: completed ? 1.4 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(18),
+            onTap: () {
+              if (habit.id != null) {
+                ref.read(healthHabitNotifierProvider.notifier).toggle(habit.id!, completed);
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
+                  // Checkmark Circle
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 26,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      color: completed ? const Color(0xFF10B981) : Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: completed ? const Color(0xFF10B981) : Colors.grey.shade400,
+                        width: 2,
+                      ),
+                    ),
+                    child: completed
+                        ? const Icon(Icons.check, size: 16, color: Colors.white)
+                        : null,
+                  ),
+                  const SizedBox(width: 14),
+
+                  // Habit Icon Avatar
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(_habitIcon(habit.icon), color: color, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Title & Category
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _localizedTitle(habit.title, isBn),
+                          style: TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.bold,
+                            decoration: completed ? TextDecoration.lineThrough : null,
+                            color: completed ? Colors.grey.shade500 : const Color(0xFF1E293B),
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Row(
+                          children: [
+                            Text(
+                              _localizedCategory(habit.category, isBn),
+                              style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
+                            ),
+                            if (habit.reminderTime != null && habit.reminderTime!.isNotEmpty) ...[
+                              Text('  •  ', style: TextStyle(color: Colors.grey.shade400, fontSize: 11)),
+                              Icon(PhosphorIconsRegular.clock, size: 12, color: Colors.grey.shade500),
+                              const SizedBox(width: 3),
+                              Text(
+                                habit.reminderTime!,
+                                style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildWeeklyChart(bool isBn, int totalHabits, Map<String, int> counts) {
-    final today = DateTime.now();
-    return _sectionContainer(
-      title: isBn ? 'সাপ্তাহিক অগ্রগতি' : 'Weekly progress',
+  // ─── 5. Motivation Banner ───
+  Widget _buildMotivationBanner(bool isBn, double progress) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(18),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: List.generate(7, (index) {
-          final date = today.subtract(Duration(days: 6 - index));
-          final count = counts[habitDateString(date)] ?? 0;
-          final ratio = totalHabits == 0 ? 0.0 : (count / totalHabits).clamp(0.0, 1.0);
-          return Column(mainAxisSize: MainAxisSize.min, children: [
-            SizedBox(height: 86, child: Align(alignment: Alignment.bottomCenter, child: Container(width: 20, height: 12 + (ratio * 62).toDouble(), decoration: BoxDecoration(color: ratio == 1 ? AppColors.primaryColor : AppColors.primaryColor.withOpacity(0.35), borderRadius: BorderRadius.circular(8))))),
-            const SizedBox(height: 6),
-            Text(_dayLabel(date.weekday, isBn), style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-          ]);
-        }),
+        children: [
+          const Icon(PhosphorIconsRegular.lightbulb, size: 24, color: Color(0xFF0F766E)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              isBn
+                  ? 'গবেষণায় দেখা গেছে, একটানা ২১ দিন একটি অভ্যাস বজায় রাখলে তা চিরস্থায়ী জীবনযাপনে রূপ নেয়।'
+                  : 'Research shows practicing a healthy routine consistently for 21 days turns it into a permanent lifestyle.',
+              style: TextStyle(fontSize: 11.5, color: Colors.blueGrey.shade800, height: 1.4),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildMissedHistory(bool isBn, int totalHabits, Map<String, int> counts) {
-    final missedDays = counts.entries.where((entry) => totalHabits > 0 && entry.value < totalHabits).length;
-    return _sectionContainer(
-      title: isBn ? 'মিসড হিস্টোরি' : 'Missed history',
-      child: Row(children: [
-        Icon(missedDays == 0 ? Icons.verified_rounded : Icons.history_toggle_off_rounded, color: missedDays == 0 ? Colors.green : Colors.orange),
-        const SizedBox(width: 10),
-        Expanded(child: Text(missedDays == 0 ? (isBn ? 'গত ৭ দিনে কোনো habit মিস হয়নি।' : 'No habits missed in the last 7 days.') : '$missedDays ${isBn ? 'দিনে কিছু habit বাকি ছিল।' : 'days had incomplete habits.'}', style: TextStyle(color: Colors.grey.shade700))),
-      ]),
+  Widget _buildEmptyState(BuildContext context, WidgetRef ref, bool isBn) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          Icon(PhosphorIconsRegular.sparkle, size: 48, color: Colors.grey.shade400),
+          const SizedBox(height: 12),
+          Text(
+            isBn ? 'কোনো অভ্যাস যুক্ত করা নেই' : 'No habits yet',
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          ),
+          const SizedBox(height: 6),
+          ElevatedButton.icon(
+            onPressed: () => _showAddHabitSheet(context, ref, isBn),
+            icon: const Icon(Icons.add, size: 16),
+            label: Text(isBn ? 'প্রথম অভ্যাস তৈরি করুন' : 'Add your first habit'),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _sectionContainer({required String title, required Widget child}) {
-    return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.grey.shade200)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)), const SizedBox(height: 14), child]));
-  }
-
-  Widget _buildEmptyState(BuildContext context, WidgetRef ref, bool isBn) => _sectionContainer(title: isBn ? 'কোনো habit নেই' : 'No habits yet', child: Center(child: TextButton.icon(onPressed: () => _showAddHabitSheet(context, ref, isBn), icon: const Icon(Icons.add), label: Text(isBn ? 'প্রথম habit যোগ করুন' : 'Add your first habit'))));
-
   Future<bool> _confirmDelete(BuildContext context, WidgetRef ref, HealthHabitModel habit, bool isBn) async {
-    final result = await showDialog<bool>(context: context, builder: (ctx) => AlertDialog(title: Text(isBn ? 'Habit মুছবেন?' : 'Delete habit?'), content: Text(habit.title), actions: [TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(isBn ? 'না' : 'Cancel')), TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(isBn ? 'মুছুন' : 'Delete'))]));
-    if (result == true) await ref.read(healthHabitNotifierProvider.notifier).delete(habit.id!);
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Text(isBn ? 'অভ্যাসটি মুছবেন?' : 'Delete habit?'),
+        content: Text('${habit.title} ${isBn ? "মুছে ফেলতে চান?" : "will be removed."}'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(isBn ? 'বাতিল' : 'Cancel')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text(isBn ? 'মুছুন' : 'Delete', style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+    if (result == true && habit.id != null) {
+      await ref.read(healthHabitNotifierProvider.notifier).delete(habit.id!);
+    }
     return result == true;
   }
 
@@ -215,11 +652,78 @@ class HealthHabitScreen extends ConsumerWidget {
     return streak;
   }
 
-  String _dayLabel(int weekday, bool isBn) => isBn ? ['সোম', 'মঙ্গল', 'বুধ', 'বৃহস্পতি', 'শুক্র', 'শনি', 'রবি'][weekday - 1] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][weekday - 1];
+  String _dayLabel(int weekday, bool isBn) {
+    if (isBn) {
+      return ['সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র', 'শনি', 'রবি'][weekday - 1];
+    }
+    return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][weekday - 1];
+  }
 
-  IconData _habitIcon(String icon) => {'water_drop': Icons.water_drop_rounded, 'directions_walk': Icons.directions_walk_rounded, 'bedtime': Icons.bedtime_rounded, 'monitor_heart': Icons.monitor_heart_rounded, 'restaurant': Icons.restaurant_rounded}.containsKey(icon) ? {'water_drop': Icons.water_drop_rounded, 'directions_walk': Icons.directions_walk_rounded, 'bedtime': Icons.bedtime_rounded, 'monitor_heart': Icons.monitor_heart_rounded, 'restaurant': Icons.restaurant_rounded}[icon]! : Icons.check_circle_rounded;
+  String _localizedTitle(String title, bool isBn) {
+    if (!isBn) return title;
+    final l = title.toLowerCase();
+    if (l.contains('water')) return 'পর্যাপ্ত পানি পান (৮ গ্লাস)';
+    if (l.contains('walk')) return '৩০ মিনিট হাঁটা বা ব্যায়াম';
+    if (l.contains('sleep')) return '৭-৮ ঘণ্টা পরিমিত ঘুম';
+    if (l.contains('bp') || l.contains('sugar')) return 'রক্তচাপ বা ডায়াবেটিস মাপা';
+    if (l.contains('meal')) return 'পুষ্টিকর সুষম খাবার গ্রহণ';
+    if (l.contains('medicine')) return 'সময়মত ওষুধ গ্রহণ';
+    if (l.contains('smoking')) return 'ধূমপান ও অতিরিক্ত চিনি বর্জন';
+    return title;
+  }
 
-  Color _parseColor(String hex) { try { return Color(int.parse(hex.replaceFirst('#', '0xFF'))); } catch (_) { return AppColors.primaryColor; } }
+  String _localizedCategory(String category, bool isBn) {
+    if (!isBn) return category;
+    switch (category.toLowerCase()) {
+      case 'nutrition':
+        return 'পুষ্টি';
+      case 'exercise':
+        return 'ব্যায়াম';
+      case 'sleep':
+        return 'ঘুম';
+      case 'vitals':
+        return 'ভাইটালস';
+      case 'medicine':
+        return 'ওষুধ';
+      case 'wellness':
+        return 'স্বাস্থ্য';
+      default:
+        return category;
+    }
+  }
+
+  IconData _habitIcon(String icon) {
+    switch (icon) {
+      case 'water_drop':
+      case 'water':
+        return PhosphorIconsRegular.drop;
+      case 'directions_walk':
+      case 'walk':
+        return PhosphorIconsRegular.footprints;
+      case 'bedtime':
+      case 'sleep':
+        return PhosphorIconsRegular.moonStars;
+      case 'monitor_heart':
+      case 'vitals':
+        return PhosphorIconsRegular.heartbeat;
+      case 'restaurant':
+      case 'food':
+        return PhosphorIconsRegular.forkKnife;
+      case 'medication':
+      case 'medicine':
+        return PhosphorIconsRegular.pill;
+      default:
+        return PhosphorIconsRegular.checkCircle;
+    }
+  }
+
+  Color _parseColor(String hex) {
+    try {
+      return Color(int.parse(hex.replaceFirst('#', '0xFF')));
+    } catch (_) {
+      return AppColors.primaryColor;
+    }
+  }
 }
 
 Future<void> _showAddHabitSheet(BuildContext context, WidgetRef ref, bool isBn) async {
@@ -257,21 +761,73 @@ class _AddHabitSheetState extends State<_AddHabitSheet> {
     final isBn = widget.isBn;
     return Container(
       padding: EdgeInsets.fromLTRB(20, 18, 20, MediaQuery.of(context).viewInsets.bottom + 24),
-      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+      ),
       child: SingleChildScrollView(
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Center(child: Container(width: 42, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(4)))),
-          const SizedBox(height: 18),
-          Text(isBn ? 'Custom habit যোগ করুন' : 'Add custom habit', style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
-          TextField(controller: _titleController, autofocus: true, decoration: InputDecoration(labelText: isBn ? 'Habit-এর নাম' : 'Habit name', hintText: isBn ? 'যেমন: ৮ গ্লাস পানি' : 'e.g. Drink 8 glasses of water', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
-          const SizedBox(height: 12),
-          DropdownButtonFormField<String>(initialValue: _category, decoration: InputDecoration(labelText: 'Category', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))), items: ['Wellness', 'Nutrition', 'Exercise', 'Sleep', 'Medicine', 'Vitals'].map((value) => DropdownMenuItem(value: value, child: Text(value))).toList(), onChanged: (value) => setState(() => _category = value ?? _category)),
-          const SizedBox(height: 12),
-          OutlinedButton.icon(onPressed: _pickReminderTime, icon: const Icon(Icons.notifications_none_rounded), label: Text(_reminderTime == null ? (isBn ? 'Reminder time যোগ করুন' : 'Add reminder time') : _reminderTime!)),
-          const SizedBox(height: 14),
-          SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _save, child: Text(isBn ? 'সংরক্ষণ করুন' : 'Save habit'))),
-        ]),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 42,
+                height: 4,
+                decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(4)),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              isBn ? 'নতুন স্বাস্থ্য অভ্যাস যোগ করুন' : 'Add Custom Health Habit',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _titleController,
+              autofocus: true,
+              decoration: InputDecoration(
+                labelText: isBn ? 'অভ্যাসের নাম' : 'Habit name',
+                hintText: isBn ? 'যেমন: ২০ মিনিট মেডিটেশন' : 'e.g. 20 min meditation',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+            ),
+            const SizedBox(height: 14),
+            DropdownButtonFormField<String>(
+              value: _category,
+              decoration: InputDecoration(
+                labelText: isBn ? 'বিভাগ (Category)' : 'Category',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              items: ['Wellness', 'Nutrition', 'Exercise', 'Sleep', 'Medicine', 'Vitals']
+                  .map((value) => DropdownMenuItem(value: value, child: Text(value)))
+                  .toList(),
+              onChanged: (value) => setState(() => _category = value ?? _category),
+            ),
+            const SizedBox(height: 14),
+            OutlinedButton.icon(
+              onPressed: _pickReminderTime,
+              icon: const Icon(PhosphorIconsRegular.alarm),
+              label: Text(_reminderTime == null ? (isBn ? 'অনুস্মারক সময় সেট করুন' : 'Add reminder time') : _reminderTime!),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: _save,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+                child: Text(
+                  isBn ? 'অভ্যাসটি সংরক্ষণ করুন' : 'Save Habit',
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 15),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -284,6 +840,14 @@ class _AddHabitSheetState extends State<_AddHabitSheet> {
   void _save() {
     final title = _titleController.text.trim();
     if (title.isEmpty) return;
-    Navigator.pop(context, HealthHabitModel(title: title, category: _category, reminderTime: _reminderTime, createdAt: DateTime.now().toIso8601String()));
+    Navigator.pop(
+      context,
+      HealthHabitModel(
+        title: title,
+        category: _category,
+        reminderTime: _reminderTime,
+        createdAt: DateTime.now().toIso8601String(),
+      ),
+    );
   }
 }
