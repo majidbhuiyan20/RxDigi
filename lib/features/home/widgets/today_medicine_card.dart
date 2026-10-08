@@ -9,6 +9,8 @@ import '../../medicine_reminder/models/medicine_adherence_model.dart';
 import '../../medicine_reminder/provider/medicine_reminder_provider.dart';
 import '../../medicine_reminder/view/add_reminder_sheet.dart';
 import '../../medicine_reminder/view/medicine_reminder_screen.dart';
+import '../../../core/utils/app_feedback.dart';
+import '../../../core/widgets/perfect_day_celebration.dart';
 
 class TodayMedicineCard extends ConsumerStatefulWidget {
   const TodayMedicineCard({super.key});
@@ -498,8 +500,12 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () {
-              HapticFeedback.mediumImpact();
               if (med.id != null) {
+                if (!isTaken) {
+                  AppFeedback.playSuccess();
+                } else {
+                  AppFeedback.playSelection();
+                }
                 ref.read(medicineReminderNotifierProvider.notifier).toggleAdherence(
                       reminderId: med.id!,
                       slot: dose.slotKey,

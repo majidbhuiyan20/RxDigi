@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/slot_style.dart';
 import '../../../app/app_colors.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../models/medicine_reminder_model.dart';
 import '../provider/medicine_reminder_provider.dart';
+import '../services/medicine_safety_advisor.dart';
 
 class MedicineReminderCard extends ConsumerWidget {
   final MedicineReminderModel reminder;
@@ -18,6 +20,7 @@ class MedicineReminderCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final advice = MedicineSafetyAdvisor.getAdvice(reminder.medicineName, reminder.dosageStrength);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -97,6 +100,81 @@ class MedicineReminderCard extends ConsumerWidget {
                         '${reminder.dosageForm} • ${reminder.instructions}',
                         style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
                       ),
+                      if (advice != null) ...[
+                        const SizedBox(height: 6),
+                        GestureDetector(
+                          onTap: () {
+                            AppFeedback.playLight();
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                title: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: advice.themeColor.withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Icon(advice.icon, color: advice.themeColor, size: 20),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        isBn ? 'সেবন নির্দেশিকা' : 'Clinical Safety Advice',
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                content: Text(
+                                  isBn ? advice.fullAdviceBn : advice.fullAdviceEn,
+                                  style: const TextStyle(fontSize: 13.5, height: 1.45, color: Color(0xFF334155)),
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () => Navigator.pop(ctx),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: advice.themeColor,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    child: Text(
+                                      isBn ? 'বুঝেছি' : 'Got it',
+                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                            decoration: BoxDecoration(
+                              color: advice.themeColor.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: advice.themeColor.withValues(alpha: 0.25)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(advice.icon, size: 12.5, color: advice.themeColor),
+                                const SizedBox(width: 4.5),
+                                Text(
+                                  isBn ? advice.badgeTextBn : advice.badgeTextEn,
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: advice.themeColor,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(PhosphorIconsRegular.info, size: 11, color: advice.themeColor.withValues(alpha: 0.6)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                       if (reminder.hasStockTracking) ...[
                         const SizedBox(height: 6),
                         Row(

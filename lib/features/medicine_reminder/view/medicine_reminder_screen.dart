@@ -7,6 +7,8 @@ import 'add_reminder_sheet.dart';
 import '../widgets/adherence_progress_card.dart';
 import '../widgets/medicine_reminder_card.dart';
 import '../widgets/reminder_empty_state.dart';
+import '../widgets/pharmacy_shopping_list_sheet.dart';
+import '../../../core/utils/app_feedback.dart';
 
 class MedicineReminderScreen extends ConsumerWidget {
   const MedicineReminderScreen({super.key});
@@ -49,6 +51,14 @@ class MedicineReminderScreen extends ConsumerWidget {
         ),
         iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
         actions: [
+          IconButton(
+            tooltip: isBn ? 'ফার্মেসি ক্রয়ের তালিকা' : 'Pharmacy Shopping List',
+            icon: const Icon(PhosphorIconsRegular.shoppingCart, size: 21, color: Color(0xFF0F172A)),
+            onPressed: () {
+              AppFeedback.playSelection();
+              PharmacyShoppingListSheet.show(context, isBn);
+            },
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: InkWell(

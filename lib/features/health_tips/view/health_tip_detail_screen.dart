@@ -3,17 +3,81 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../models/health_tip_model.dart';
 import '../provider/health_tips_provider.dart';
+import '../services/health_tip_tts_service.dart';
 import '../theme/tips_theme.dart';
+import '../widgets/tip_story_card_modal.dart';
 
-class HealthTipDetailScreen extends ConsumerWidget {
+class HealthTipDetailScreen extends ConsumerStatefulWidget {
   final HealthTipModel tip;
 
   const HealthTipDetailScreen({super.key, required this.tip});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HealthTipDetailScreen> createState() => _HealthTipDetailScreenState();
+}
+
+class _HealthTipDetailScreenState extends ConsumerState<HealthTipDetailScreen> {
+  final HealthTipTtsService _tts = HealthTipTtsService();
+
+  @override
+  void initState() {
+    super.initState();
+    _tts.onStateChanged = (state) {
+      if (mounted) setState(() {});
+    };
+  }
+
+  @override
+  void dispose() {
+    _tts.stop();
+    super.dispose();
+  }
+
+  void _toggleAudio(bool isBn, String hack, String remedy) {
+    AppFeedback.playLight();
+    final tip = widget.tip;
+    if (_tts.state == TtsPlaybackState.playing) {
+      _tts.pause();
+      return;
+    }
+    final buffer = StringBuffer();
+    buffer.write('${tip.getTitle(isBn)}. ');
+    buffer.write('${tip.getSummary(isBn)}. ');
+    if (hack.isNotEmpty) {
+      buffer.write(isBn ? 'জরুরি পরামর্শ: $hack. ' : 'Quick tip: $hack. ');
+    }
+    if (remedy.isNotEmpty) {
+      buffer.write(isBn ? 'ঘরোয়া প্রতিকার: $remedy. ' : 'Home remedy: $remedy. ');
+    }
+    buffer.write(isBn
+        ? 'সতর্কতা: ${tip.getDisclaimer(true)}'
+        : 'Disclaimer: ${tip.getDisclaimer(false)}');
+
+    _tts.speak(
+      tipId: tip.id,
+      text: buffer.toString(),
+      isBn: isBn,
+    );
+  }
+
+  void _cycleSpeed() {
+    AppFeedback.playSelection();
+    if (_tts.rate <= 0.45) {
+      _tts.setRate(0.5); // 1.0x
+    } else if (_tts.rate <= 0.55) {
+      _tts.setRate(0.65); // 1.25x
+    } else {
+      _tts.setRate(0.4); // 0.8x
+    }
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tip = widget.tip;
     final isBn = ref.watch(tipLanguageIsBnProvider);
     final bookmarkedIds = ref.watch(bookmarkedTipIdsProvider).value ?? [];
     final isBookmarked = bookmarkedIds.contains(tip.id);
@@ -58,6 +122,12 @@ class HealthTipDetailScreen extends ConsumerWidget {
               HapticFeedback.selectionClick();
               ref.read(tipLanguageIsBnProvider.notifier).toggle();
             },
+          ),
+          // Story Card Export
+          IconButton(
+            tooltip: isBn ? 'স্টোরি কার্ড' : 'Story Card',
+            icon: const Icon(PhosphorIconsFill.instagramLogo, color: Color(0xFFE1306C)),
+            onPressed: () => TipStoryCardModal.show(context, tip, isBn),
           ),
           // Share
           IconButton(
@@ -161,6 +231,10 @@ class HealthTipDetailScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 14),
+
+            // 1.5. Audio Health Bite (Text-to-Speech Player Bar)
+            _buildAudioPlayerBar(isBn, hack, remedy),
             const SizedBox(height: 14),
 
             // 2. Quick 1-Minute Hack (if available)
@@ -424,6 +498,10 @@ class HealthTipDetailScreen extends ConsumerWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 14),
+
+            // 8.5. Share as Branded Story Card (WhatsApp/Instagram)
+            _buildStoryCardBanner(isBn),
             const SizedBox(height: 16),
 
             // 9. Disclaimer
@@ -548,5 +626,240 @@ class HealthTipDetailScreen extends ConsumerWidget {
     buffer.writeln('📱 RxDigi হেলথ অ্যাপ থেকে শেয়ারকৃত।');
 
     Share.share(buffer.toString());
+  }
+
+  Widget _buildAudioPlayerBar(bool isBn, String hack, String remedy) {
+    final isPlaying = _tts.state == TtsPlaybackState.playing;
+    final isPaused = _tts.state == TtsPlaybackState.paused;
+    final isActive = isPlaying || isPaused;
+
+    String speedLabel = '1.0x';
+    if (_tts.rate <= 0.45) speedLabel = '0.8x';
+    if (_tts.rate >= 0.6) speedLabel = '1.2x';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: isActive ? const Color(0xFFF0FDFA) : Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isActive ? const Color(0xFF14B8A6) : const Color(0xFFE2E8F0),
+          width: isActive ? 1.5 : 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isActive
+                ? const Color(0xFF0F766E).withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Audio icon with circular background
+          Container(
+            padding: const EdgeInsets.all(9),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F766E).withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isPlaying ? PhosphorIconsFill.waveform : PhosphorIconsFill.speakerHigh,
+              color: const Color(0xFF0F766E),
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      isBn ? 'অডিও হেলথ বাইট' : 'Audio Health Bite',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0F172A),
+                      ),
+                    ),
+                    if (isPlaying) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          isBn ? 'পাঠ চলছে' : 'Playing',
+                          style: const TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF047857),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  isPlaying
+                      ? (isBn ? 'টিপসটি মিষ্টি কণ্ঠে পড়ে শোনানো হচ্ছে' : 'Reading aloud in clear speech')
+                      : (isPaused
+                          ? (isBn ? 'সাময়িক বিরতি দেওয়া হয়েছে' : 'Audio playback paused')
+                          : (isBn ? 'ট্যাপ করে পুরো পরামর্শ শুনুন' : 'Tap to listen to this health tip')),
+                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 6),
+
+          // Speed Cycle Chip
+          InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: _cycleSpeed,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                speedLabel,
+                style: const TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF475569),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // Play / Pause Circle Button
+          InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () => _toggleAudio(isBn, hack, remedy),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: Color(0xFF0F766E),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isPlaying ? PhosphorIconsFill.pause : PhosphorIconsFill.play,
+                color: Colors.white,
+                size: 16,
+              ),
+            ),
+          ),
+
+          // Stop Button (if active)
+          if (isActive) ...[
+            const SizedBox(width: 6),
+            InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
+                AppFeedback.playLight();
+                _tts.stop();
+              },
+              child: Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  PhosphorIconsFill.stop,
+                  color: Color(0xFF64748B),
+                  size: 14,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStoryCardBanner(bool isBn) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF042F2E), Color(0xFF0F766E)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F766E).withValues(alpha: 0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(PhosphorIconsFill.instagramLogo, color: Colors.white, size: 26),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isBn ? 'স্টোরি কার্ড হিসেবে শেয়ার' : 'Share as Story Card',
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  isBn
+                      ? 'ইনস্টাগ্রাম ও হোয়াটসঅ্যাপের জন্য পোস্টার'
+                      : 'Create beautiful poster card for stories',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.white.withValues(alpha: 0.85),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => TipStoryCardModal.show(context, widget.tip, isBn),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: const Color(0xFF0F766E),
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text(
+              isBn ? 'পোস্টার' : 'Export',
+              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

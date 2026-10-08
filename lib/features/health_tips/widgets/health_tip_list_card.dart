@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../models/health_tip_model.dart';
 import '../provider/health_tips_provider.dart';
+import '../services/health_tip_tts_service.dart';
 import '../theme/tips_theme.dart';
 import '../view/health_tip_detail_screen.dart';
+import 'tip_story_card_modal.dart';
 
 class HealthTipListCard extends ConsumerWidget {
   final HealthTipModel tip;
@@ -185,30 +188,78 @@ class HealthTipListCard extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (tip.isTrending)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFEF2F2),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(PhosphorIconsFill.flame, size: 10, color: Color(0xFFDC2626)),
-                            const SizedBox(width: 3),
-                            Text(
-                              isBn ? 'জনপ্রিয় সমস্যা' : 'Common Concern',
-                              style: const TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFDC2626),
-                              ),
+                    Row(
+                      children: [
+                        // Listen quick button
+                        InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () {
+                            AppFeedback.playLight();
+                            final buffer = StringBuffer();
+                            buffer.write('${tip.getTitle(isBn)}. ');
+                            buffer.write(tip.getSummary(isBn));
+                            HealthTipTtsService().speak(
+                              tipId: tip.id,
+                              text: buffer.toString(),
+                              isBn: isBn,
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF0FDFA),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: const Color(0xFF99F6E4)),
                             ),
-                          ],
+                            child: Row(
+                              children: [
+                                const Icon(PhosphorIconsFill.speakerHigh, size: 12, color: Color(0xFF0F766E)),
+                                const SizedBox(width: 4),
+                                Text(
+                                  isBn ? 'শুনুন' : 'Listen',
+                                  style: const TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF0F766E),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      )
-                    else
-                      const SizedBox.shrink(),
+                        const SizedBox(width: 6),
+                        // Story Card quick button
+                        InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () {
+                            AppFeedback.playLight();
+                            TipStoryCardModal.show(context, tip, isBn);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFDF2F8),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: const Color(0xFFFBCFE8)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(PhosphorIconsFill.instagramLogo, size: 12, color: Color(0xFFDB2777)),
+                                const SizedBox(width: 4),
+                                Text(
+                                  isBn ? 'স্টোরি' : 'Story',
+                                  style: const TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFFDB2777),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     Row(
                       children: [
                         Text(

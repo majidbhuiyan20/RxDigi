@@ -3,27 +3,21 @@ import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
 import '../../../app/app_routes.dart';
+import '../../../core/utils/time_context_helper.dart';
 import '../../medicines/view/medicines_screen.dart';
 import '../../profile/view/profile_screen.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
 
-  String _getGreeting(bool isBn) {
-    final hour = DateTime.now().hour;
-    if (hour < 12) {
-      return isBn ? 'শুভ সকাল' : 'Good Morning';
-    } else if (hour < 17) {
-      return isBn ? 'শুভ অপরাহ্ন' : 'Good Afternoon';
-    } else {
-      return isBn ? 'শুভ সন্ধ্যা' : 'Good Evening';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
     final String todayDate = DateFormat('EEEE, d MMMM').format(DateTime.now());
+    final gradientColors = TimeContextHelper.getPeriodGradient();
+    final greeting = TimeContextHelper.getGreeting(isBn);
+    final periodIcon = TimeContextHelper.getPeriodIcon();
+    final contextPrompt = TimeContextHelper.getContextPrompt(isBn);
 
     return Container(
       padding: EdgeInsets.only(
@@ -33,19 +27,15 @@ class HomeHeader extends StatelessWidget {
         bottom: 22,
       ),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF0F766E), // Deep Emerald Teal
-            Color(0xFF0D9488),
-            Color(0xFF14B8A6),
-          ],
+        gradient: LinearGradient(
+          colors: gradientColors,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F766E).withOpacity(0.25),
+            color: gradientColors.first.withValues(alpha: 0.25),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -64,7 +54,7 @@ class HomeHeader extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          _getGreeting(isBn),
+                          greeting,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 22,
@@ -72,11 +62,18 @@ class HomeHeader extends StatelessWidget {
                             letterSpacing: -0.3,
                           ),
                         ),
-                        const SizedBox(width: 6),
-                        const Icon(
-                          PhosphorIconsFill.sparkle,
-                          color: Color(0xFFFDE047),
-                          size: 18,
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            periodIcon,
+                            color: const Color(0xFFFDE047),
+                            size: 16,
+                          ),
                         ),
                       ],
                     ),
@@ -84,7 +81,7 @@ class HomeHeader extends StatelessWidget {
                     Text(
                       todayDate,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.85),
+                        color: Colors.white.withValues(alpha: 0.85),
                         fontSize: 12.5,
                         fontWeight: FontWeight.w500,
                       ),
@@ -127,7 +124,26 @@ class HomeHeader extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
+
+          // Contextual Time-of-Day Focus Pill
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+            ),
+            child: Text(
+              contextPrompt,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
 
           // Embedded Quick Search Bar for 21k Medicines
           GestureDetector(

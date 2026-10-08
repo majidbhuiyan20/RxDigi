@@ -192,23 +192,65 @@ class _VitalTrendChartState extends State<VitalTrendChart> {
           const SizedBox(height: 12),
           // Legend / Target indicators
           if (type == 'BP')
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Column(
               children: [
-                _buildDotLegend(AppColors.primaryColor, 'Systolic (উপরের)'),
-                const SizedBox(width: 16),
-                _buildDotLegend(const Color(0xFF0D9488), 'Diastolic (নিচের)'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildDotLegend(AppColors.primaryColor, 'Systolic (উপরের)'),
+                    const SizedBox(width: 16),
+                    _buildDotLegend(const Color(0xFF0D9488), 'Diastolic (নিচের)'),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildZoneBadge(const Color(0xFF10B981), '<120/80', 'স্বাভাবিক'),
+                      _buildZoneBadge(const Color(0xFFF59E0B), '120-139', 'উচ্চ ঝুঁকি'),
+                      _buildZoneBadge(const Color(0xFFEF4444), '140+', 'উচ্চ রক্তচাপ'),
+                    ],
+                  ),
+                ),
               ],
             )
           else if (type == 'SUGAR')
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Column(
               children: [
-                _buildDotLegend(const Color(0xFFEA580C), 'ব্লাড গ্লুকোজ লেভেল'),
-                const SizedBox(width: 14),
-                Text(
-                  'লক্ষ্যমাত্রা: ৪.০ - ৭.০ mmol/L',
-                  style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildDotLegend(const Color(0xFFEA580C), 'ব্লাড গ্লুকোজ লেভেল'),
+                    const SizedBox(width: 14),
+                    Text(
+                      'লক্ষ্যমাত্রা: ৪.০ - ৭.০ mmol/L',
+                      style: TextStyle(fontSize: 10.5, color: Colors.grey.shade600),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildZoneBadge(const Color(0xFF10B981), '4.0-7.0', 'স্বাভাবিক'),
+                      _buildZoneBadge(const Color(0xFFF59E0B), '7.1-10.0', 'বর্ডারলাইন'),
+                      _buildZoneBadge(const Color(0xFFEF4444), '>10.0', 'উচ্চ মাত্রা'),
+                    ],
+                  ),
                 ),
               ],
             )
@@ -253,6 +295,28 @@ class _VitalTrendChartState extends State<VitalTrendChart> {
       ],
     );
   }
+
+  Widget _buildZoneBadge(Color color, String range, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '$range $label',
+          style: TextStyle(
+            fontSize: 9.5,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade700,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _LineChartPainter extends CustomPainter {
@@ -288,15 +352,82 @@ class _LineChartPainter extends CustomPainter {
       }
     }
 
-    // Add padding to range
-    final pad = (maxY - minY).clamp(10.0, 50.0) * 0.25;
-    minY -= pad;
-    maxY += pad;
+    // Add padding to range & ensure standard clinical reference lines fit nicely
+    if (type == 'BP') {
+      minY = min(minY, 65.0);
+      maxY = max(maxY, 155.0);
+    } else if (type == 'SUGAR') {
+      minY = min(minY, 3.5);
+      maxY = max(maxY, 12.5);
+    } else {
+      final pad = (maxY - minY).clamp(10.0, 50.0) * 0.25;
+      minY -= pad;
+      maxY += pad;
+    }
     final rangeY = maxY - minY > 0 ? (maxY - minY) : 1.0;
+
+    // --- AHA / WHO Clinical Background Range Bands ---
+    if (type == 'BP') {
+      final y140 = (size.height - ((140.0 - minY) / rangeY * size.height)).clamp(0.0, size.height);
+      final y120 = (size.height - ((120.0 - minY) / rangeY * size.height)).clamp(0.0, size.height);
+
+      // Red Zone: Hypertension (>= 140)
+      canvas.drawRect(
+        Rect.fromLTWH(0, 0, size.width, y140),
+        Paint()..color = const Color(0xFFEF4444).withValues(alpha: 0.07),
+      );
+
+      // Amber Zone: Elevated (120 - 140)
+      canvas.drawRect(
+        Rect.fromLTWH(0, y140, size.width, y120 - y140),
+        Paint()..color = const Color(0xFFF59E0B).withValues(alpha: 0.07),
+      );
+
+      // Green Zone: Normal (< 120)
+      canvas.drawRect(
+        Rect.fromLTWH(0, y120, size.width, size.height - y120),
+        Paint()..color = const Color(0xFF10B981).withValues(alpha: 0.07),
+      );
+
+      // Guideline 140 mmHg
+      final guidePaint = Paint()
+        ..color = const Color(0xFFEF4444).withValues(alpha: 0.3)
+        ..strokeWidth = 1
+        ..style = PaintingStyle.stroke;
+      canvas.drawLine(Offset(0, y140), Offset(size.width, y140), guidePaint);
+
+      // Guideline 120 mmHg
+      final guidePaint120 = Paint()
+        ..color = const Color(0xFF10B981).withValues(alpha: 0.35)
+        ..strokeWidth = 1
+        ..style = PaintingStyle.stroke;
+      canvas.drawLine(Offset(0, y120), Offset(size.width, y120), guidePaint120);
+    } else if (type == 'SUGAR') {
+      final y10 = (size.height - ((10.0 - minY) / rangeY * size.height)).clamp(0.0, size.height);
+      final y7 = (size.height - ((7.0 - minY) / rangeY * size.height)).clamp(0.0, size.height);
+
+      // Red Zone: High (> 10.0)
+      canvas.drawRect(
+        Rect.fromLTWH(0, 0, size.width, y10),
+        Paint()..color = const Color(0xFFEF4444).withValues(alpha: 0.07),
+      );
+
+      // Amber Zone: Elevated (7.0 - 10.0)
+      canvas.drawRect(
+        Rect.fromLTWH(0, y10, size.width, y7 - y10),
+        Paint()..color = const Color(0xFFF59E0B).withValues(alpha: 0.07),
+      );
+
+      // Green Zone: Normal (< 7.0)
+      canvas.drawRect(
+        Rect.fromLTWH(0, y7, size.width, size.height - y7),
+        Paint()..color = const Color(0xFF10B981).withValues(alpha: 0.07),
+      );
+    }
 
     // Background horizontal grid lines
     final gridPaint = Paint()
-      ..color = const Color(0xFFF1F5F9)
+      ..color = const Color(0xFFF1F5F9).withValues(alpha: 0.6)
       ..strokeWidth = 1;
 
     for (int i = 0; i <= 3; i++) {

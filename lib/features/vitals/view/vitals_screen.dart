@@ -7,6 +7,7 @@ import '../../../app/app_colors.dart';
 import '../models/vital_log_model.dart';
 import '../provider/vitals_provider.dart';
 import '../widgets/vital_trend_chart.dart';
+import '../widgets/doctor_report_export_sheet.dart';
 import 'add_vital_sheet.dart';
 
 class VitalsScreen extends ConsumerStatefulWidget {
@@ -52,6 +53,41 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
         ),
         iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
         actions: [
+          vitalsAsync.maybeWhen(
+            data: (logs) => logs.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () => DoctorReportExportSheet.show(context, logs),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(PhosphorIconsFill.filePdf, size: 14, color: Color(0xFFEF4444)),
+                            const SizedBox(width: 4),
+                            Text(
+                              isBn ? 'ডাক্তার সামারি' : 'Doctor PDF',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFEF4444),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            orElse: () => const SizedBox.shrink(),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: InkWell(
@@ -125,6 +161,83 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
                     physics: const BouncingScrollPhysics(),
                     children: [
                       VitalTrendChart(logs: list, vitalType: _selectedFilter),
+
+                      // Clinical 1-Click Doctor Summary Report Banner
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => DoctorReportExportSheet.show(context, list),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF0F766E), Color(0xFF0D9488)],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF0F766E).withValues(alpha: 0.15),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(PhosphorIconsFill.filePdf, size: 22, color: Colors.white),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        isBn ? 'ডাক্তার ভিজিট সামারি PDF' : 'Doctor Visit Summary (PDF)',
+                                        style: const TextStyle(
+                                          fontSize: 13.5,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Text(
+                                        isBn
+                                            ? 'রক্তচাপ ও সুগার চার্টসহ ১-পৃষ্ঠার রিপোর্ট প্রস্তুত'
+                                            : 'Export 1-page clinical log for physician',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.white.withValues(alpha: 0.85),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    isBn ? 'এক্সপোর্ট' : 'Export',
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF0F766E),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Row(
