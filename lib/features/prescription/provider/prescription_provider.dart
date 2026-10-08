@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:prescripto/core/data/models/medicine_in_prescription_model.dart';
 import 'package:prescripto/core/data/models/patient_model.dart';

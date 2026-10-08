@@ -10,22 +10,32 @@ class AppTheme {
       colorSchemeSeed: AppColors.primaryColor,
       scaffoldBackgroundColor: AppColors.appBackgroundColor,
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: Color(0xFF0F172A),
         elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: false,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Color(0xFF0F172A)),
         titleTextStyle: TextStyle(
-          color: Colors.white,
+          color: Color(0xFF0F172A),
           fontSize: 18,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.3,
+        ),
+      ),
+      cardTheme: CardTheme(
+        color: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primaryColor,
       ),
       inputDecorationTheme: _getInputDecorationTheme(),
-      filledButtonTheme: _getFilledButtonThemeData()
+      filledButtonTheme: _getFilledButtonThemeData(),
     );
   }
 

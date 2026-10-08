@@ -26,14 +26,14 @@ class DailyHealthHackBanner extends ConsumerWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF1E3A8A), Color(0xFF2563EB)],
+              colors: [Color(0xFF0F766E), Color(0xFF0D9488)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF2563EB).withOpacity(0.25),
+                color: const Color(0xFF0F766E).withValues(alpha: 0.22),
                 blurRadius: 14,
                 offset: const Offset(0, 6),
               ),

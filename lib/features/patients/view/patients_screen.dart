@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:prescripto/app/app_colors.dart';
 import 'package:prescripto/core/data/models/patient_model.dart';
 import 'package:prescripto/core/data/providers/patient_provider.dart';
@@ -41,10 +42,10 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
     final patientsAsync = ref.watch(patientListProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F5),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: AppColors.primaryColor,
+        backgroundColor: const Color(0xFF0F766E),
         title: const Text(
           'Patient Directory',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -53,12 +54,19 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
       ),
       body: Column(
         children: [
-          // Modern Search Bar Header (Matched with Medicine Directory)
+          // Modern Search Bar Header
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
             decoration: const BoxDecoration(
-              color: AppColors.primaryColor,
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF0F766E),
+                  Color(0xFF0D9488),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(32),
                 bottomRight: Radius.circular(32),
@@ -68,21 +76,21 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withOpacity(0.18),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    border: Border.all(color: Colors.white.withOpacity(0.25)),
                   ),
                   child: TextField(
                     controller: _searchController,
                     onChanged: _onSearchChanged,
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                    style: const TextStyle(fontSize: 15, color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Search patient name or phone...',
-                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
-                      prefixIcon: const Icon(Icons.search, color: Colors.white70),
+                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.65)),
+                      prefixIcon: const Icon(PhosphorIconsRegular.magnifyingGlass, color: Colors.white),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.cancel, color: Colors.white70),
+                              icon: const Icon(Icons.close_rounded, color: Colors.white),
                               onPressed: () {
                                 _searchController.clear();
                                 _onSearchChanged('');
@@ -91,7 +99,7 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
                             )
                           : null,
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     ),
                   ),
                 ),
@@ -128,7 +136,7 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 110),
                   itemCount: filteredPatients.length,
                   itemBuilder: (context, index) {
                     return _buildPatientCard(filteredPatients[index]);
@@ -150,24 +158,24 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(32),
+            padding: const EdgeInsets.all(28),
             decoration: BoxDecoration(
               color: Colors.grey.shade100,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.person_off_outlined, size: 80, color: Colors.grey.shade400),
+            child: Icon(PhosphorIconsRegular.userMinus, size: 64, color: Colors.grey.shade400),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Text(
             'No patients found',
-            style: TextStyle(fontSize: 18, color: Colors.grey.shade800, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 17, color: Color(0xFF0F172A), fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             _searchQuery.isEmpty 
               ? 'Your patient list is currently empty' 
               : 'Try searching with a different name or phone',
-            style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
           ),
         ],
       ),
@@ -176,22 +184,23 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
 
   Widget _buildPatientCard(PatientModel patient) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(18),
           onTap: () {
             Navigator.push(
               context,
@@ -205,24 +214,24 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
             child: Row(
               children: [
                 Container(
-                  height: 60,
-                  width: 60,
+                  height: 52,
+                  width: 52,
                   decoration: BoxDecoration(
                     color: AppColors.primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   child: Center(
                     child: Text(
                       patient.name.isNotEmpty ? patient.name[0].toUpperCase() : 'P',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.primaryColor,
                         fontWeight: FontWeight.w800,
-                        fontSize: 24,
+                        fontSize: 22,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,30 +240,30 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
                         patient.name,
                         style: const TextStyle(
                           fontWeight: FontWeight.w800,
-                          fontSize: 17,
-                          color: Color(0xFF1A1C1E),
+                          fontSize: 16,
+                          color: Color(0xFF0F172A),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(Icons.cake_outlined, size: 14, color: Colors.grey.shade400),
+                          Icon(PhosphorIconsRegular.cake, size: 14, color: Colors.grey.shade400),
                           const SizedBox(width: 4),
                           Text(
                             '${patient.age ?? 'N/A'} yrs • ${patient.gender ?? 'N/A'}',
-                            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                            style: TextStyle(color: Colors.grey.shade600, fontSize: 12.5),
                           ),
                         ],
                       ),
                       if (patient.phone != null && patient.phone!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 3),
                         Row(
                           children: [
-                            Icon(Icons.phone_outlined, size: 14, color: Colors.grey.shade400),
+                            Icon(PhosphorIconsRegular.phone, size: 14, color: Colors.grey.shade400),
                             const SizedBox(width: 4),
                             Text(
                               patient.phone!,
-                              style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                              style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
                             ),
                           ],
                         ),
@@ -262,7 +271,7 @@ class _PatientsScreenState extends ConsumerState<PatientsScreen> {
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade300),
+                Icon(PhosphorIconsRegular.caretRight, size: 16, color: Colors.grey.shade400),
               ],
             ),
           ),

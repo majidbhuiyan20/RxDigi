@@ -206,22 +206,25 @@ class MedicineReminderCard extends ConsumerWidget {
 
             // Times Slots Row
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (reminder.morning)
-                  _buildSlotBadge(SlotStyle.morning, isBn ? 'সকাল' : 'Morning', reminder.morningTime, reminder.isActive),
-                if (reminder.noon) ...[
-                  const SizedBox(width: 6),
-                  _buildSlotBadge(SlotStyle.noon, isBn ? 'দুপুর' : 'Noon', reminder.noonTime, reminder.isActive),
-                ],
-                if (reminder.evening) ...[
-                  const SizedBox(width: 6),
-                  _buildSlotBadge(SlotStyle.evening, isBn ? 'সন্ধ্যা' : 'Evening', reminder.eveningTime, reminder.isActive),
-                ],
-                if (reminder.night) ...[
-                  const SizedBox(width: 6),
-                  _buildSlotBadge(SlotStyle.night, isBn ? 'রাত' : 'Night', reminder.nightTime, reminder.isActive),
-                ],
-                const Spacer(),
+                Expanded(
+                  child: Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      if (reminder.morning)
+                        _buildSlotBadge(SlotStyle.morning, isBn ? 'সকাল' : 'Morning', reminder.morningTime, reminder.isActive),
+                      if (reminder.noon)
+                        _buildSlotBadge(SlotStyle.noon, isBn ? 'দুপুর' : 'Noon', reminder.noonTime, reminder.isActive),
+                      if (reminder.evening)
+                        _buildSlotBadge(SlotStyle.evening, isBn ? 'সন্ধ্যা' : 'Evening', reminder.eveningTime, reminder.isActive),
+                      if (reminder.night)
+                        _buildSlotBadge(SlotStyle.night, isBn ? 'রাত' : 'Night', reminder.nightTime, reminder.isActive),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
                 IconButton(
                   icon: Icon(PhosphorIconsRegular.trash, size: 20, color: Colors.red.shade400),
                   tooltip: isBn ? 'মুছুন' : 'Delete',
@@ -265,17 +268,15 @@ class MedicineReminderCard extends ConsumerWidget {
   IconData _getFormIcon(String form) {
     switch (form.toLowerCase()) {
       case 'tablet':
-        return Icons.medication_rounded;
       case 'capsule':
-        return Icons.medication_liquid_rounded;
+        return PhosphorIconsRegular.pill;
       case 'syrup':
-        return Icons.local_drink_rounded;
       case 'drop':
-        return Icons.water_drop_rounded;
+        return PhosphorIconsRegular.drop;
       case 'injection':
-        return Icons.vaccines_rounded;
+        return PhosphorIconsRegular.syringe;
       default:
-        return Icons.healing_rounded;
+        return PhosphorIconsRegular.firstAid;
     }
   }
 

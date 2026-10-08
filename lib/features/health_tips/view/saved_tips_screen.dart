@@ -38,13 +38,13 @@ class SavedTipsScreen extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(18),
                       decoration: const BoxDecoration(
-                        color: Color(0xFFEFF6FF),
+                        color: Color(0xFFF0FDFA),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         PhosphorIconsRegular.bookmarkSimple,
                         size: 36,
-                        color: Color(0xFF2563EB),
+                        color: Color(0xFF0F766E),
                       ),
                     ),
                     const SizedBox(height: 14),

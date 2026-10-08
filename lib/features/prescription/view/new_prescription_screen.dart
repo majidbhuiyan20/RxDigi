@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prescripto/app/app_colors.dart';
-import 'package:prescripto/core/data/repositories/doctor_repository.dart';
-import 'package:prescripto/core/utils/pdf_generator.dart';
-import 'package:prescripto/core/data/models/prescription_model.dart';
-import 'package:prescripto/core/data/providers/patient_provider.dart';
-import 'package:prescripto/core/data/providers/prescription_provider.dart' as core_providers;
 import 'package:prescripto/features/prescription/provider/prescription_provider.dart';
 import 'package:prescripto/features/prescription/widgets/step_patient_info.dart';
 import 'package:prescripto/features/prescription/widgets/step_diagnosis.dart';
@@ -178,55 +173,5 @@ class _NewPrescriptionScreenState extends ConsumerState<NewPrescriptionScreen> {
         ),
       ),
     );
-  }
-
-  void _finishPrescription() async {
-    final notifier = ref.read(prescriptionProvider.notifier);
-    final state = ref.read(prescriptionProvider);
-
-    if (state.patient == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please add patient information first')),
-      );
-      setState(() => _currentStep = 0);
-      return;
-    }
-
-    final id = await notifier.savePrescription();
-
-    if (id != -1 && mounted) {
-      final doctor = await DoctorRepository().getLatestDoctor();
-      if (doctor != null) {
-        final prescription = PrescriptionModel(
-          id: id,
-          patientId: state.patient!.id ?? -1,
-          doctorId: doctor.id,
-          date: DateTime.now(),
-          chiefComplaints: state.chiefComplaints,
-          diagnosis: state.diagnosis,
-          vitalSigns: state.vitalSigns,
-          pastHistory: state.pastHistory,
-          medicines: state.medicines,
-          advice: state.advice,
-          nextVisit: state.nextVisit,
-          labTests: state.labTests,
-        );
-
-        await PdfGenerator.printPrescription(prescription, state.patient!, doctor);
-        
-        if (mounted) {
-          // Refresh the prescription and patient lists to show the new entry on the Home Screen
-          ref.invalidate(core_providers.prescriptionListProvider);
-          ref.invalidate(patientListProvider);
-
-          notifier.reset();
-          Navigator.pop(context);
-        }
-      }
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to save prescription')),
-      );
-    }
   }
 }

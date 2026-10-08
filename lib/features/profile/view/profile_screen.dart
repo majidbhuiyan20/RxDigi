@@ -13,8 +13,13 @@ class ProfileScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.appBackgroundColor,
       appBar: AppBar(
-        title: const Text('Doctor Profile'),
-
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Doctor Profile',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Color(0xFF0F172A)),
+        ),
+        iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
       ),
       body: doctorAsync.when(
         data: (doctor) {
@@ -22,7 +27,7 @@ class ProfileScreen extends ConsumerWidget {
           return SingleChildScrollView(
             child: Column(
               children: [
-                _buildHeader(doctor),
+                _buildHeader(context, doctor),
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -67,11 +72,18 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(dynamic doctor) {
+  Widget _buildHeader(BuildContext context, dynamic doctor) {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        color: AppColors.primaryColor,
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF0F766E),
+            Color(0xFF0D9488),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(32),
           bottomRight: Radius.circular(32),
@@ -97,7 +109,7 @@ class ProfileScreen extends ConsumerWidget {
               radius: 50,
               backgroundColor: AppColors.primaryLight,
               child: Text(
-                doctor.fullName[0].toUpperCase(),
+                doctor.fullName.isNotEmpty ? doctor.fullName[0].toUpperCase() : 'D',
                 style: const TextStyle(
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
@@ -129,7 +141,7 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              // Edit Profile Logic
+              Navigator.pushNamed(context, '/intro_onboarding');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,

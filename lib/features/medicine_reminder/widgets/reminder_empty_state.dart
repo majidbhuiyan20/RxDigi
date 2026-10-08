@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
 import '../view/add_reminder_sheet.dart';
 
@@ -18,15 +19,19 @@ class ReminderEmptyState extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.08),
+                color: AppColors.primaryColor.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.alarm_on_rounded, size: 64, color: AppColors.primaryColor),
+              child: const Icon(PhosphorIconsRegular.alarm, size: 56, color: AppColors.primaryColor),
             ),
             const SizedBox(height: 20),
             Text(
               isBn ? 'কোনো মেডিসিন রিমাইন্ডার নেই' : 'No Medicine Reminders Yet',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF0F172A),
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -39,7 +44,7 @@ class ReminderEmptyState extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () => AddReminderSheet.show(context),
-              icon: const Icon(Icons.add, color: Colors.white),
+              icon: const Icon(PhosphorIconsBold.plus, color: Colors.white, size: 16),
               label: Text(
                 isBn ? 'প্রথম রিমাইন্ডার যোগ করুন' : 'Add First Reminder',
                 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

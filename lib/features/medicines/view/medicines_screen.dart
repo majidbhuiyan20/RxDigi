@@ -104,7 +104,7 @@ class _MedicinesScreenState extends ConsumerState<MedicinesScreen> {
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: AppColors.primaryColor,
+        backgroundColor: const Color(0xFF0F766E),
         title: Text(
           isBn ? 'ঔষধের ডিরেক্টরি ও দাম' : 'Medicine Index & Prices',
           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -118,7 +118,14 @@ class _MedicinesScreenState extends ConsumerState<MedicinesScreen> {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
             decoration: const BoxDecoration(
-              color: AppColors.primaryColor,
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF0F766E),
+                  Color(0xFF0D9488),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(28),
                 bottomRight: Radius.circular(28),
@@ -176,7 +183,7 @@ class _MedicinesScreenState extends ConsumerState<MedicinesScreen> {
                     ? _buildEmptyState(isBn)
                     : ListView.builder(
                         controller: _scrollController,
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 110),
                         itemCount: _medicines.length + (_hasMore ? 1 : 0),
                         itemBuilder: (context, index) {
                           if (index == _medicines.length) {

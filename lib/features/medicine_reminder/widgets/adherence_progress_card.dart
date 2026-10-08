@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
 
 class AdherenceProgressCard extends StatelessWidget {
@@ -24,10 +25,10 @@ class AdherenceProgressCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [
-            AppColors.primaryColor,
-            AppColors.primaryColor.withOpacity(0.85),
+            Color(0xFF0F766E), // Deep Clinical Teal
+            Color(0xFF0D9488), // Vibrant Teal
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -35,7 +36,7 @@ class AdherenceProgressCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryColor.withOpacity(0.25),
+            color: const Color(0xFF0F766E).withValues(alpha: 0.22),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -52,7 +53,7 @@ class AdherenceProgressCard extends StatelessWidget {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.check_circle_outline, color: Colors.white, size: 22),
+                child: const Icon(PhosphorIconsFill.checkCircle, color: Colors.white, size: 22),
               ),
               const SizedBox(width: 12),
               Expanded(

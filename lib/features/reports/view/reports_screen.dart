@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:prescripto/app/app_colors.dart';
 import 'package:prescripto/core/data/providers/prescription_provider.dart';
 
@@ -11,8 +12,28 @@ class ReportsScreen extends ConsumerWidget {
     final prescriptionsAsync = ref.watch(prescriptionListProvider);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text('Practice Reports'),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(PhosphorIconsFill.chartBar, size: 18, color: AppColors.primaryColor),
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              'Practice Reports',
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Color(0xFF0F172A)),
+            ),
+          ],
+        ),
+        iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
       ),
       body: prescriptionsAsync.when(
         data: (prescriptions) {
@@ -21,7 +42,8 @@ class ReportsScreen extends ConsumerWidget {
           final thisMonthRx = prescriptions.where((p) => p.date.year == today.year && p.date.month == today.month).length;
           
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+            physics: const BouncingScrollPhysics(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -29,40 +51,42 @@ class ReportsScreen extends ConsumerWidget {
                   context,
                   title: 'Total Prescriptions',
                   value: totalRx.toString(),
-                  icon: Icons.assignment_turned_in,
-                  color: AppColors.actionBlue,
+                  icon: PhosphorIconsRegular.fileText,
+                  color: AppColors.primaryColor,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 _buildStatCard(
                   context,
                   title: 'Prescriptions This Month',
                   value: thisMonthRx.toString(),
-                  icon: Icons.calendar_month,
-                  color: AppColors.actionTeal,
+                  icon: PhosphorIconsRegular.calendar,
+                  color: const Color(0xFF0D9488),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
                 const Text(
                   'Insights',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.borderColor),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
-                  child: const Column(
-                    children: [
-                      Icon(Icons.insights, size: 48, color: Colors.grey),
-                      SizedBox(height: 16),
-                      Text(
-                        'Detailed analytics and charts are coming soon!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
+                  child: const Center(
+                    child: Column(
+                      children: [
+                        Icon(PhosphorIconsRegular.chartLineUp, size: 40, color: Color(0xFF94A3B8)),
+                        SizedBox(height: 12),
+                        Text(
+                          'Detailed prescription analytics and visual trends',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -82,11 +106,11 @@ class ReportsScreen extends ConsumerWidget {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.borderColor),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
@@ -101,21 +125,21 @@ class ReportsScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: color, size: 32),
+            child: Icon(icon, color: color, size: 28),
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 value,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
               ),
               Text(
                 title,
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
               ),
             ],
           ),

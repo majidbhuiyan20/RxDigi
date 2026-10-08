@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
 import '../../../app/app_routes.dart';
 import '../../../core/data/database/database_helper.dart';
@@ -25,7 +26,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
-            Icon(Icons.health_and_safety, color: Color(0xFFE65100)),
+            Icon(PhosphorIconsFill.shieldWarning, color: Color(0xFFE65100), size: 24),
             SizedBox(width: 8),
             Text('Medical Disclaimer', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           ],
@@ -42,8 +43,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primaryColor),
-            child: const Text('I Understand', style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('I Understand', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -57,7 +61,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
-            Icon(Icons.privacy_tip_outlined, color: Color(0xFF00897B)),
+            Icon(PhosphorIconsFill.lockKey, color: Color(0xFF0F766E), size: 24),
             SizedBox(width: 8),
             Text('Data Privacy & Security', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           ],
@@ -74,7 +78,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
+            child: const Text('Close', style: TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -143,12 +147,40 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final isBn = locale.languageCode == 'bn';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: Text(l10n.settings, style: const TextStyle(fontWeight: FontWeight.bold)),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                PhosphorIconsFill.gear,
+                size: 18,
+                color: AppColors.primaryColor,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              l10n.settings,
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 17,
+                color: Color(0xFF0F172A),
+              ),
+            ),
+          ],
+        ),
+        iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 110),
+        physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -158,9 +190,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withOpacity(0.02),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -168,20 +201,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.language, size: 24, color: Color(0xFF004D40)),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(PhosphorIconsRegular.translate, size: 20, color: AppColors.primaryColor),
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       l10n.language,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0F172A),
+                      ),
                     ),
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: const Color(0xFFF1F5F9),
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(3),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -202,44 +246,44 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // 👨‍⚕️ Prescriber / Doctor Profile
             _buildSettingsTile(
-              icon: Icons.badge_outlined,
+              icon: PhosphorIconsRegular.userCircle,
               title: isBn ? 'প্রেসক্রাইবার / ডক্টর প্রোফাইল' : 'Doctor / Prescriber Profile',
               subtitle: isBn ? 'ডিগ্রি, চেম্বার ও প্যাডের তথ্য সম্পাদনা' : 'Edit degrees, chamber & pad info',
               color: AppColors.primaryColor,
               onTap: () => Navigator.pushNamed(context, AppRoutes.introOnboarding),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
 
             // 📜 Medical Disclaimer
             _buildSettingsTile(
-              icon: Icons.health_and_safety_outlined,
+              icon: PhosphorIconsRegular.shieldWarning,
               title: isBn ? 'মেডিকেল ডিসক্লেইমার' : 'Medical Disclaimer',
               subtitle: isBn ? 'স্বাস্থ্য তথ্য ও অ্যাপের ব্যবহারের শর্তাবলী' : 'Health advice & clinical terms',
-              color: const Color(0xFFE65100),
+              color: const Color(0xFFEA580C),
               onTap: () => _showMedicalDisclaimer(context),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
 
             // 🔒 Data Privacy & Security
             _buildSettingsTile(
-              icon: Icons.privacy_tip_outlined,
+              icon: PhosphorIconsRegular.lockKey,
               title: isBn ? 'ডাটা প্রাইভেসি ও নিরাপত্তা' : 'Privacy & Data Security',
               subtitle: isBn ? '১০০% অফলাইন ও ডিভাইসে সংরক্ষিত' : '100% offline & stored on-device',
-              color: const Color(0xFF00897B),
+              color: const Color(0xFF0F766E),
               onTap: () => _showPrivacySecurity(context),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
 
             // 🗑️ Clear / Reset Data (Google Play Compliance)
             _buildSettingsTile(
-              icon: Icons.delete_outline_rounded,
+              icon: PhosphorIconsRegular.trashSimple,
               title: isBn ? 'সকল ডাটা মুছুন (রিসেট)' : 'Clear App Data & Reset',
               subtitle: isBn ? 'ডিভাইসের সকল স্বাস্থ্য ও প্রেসক্রিপশন রেকর্ড ডিলিট' : 'Delete all local logs & records',
-              color: Colors.red.shade700,
+              color: const Color(0xFFDC2626),
               onTap: () => _confirmResetData(context),
             ),
             const SizedBox(height: 32),
@@ -248,9 +292,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Center(
               child: Column(
                 children: [
-                  Text(
-                    'RxDigi - Smart Health & Rx',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
+                  const Text(
+                    'RxDigi • Smart Health & Rx',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -277,27 +321,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         leading: Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(9),
           decoration: BoxDecoration(
             color: color.withOpacity(0.12),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: color, size: 22),
+          child: Icon(icon, color: color, size: 20),
         ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5, color: Color(0xFF0F172A)),
+        ),
         subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-        trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 15, color: Colors.grey),
+        trailing: const Icon(PhosphorIconsRegular.caretRight, size: 16, color: Color(0xFF94A3B8)),
         onTap: onTap,
       ),
     );
@@ -311,17 +359,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(25),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1.5),
                   ),
                 ]
               : null,
@@ -329,9 +377,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 14,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            color: isSelected ? Colors.black : Colors.grey[600],
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            color: isSelected ? const Color(0xFF0F172A) : const Color(0xFF64748B),
           ),
         ),
       ),

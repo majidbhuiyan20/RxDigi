@@ -141,7 +141,7 @@ class _StepPreviewState extends ConsumerState<StepPreview> {
 
                     if (state.nextVisit != null && state.nextVisit!.isNotEmpty) ...[
                       const SizedBox(height: 16),
-                      Text('Follow-up: ${state.nextVisit}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                      Text('Follow-up: ${state.nextVisit}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryColor)),
                     ],
                     
                     const SizedBox(height: 60),
