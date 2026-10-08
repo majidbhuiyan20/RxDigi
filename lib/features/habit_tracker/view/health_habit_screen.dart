@@ -11,6 +11,7 @@ import '../widgets/habit_category_chart.dart';
 import '../widgets/habit_stats_overview.dart';
 import '../widgets/habit_item_card.dart';
 import '../widgets/habit_water_tracker.dart';
+import '../provider/water_intake_provider.dart';
 
 class HealthHabitScreen extends ConsumerStatefulWidget {
   const HealthHabitScreen({super.key});
@@ -21,7 +22,6 @@ class HealthHabitScreen extends ConsumerStatefulWidget {
 
 class _HealthHabitScreenState extends ConsumerState<HealthHabitScreen> {
   int _activeTab = 0; // 0: Daily Checklist, 1: Weekly Analytics
-  int _waterGlasses = 5;
 
   @override
   Widget build(BuildContext context) {
@@ -364,8 +364,10 @@ class _HealthHabitScreenState extends ConsumerState<HealthHabitScreen> {
 
             // Water Hydration Widget
             HabitWaterTracker(
-              glasses: _waterGlasses,
-              onChanged: (val) => setState(() => _waterGlasses = val),
+              glasses: ref.watch(waterIntakeForDateProvider(habitDateString(selectedDate))),
+              onChanged: (val) {
+                ref.read(waterIntakeNotifierProvider.notifier).setGlasses(habitDateString(selectedDate), val);
+              },
               isBn: isBn,
             ),
             const SizedBox(height: 16),

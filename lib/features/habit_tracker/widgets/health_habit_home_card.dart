@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
+import '../../../core/utils/app_feedback.dart';
+import '../../../core/widgets/perfect_day_celebration.dart';
 import '../models/health_habit_model.dart';
 import '../provider/health_habit_provider.dart';
+import '../provider/water_intake_provider.dart';
 import '../view/health_habit_screen.dart';
 
 class HealthHabitHomeCard extends ConsumerWidget {
@@ -27,6 +30,8 @@ class HealthHabitHomeCard extends ConsumerWidget {
         final progress = completed.length / habits.length;
         final percent = (progress * 100).toInt();
         final streak = _calculateStreak(counts);
+        final todayKey = habitDateString(DateTime.now());
+        final waterGlasses = ref.watch(waterIntakeForDateProvider(todayKey));
 
         // Display up to 3 most relevant habits on home
         final displayHabits = habits.take(3).toList();
@@ -127,7 +132,86 @@ class HealthHabitHomeCard extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
+
+              // 2.5. Water Hydration Quick Action Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F9FF),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFBAE6FD)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF0284C7),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(PhosphorIconsFill.drop, color: Colors.white, size: 14),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                isBn ? 'দৈনিক পানি পান' : 'Water Hydration',
+                                style: const TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0369A1),
+                                ),
+                              ),
+                              Text(
+                                '$waterGlasses/৮ ${isBn ? "গ্লাস" : "glasses"}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF0284C7),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: (waterGlasses / 8.0).clamp(0.0, 1.0),
+                              minHeight: 5,
+                              backgroundColor: const Color(0xFFE0F2FE),
+                              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF0284C7)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Quick Increment Button
+                    InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () {
+                        AppFeedback.playSuccess();
+                        ref.read(waterIntakeNotifierProvider.notifier).increment(todayKey);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0284C7),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(PhosphorIconsBold.plus, color: Colors.white, size: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
 
               // 3. Interactive Habit Rows (1-Tap Completion Right on Home!)
               ...displayHabits.map((habit) {
@@ -150,7 +234,17 @@ class HealthHabitHomeCard extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(14),
                       onTap: () {
                         if (habit.id != null) {
+                          AppFeedback.playSuccess();
                           ref.read(healthHabitNotifierProvider.notifier).toggle(habit.id!, isDone);
+                          if (!isDone && completed.length + 1 >= habits.length) {
+                            PerfectDayCelebration.show(
+                              context,
+                              title: isBn ? 'অভিনন্দন! শতভাগ অভ্যাস সম্পন্ন' : 'Outstanding! 100% Habits Done',
+                              message: isBn
+                                  ? 'আজকের সকল স্বাস্থ্যকর রুটিন চমৎকারভাবে পূর্ণ হয়েছে।'
+                                  : 'You achieved all your wellness habits for today!',
+                            );
+                          }
                         }
                       },
                       child: Padding(

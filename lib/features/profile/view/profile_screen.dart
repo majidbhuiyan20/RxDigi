@@ -1,256 +1,390 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:prescripto/app/app_colors.dart';
-import 'package:prescripto/core/data/providers/doctor_provider.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../../app/app_colors.dart';
+import '../../../core/utils/app_feedback.dart';
+import '../../../core/data/providers/doctor_provider.dart';
+import '../provider/health_profile_provider.dart';
+import '../models/user_health_profile_model.dart';
+import '../widgets/digital_health_card_widget.dart';
+import '../widgets/edit_health_card_sheet.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isBn = Localizations.localeOf(context).languageCode == 'bn';
+    final profile = ref.watch(healthProfileProvider);
     final doctorAsync = ref.watch(latestDoctorProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.appBackgroundColor,
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: const Text(
-          'Doctor Profile',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Color(0xFF0F172A)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F766E).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                PhosphorIconsFill.identificationCard,
+                size: 18,
+                color: Color(0xFF0F766E),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              isBn ? 'মেডিকেল প্রোফাইল ও হেলথ কার্ড' : 'Health Profile & Medical ID',
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 16.5,
+                color: Color(0xFF0F172A),
+              ),
+            ),
+          ],
         ),
         iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
+        actions: [
+          IconButton(
+            tooltip: isBn ? 'কার্ড এডিট করুন' : 'Edit Card',
+            icon: const Icon(PhosphorIconsBold.pencilSimple, color: Color(0xFF0F766E)),
+            onPressed: () => EditHealthCardSheet.show(context, profile),
+          ),
+        ],
       ),
-      body: doctorAsync.when(
-        data: (doctor) {
-          if (doctor == null) return const Center(child: Text('No Profile Found'));
-          return SingleChildScrollView(
-            child: Column(
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 40),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ─── 1. Ultra-Premium Digital Health Card ───
+            DigitalHealthCardWidget(
+              profile: profile,
+              onEdit: () => EditHealthCardSheet.show(context, profile),
+              onShare: () => _shareHealthCard(profile, isBn),
+            ),
+            const SizedBox(height: 14),
+
+            // Card Action Buttons (Make / Edit & Share)
+            Row(
               children: [
-                _buildHeader(context, doctor),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle('Professional Information'),
-                      _buildInfoCard([
-                        _buildProfileItem(Icons.school_outlined, 'Degrees', doctor.degrees ?? 'N/A'),
-                        _buildProfileItem(Icons.psychology_outlined, 'Specialization', doctor.specialization ?? 'N/A'),
-                        _buildProfileItem(Icons.badge_outlined, 'BMDC Reg No', doctor.bmdcRegNo ?? 'N/A'),
-                        _buildProfileItem(Icons.work_outline, 'Position', doctor.position ?? 'N/A'),
-                      ]),
-                      const SizedBox(height: 24),
-                      _buildSectionTitle('Contact Information'),
-                      _buildInfoCard([
-                        _buildProfileItem(Icons.phone_outlined, 'Mobile', doctor.mobile),
-                        _buildProfileItem(Icons.email_outlined, 'Email', doctor.email),
-                        if (doctor.phoneNumber != null)
-                          _buildProfileItem(Icons.call_outlined, 'Clinic Phone', doctor.phoneNumber!),
-                      ]),
-                      const SizedBox(height: 24),
-                      _buildSectionTitle('Clinic Details'),
-                      _buildInfoCard([
-                        _buildProfileItem(Icons.local_hospital_outlined, 'Clinic Name', doctor.clinicName),
-                        _buildProfileItem(Icons.location_on_outlined, 'Address', doctor.address),
-                        if (doctor.roomNumber != null)
-                          _buildProfileItem(Icons.meeting_room_outlined, 'Room/Chamber', doctor.roomNumber!),
-                        if (doctor.startTime != null && doctor.endTime != null)
-                          _buildProfileItem(Icons.access_time, 'Visiting Hours', '${doctor.startTime} - ${doctor.endTime}'),
-                      ]),
-                      const SizedBox(height: 40),
-                    ],
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => EditHealthCardSheet.show(context, profile),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0F766E),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    icon: const Icon(PhosphorIconsBold.pencilSimple, size: 16),
+                    label: Text(
+                      isBn ? 'কার্ড তৈরি / এডিট করুন' : 'Make / Edit Card',
+                      style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _shareHealthCard(profile, isBn),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF0F766E),
+                      side: const BorderSide(color: Color(0xFF0F766E), width: 1.5),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    icon: const Icon(PhosphorIconsBold.shareNetwork, size: 16),
+                    label: Text(
+                      isBn ? 'কার্ড শেয়ার করুন' : 'Share Card',
+                      style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],
             ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
-      ),
-    );
-  }
+            const SizedBox(height: 20),
 
-  Widget _buildHeader(BuildContext context, dynamic doctor) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF0F766E),
-            Color(0xFF0D9488),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
-      ),
-      padding: const EdgeInsets.fromLTRB(24, 10, 24, 40),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: CircleAvatar(
-              radius: 50,
-              backgroundColor: AppColors.primaryLight,
-              child: Text(
-                doctor.fullName.isNotEmpty ? doctor.fullName[0].toUpperCase() : 'D',
-                style: const TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryColor,
-                ),
+            // ─── 2. Emergency ICE Notice Card ───
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEF2F2),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFFFECACA)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEF4444),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(PhosphorIconsFill.phoneCall, color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isBn ? 'জরুরি যোগাযোগ (ICE Contact)' : 'Emergency ICE Contact',
+                          style: const TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF991B1B),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${profile.emergencyContact} (${profile.emergencyRelation})',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF7F1D1D),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            '${doctor.title ?? ''} ${doctor.fullName}',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+            const SizedBox(height: 20),
+
+            // ─── 3. Clinical & Medical Summary Section ───
+            Text(
+              isBn ? 'চিকিৎসাগত তথ্যাবলি (Medical Summary)' : 'Medical Summary',
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF0F172A),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            doctor.specialization ?? 'Specialist',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white.withOpacity(0.9),
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/intro_onboarding');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: AppColors.primaryColor,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
+            const SizedBox(height: 12),
+
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              child: Column(
+                children: [
+                  _buildProfileRow(
+                    PhosphorIconsFill.drop,
+                    const Color(0xFFDC2626),
+                    isBn ? 'রক্তের গ্রুপ' : 'Blood Group',
+                    '${profile.bloodGroup} Positive',
+                    badgeColor: const Color(0xFFFEE2E2),
+                    badgeTextColor: const Color(0xFFDC2626),
+                  ),
+                  const Divider(height: 20, color: Color(0xFFF1F5F9)),
+                  _buildProfileRow(
+                    PhosphorIconsFill.user,
+                    AppColors.primaryColor,
+                    isBn ? 'বয়স ও লিঙ্গ' : 'Age & Gender',
+                    '${profile.age} বছর (${profile.gender})',
+                  ),
+                  const Divider(height: 20, color: Color(0xFFF1F5F9)),
+                  _buildProfileRow(
+                    PhosphorIconsFill.warningCircle,
+                    const Color(0xFFF59E0B),
+                    isBn ? 'অ্যালার্জি' : 'Allergies',
+                    profile.allergies.join(', '),
+                  ),
+                  const Divider(height: 20, color: Color(0xFFF1F5F9)),
+                  _buildProfileRow(
+                    PhosphorIconsFill.heartbeat,
+                    const Color(0xFF8B5CF6),
+                    isBn ? 'দীর্ঘস্থায়ী রোগ' : 'Conditions',
+                    profile.chronicConditions.join(', '),
+                  ),
+                  const Divider(height: 20, color: Color(0xFFF1F5F9)),
+                  _buildProfileRow(
+                    PhosphorIconsFill.heart,
+                    const Color(0xFF10B981),
+                    isBn ? 'অঙ্গদানকারী স্ট্যাটাস' : 'Organ Donor',
+                    profile.isOrganDonor ? 'নিবন্ধিত (Yes)' : 'না (No)',
+                  ),
+                ],
+              ),
             ),
-            child: const Text('Edit Profile', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-  }
+            const SizedBox(height: 20),
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 12),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          color: AppColors.textBlackColor,
+            // ─── 4. Doctor Credentials (if applicable) ───
+            doctorAsync.maybeWhen(
+              data: (doctor) => doctor != null
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isBn ? 'ডাক্তার প্রোফাইল (Doctor Credentials)' : 'Physician Information',
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                          ),
+                          child: Column(
+                            children: [
+                              _buildProfileRow(
+                                PhosphorIconsFill.firstAid,
+                                const Color(0xFF0F766E),
+                                isBn ? 'চিকিৎসক' : 'Doctor Name',
+                                doctor.fullName,
+                              ),
+                              if (doctor.specialization != null) ...[
+                                const Divider(height: 20, color: Color(0xFFF1F5F9)),
+                                _buildProfileRow(
+                                  PhosphorIconsFill.brain,
+                                  const Color(0xFF0284C7),
+                                  isBn ? 'বিশেষজ্ঞ' : 'Specialization',
+                                  doctor.specialization!,
+                                ),
+                              ],
+                              if (doctor.bmdcRegNo != null) ...[
+                                const Divider(height: 20, color: Color(0xFFF1F5F9)),
+                                _buildProfileRow(
+                                  PhosphorIconsFill.sealCheck,
+                                  const Color(0xFF059669),
+                                  'BMDC Reg No',
+                                  doctor.bmdcRegNo!,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
+              orElse: () => const SizedBox.shrink(),
+            ),
+
+            // ─── 5. App & Safety Info ───
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  const Icon(PhosphorIconsFill.lockKey, size: 20, color: Color(0xFF64748B)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      isBn
+                          ? 'আপনার ডিজিটাল হেলথ কার্ড সম্পূর্ণ অফলাইনে আপনার ডিভাইসে নিরাপদে সংরক্ষিত।'
+                          : 'Your Digital Health ID Card is securely stored on-device locally.',
+                      style: const TextStyle(fontSize: 11.5, color: Color(0xFF475569)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoCard(List<Widget> children) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+  Widget _buildProfileRow(
+    IconData icon,
+    Color iconColor,
+    String label,
+    String value, {
+    Color? badgeColor,
+    Color? badgeTextColor,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: iconColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
           ),
-        ],
-      ),
-      child: Column(
-        children: children.asMap().entries.map((entry) {
-          final index = entry.key;
-          final widget = entry.value;
-          final isLast = index == children.length - 1;
-          
-          return Column(
-            children: [
-              widget,
-              if (!isLast)
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  indent: 60,
-                  endIndent: 20,
-                  color: AppColors.borderColor.withOpacity(0.5),
-                ),
-            ],
-          );
-        }).toList(),
-      ),
+          child: Icon(icon, size: 16, color: iconColor),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF475569),
+            ),
+          ),
+        ),
+        if (badgeColor != null)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: badgeColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: badgeTextColor ?? Colors.black,
+              ),
+            ),
+          )
+        else
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0F172A),
+            ),
+          ),
+      ],
     );
   }
 
-  Widget _buildProfileItem(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppColors.primaryLight,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: AppColors.primaryColor, size: 22),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: AppColors.textGreyColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textBlackColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  void _shareHealthCard(UserHealthProfileModel profile, bool isBn) {
+    AppFeedback.playLight();
+    final buffer = StringBuffer();
+    buffer.writeln('🪪 RxDigi EMERGENCY MEDICAL ID CARD');
+    buffer.writeln('═══════════════════════════════');
+    buffer.writeln('নাম: ${profile.name}');
+    buffer.writeln('কার্ড আইডি: ${profile.cardId}');
+    buffer.writeln('রক্তের গ্রুপ: ${profile.bloodGroup} Positive');
+    buffer.writeln('বয়স ও লিঙ্গ: ${profile.age} বছর (${profile.gender})');
+    buffer.writeln('জরুরি যোগাযোগ (ICE): ${profile.emergencyContact} (${profile.emergencyRelation})');
+    if (profile.allergies.isNotEmpty) {
+      buffer.writeln('অ্যালার্জি: ${profile.allergies.join(", ")}');
+    }
+    if (profile.chronicConditions.isNotEmpty) {
+      buffer.writeln('রোগ: ${profile.chronicConditions.join(", ")}');
+    }
+    buffer.writeln('═══════════════════════════════');
+    buffer.writeln('📱 RxDigi হেলথ অ্যাপ থেকে প্রস্তুতকৃত।');
+
+    Share.share(buffer.toString());
   }
 }
