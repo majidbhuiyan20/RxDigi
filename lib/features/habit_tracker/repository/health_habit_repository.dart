@@ -74,4 +74,14 @@ class HealthHabitRepository {
     );
     return {for (final row in rows) row['date'] as String: row['count'] as int};
   }
+
+  Future<List<Map<String, dynamic>>> getCompletedLogsForDates(List<String> dates) async {
+    if (dates.isEmpty) return [];
+    final db = await _dbHelper.database;
+    return db.query(
+      'habit_logs',
+      where: 'date IN (${List.filled(dates.length, '?').join(',')}) AND completed = 1',
+      whereArgs: dates,
+    );
+  }
 }

@@ -148,6 +148,22 @@ class MedicineReminderRepository {
 
       // For this specific date, calculate how many doses were actually scheduled
       int scheduledForDay = 0;
+      final isToday = (i == 0);
+      final currentHour = now.hour;
+
+      final adherenceLogs = await db.query(
+        'medicine_adherence_logs',
+        where: 'date = ? AND isTaken = 1',
+        whereArgs: [dateStr],
+      );
+      final takenSlotsSet = <String>{};
+      for (final row in adherenceLogs) {
+        final rId = row['reminderId'];
+        final slot = row['slot'];
+        takenSlotsSet.add('${rId}_$slot');
+      }
+      final takenCount = adherenceLogs.length;
+
       for (final med in allMeds) {
         // If the date is BEFORE the medicine was started, do not schedule
         if (dateStr.compareTo(med.startDate) < 0) {
@@ -161,17 +177,27 @@ class MedicineReminderRepository {
             if (date.isAfter(end)) continue;
           }
         }
-        if (med.morning) scheduledForDay++;
-        if (med.noon) scheduledForDay++;
-        if (med.evening) scheduledForDay++;
-        if (med.night) scheduledForDay++;
+        if (!isToday) {
+          if (med.morning) scheduledForDay++;
+          if (med.noon) scheduledForDay++;
+          if (med.evening) scheduledForDay++;
+          if (med.night) scheduledForDay++;
+        } else {
+          // For today, only count doses whose time window has passed or were taken
+          if (med.morning) {
+            if (currentHour >= 12 || takenSlotsSet.contains('${med.id}_morning')) scheduledForDay++;
+          }
+          if (med.noon) {
+            if (currentHour >= 17 || takenSlotsSet.contains('${med.id}_noon')) scheduledForDay++;
+          }
+          if (med.evening) {
+            if (currentHour >= 21 || takenSlotsSet.contains('${med.id}_evening')) scheduledForDay++;
+          }
+          if (med.night) {
+            if (currentHour >= 21 || takenSlotsSet.contains('${med.id}_night')) scheduledForDay++;
+          }
+        }
       }
-
-      final countResult = await db.rawQuery(
-        'SELECT COUNT(*) as count FROM medicine_adherence_logs WHERE date = ? AND isTaken = 1',
-        [dateStr],
-      );
-      final takenCount = Sqflite.firstIntValue(countResult) ?? 0;
 
       final weekdayIndex = date.weekday - 1;
       final dayNameBn = bnDayNames[weekdayIndex];

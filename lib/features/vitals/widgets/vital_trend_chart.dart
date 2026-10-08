@@ -421,3 +421,4 @@ class _LineChartPainter extends CustomPainter {
         oldDelegate.selectedIndex != selectedIndex;
   }
 }
+
