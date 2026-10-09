@@ -18,17 +18,35 @@ class _DietNutritionScreenState extends State<DietNutritionScreen> {
   final TextEditingController _searchController = TextEditingController();
   FoodCategory? _selectedCategory;
   bool _onlyDiabeticSafe = false;
+  bool _isLoading = true;
+  List<BangladeshiFoodModel> _allFoods = [];
 
   // Selected meal plate: Map<Food, Quantity>
   final Map<BangladeshiFoodModel, int> _selectedMeal = {};
 
+  @override
+  void initState() {
+    super.initState();
+    _loadFoods();
+  }
+
+  Future<void> _loadFoods() async {
+    final list = await BangladeshiFoodDatabase.loadAllFoods();
+    if (mounted) {
+      setState(() {
+        _allFoods = list;
+        _isLoading = false;
+      });
+    }
+  }
+
   List<BangladeshiFoodModel> get _filteredFoods {
-    var list = BangladeshiFoodDatabase.searchFoods(_searchController.text);
+    var list = BangladeshiFoodDatabase.searchFoods(_allFoods, _searchController.text);
     if (_selectedCategory != null) {
-      list = list.where((f) => f.category == _selectedCategory).toList();
+      list = BangladeshiFoodDatabase.filterByCategory(list, _selectedCategory);
     }
     if (_onlyDiabeticSafe) {
-      list = list.where((f) => f.diabeticRisk == DiabeticRisk.safe).toList();
+      list = BangladeshiFoodDatabase.getDiabeticSafeFoods(list);
     }
     return list;
   }
@@ -272,30 +290,36 @@ class _DietNutritionScreenState extends State<DietNutritionScreen> {
 
           // ─── 3. Foods List ───
           Expanded(
-            child: foods.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('🔍', style: TextStyle(fontSize: 40)),
-                        const SizedBox(height: 10),
-                        Text(
-                          isBn ? 'কোনো খাবার পাওয়া যায়নি' : 'No foods found',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade700,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          isBn ? 'অন্য কোনো নাম লিখে সার্চ করুন' : 'Try searching with another keyword',
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                        ),
-                      ],
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF10B981),
                     ),
                   )
-                : ListView.separated(
+                : foods.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('🔍', style: TextStyle(fontSize: 40)),
+                            const SizedBox(height: 10),
+                            Text(
+                              isBn ? 'কোনো খাবার পাওয়া যায়নি' : 'No foods found',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              isBn ? 'অন্য কোনো নাম লিখে সার্চ করুন' : 'Try searching with another keyword',
+                              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.separated(
                     padding: EdgeInsets.fromLTRB(16, 14, 16, _selectedMeal.isNotEmpty ? 90 : 30),
                     physics: const BouncingScrollPhysics(),
                     itemCount: foods.length,

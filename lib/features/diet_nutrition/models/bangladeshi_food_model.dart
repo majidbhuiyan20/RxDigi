@@ -126,5 +126,79 @@ class BangladeshiFoodModel {
     required this.diabeticAdviceEn,
     required this.emoji,
   });
+
+  factory BangladeshiFoodModel.fromJson(Map<String, dynamic> json) {
+    FoodCategory parseCategory(String? cat) {
+      switch (cat) {
+        case 'grains':
+          return FoodCategory.grains;
+        case 'lentilsVeg':
+          return FoodCategory.lentilsVeg;
+        case 'fishMeat':
+          return FoodCategory.fishMeat;
+        case 'fruits':
+          return FoodCategory.fruits;
+        case 'snacksSweets':
+          return FoodCategory.snacksSweets;
+        case 'beverages':
+          return FoodCategory.beverages;
+        default:
+          return FoodCategory.grains;
+      }
+    }
+
+    DiabeticRisk parseDiabeticRisk(String? risk) {
+      switch (risk) {
+        case 'safe':
+          return DiabeticRisk.safe;
+        case 'moderate':
+          return DiabeticRisk.moderate;
+        case 'highRisk':
+          return DiabeticRisk.highRisk;
+        default:
+          return DiabeticRisk.moderate;
+      }
+    }
+
+    return BangladeshiFoodModel(
+      id: json['id'] as String? ?? '',
+      nameBn: json['nameBn'] as String? ?? '',
+      nameEn: json['nameEn'] as String? ?? '',
+      category: parseCategory(json['category'] as String?),
+      servingSizeBn: json['servingSizeBn'] as String? ?? '',
+      servingSizeEn: json['servingSizeEn'] as String? ?? '',
+      calories: (json['calories'] as num?)?.toInt() ?? 0,
+      carbs: (json['carbs'] as num?)?.toDouble() ?? 0.0,
+      protein: (json['protein'] as num?)?.toDouble() ?? 0.0,
+      fat: (json['fat'] as num?)?.toDouble() ?? 0.0,
+      fiber: (json['fiber'] as num?)?.toDouble() ?? 0.0,
+      glycemicIndex: (json['glycemicIndex'] as num?)?.toInt() ?? 0,
+      diabeticRisk: parseDiabeticRisk(json['diabeticRisk'] as String?),
+      diabeticAdviceBn: json['diabeticAdviceBn'] as String? ?? '',
+      diabeticAdviceEn: json['diabeticAdviceEn'] as String? ?? '',
+      emoji: json['emoji'] as String? ?? '🍽️',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'nameBn': nameBn,
+      'nameEn': nameEn,
+      'category': category.name,
+      'servingSizeBn': servingSizeBn,
+      'servingSizeEn': servingSizeEn,
+      'calories': calories,
+      'carbs': carbs,
+      'protein': protein,
+      'fat': fat,
+      'fiber': fiber,
+      'glycemicIndex': glycemicIndex,
+      'diabeticRisk': diabeticRisk.name,
+      'diabeticAdviceBn': diabeticAdviceBn,
+      'diabeticAdviceEn': diabeticAdviceEn,
+      'emoji': emoji,
+    };
+  }
 }
 
