@@ -25,6 +25,11 @@ class AppFeedback {
     SystemSound.play(SystemSoundType.click);
   }
 
+  /// Triggered on celebration cards, weekly digests, and trophy shares.
+  static void playCelebration() {
+    playMilestone();
+  }
+
   /// Triggered on quick tabs, segmented switcher, or date selector.
   static void playSelection() {
     HapticFeedback.selectionClick();
