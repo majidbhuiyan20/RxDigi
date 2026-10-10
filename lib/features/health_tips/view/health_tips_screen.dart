@@ -61,8 +61,16 @@ class _HealthTipsScreenState extends ConsumerState<HealthTipsScreen> {
                 data: (allTips) {
                   final filteredTips = allTips.where((tip) {
                     // Body part filter
-                    if (selectedBodyPart != null && tip.bodyPart != selectedBodyPart) {
-                      return false;
+                    if (selectedBodyPart != null) {
+                      final s = selectedBodyPart;
+                      final bp = tip.bodyPart;
+                      final matches = (bp == s) ||
+                          ((s == 'bone' || s == 'bones') && (bp == 'bone' || bp == 'bones')) ||
+                          ((s == 'kidney' || s == 'kidneys') && (bp == 'kidney' || bp == 'kidneys')) ||
+                          ((s == 'mouth' || s == 'ent') && (bp == 'mouth' || bp == 'ent')) ||
+                          ((s == 'hands_feet' || s == 'feet') && (bp == 'hands_feet' || bp == 'feet')) ||
+                          ((s == 'pancreas' || s == 'lifestyle') && (bp == 'pancreas' || bp == 'lifestyle'));
+                      if (!matches) return false;
                     }
 
                     // Search query filter

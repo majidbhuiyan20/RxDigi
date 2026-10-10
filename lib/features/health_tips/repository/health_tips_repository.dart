@@ -17,11 +17,22 @@ class HealthTipsRepository {
     'assets/data/tips/ent_oral.json',
     'assets/data/tips/kidney_hydration.json',
     'assets/data/tips/hands_feet_nails.json',
+    'assets/data/tips/women_maternal.json',
+    'assets/data/tips/fitness_posture.json',
   ];
 
   static const String _bookmarksKey = 'rxdigi_bookmarked_tip_ids';
 
   List<HealthTipModel>? _cachedTips;
+
+  Future<HealthTipModel?> getTipById(String tipId) async {
+    final tips = await getAllTips();
+    try {
+      return tips.firstWhere((t) => t.id == tipId);
+    } catch (_) {
+      return null;
+    }
+  }
 
   Future<List<HealthTipModel>> getAllTips() async {
     if (_cachedTips != null && _cachedTips!.isNotEmpty) {

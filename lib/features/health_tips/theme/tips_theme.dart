@@ -47,12 +47,19 @@ class TipsTheme {
     'hair': Color(0xFF9333EA),          // Purple
     'skin': Color(0xFFE11D48),          // Rose Pink
     'heart': Color(0xFFDC2626),         // Crimson Red
+    'bone': Color(0xFF475569),          // Slate
     'bones': Color(0xFF475569),         // Slate
     'ent': Color(0xFF0D9488),           // Teal
+    'mouth': Color(0xFF0D9488),         // Teal
+    'kidney': Color(0xFF0891B2),        // Cyan
     'kidneys': Color(0xFF0891B2),       // Cyan
     'feet': Color(0xFF6D28D9),          // Violet
+    'hands_feet': Color(0xFF6D28D9),    // Violet
     'emergency': Color(0xFFB91C1C),     // Deep Red
     'lifestyle': Color(0xFF059669),     // Emerald
+    'pancreas': Color(0xFF059669),      // Emerald
+    'women': Color(0xFFBE185D),         // Deep Pink
+    'fitness': Color(0xFF16A34A),       // Vibrant Green
   };
 
   /// Returns themed category color
@@ -86,16 +93,20 @@ class TipsTheme {
       return PhosphorIconsRegular.heartbeat;
     } else if (lower.contains('bone') || lower.contains('joint') || lower.contains('হাড়') || lower.contains('কোমর')) {
       return PhosphorIconsRegular.personSimpleWalk;
-    } else if (lower.contains('ent') || lower.contains('ear') || lower.contains('oral') || lower.contains('দাঁত')) {
+    } else if (lower.contains('ent') || lower.contains('mouth') || lower.contains('ear') || lower.contains('oral') || lower.contains('দাঁত')) {
       return PhosphorIconsRegular.smiley;
     } else if (lower.contains('kidney') || lower.contains('water') || lower.contains('পানি')) {
       return PhosphorIconsRegular.dropHalfBottom;
-    } else if (lower.contains('feet') || lower.contains('nail') || lower.contains('পা') || lower.contains('নখ')) {
+    } else if (lower.contains('feet') || lower.contains('hand') || lower.contains('nail') || lower.contains('পা') || lower.contains('নখ')) {
       return PhosphorIconsRegular.footprints;
     } else if (lower.contains('emergency') || lower.contains('aid') || lower.contains('জরুরি')) {
       return PhosphorIconsRegular.firstAid;
-    } else if (lower.contains('lifestyle') || lower.contains('diabetes') || lower.contains('জীবনধারা')) {
+    } else if (lower.contains('lifestyle') || lower.contains('pancreas') || lower.contains('diabetes') || lower.contains('জীবনধারা')) {
       return PhosphorIconsRegular.scales;
+    } else if (lower.contains('women') || lower.contains('নারী') || lower.contains('মাতৃত্ব')) {
+      return PhosphorIconsRegular.flowerLotus;
+    } else if (lower.contains('fitness') || lower.contains('ব্যায়াম') || lower.contains('posture')) {
+      return PhosphorIconsRegular.personSimpleWalk;
     }
     return PhosphorIconsRegular.heartStraight;
   }

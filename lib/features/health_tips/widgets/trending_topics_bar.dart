@@ -23,6 +23,20 @@ class TrendingTopicsBar extends ConsumerWidget {
       'color': const Color(0xFF4F46E5),
     },
     {
+      'id': 'heart',
+      'title_bn': 'রক্তচাপ ও হার্ট',
+      'title_en': 'BP & Heart',
+      'icon': PhosphorIconsFill.heartbeat,
+      'color': const Color(0xFFDC2626),
+    },
+    {
+      'id': 'pancreas',
+      'title_bn': 'ব্লাড সুগার ও ডায়াবেটিস',
+      'title_en': 'Sugar & Diet',
+      'icon': PhosphorIconsFill.scales,
+      'color': const Color(0xFF059669),
+    },
+    {
       'id': 'eyes',
       'title_bn': 'স্ক্রিনে চোখের ক্লান্তি',
       'title_en': 'Screen Strain',
@@ -37,18 +51,25 @@ class TrendingTopicsBar extends ConsumerWidget {
       'color': const Color(0xFF9333EA),
     },
     {
-      'id': 'heart',
-      'title_bn': 'রক্তচাপ ও কোলেস্টেরল',
-      'title_en': 'High BP & Heart',
-      'icon': PhosphorIconsFill.heartbeat,
-      'color': const Color(0xFFDC2626),
-    },
-    {
-      'id': 'bones',
+      'id': 'bone',
       'title_bn': 'কোমর ও ঘাড় ব্যথা',
       'title_en': 'Back & Neck Pain',
       'icon': PhosphorIconsFill.personSimpleWalk,
       'color': const Color(0xFF475569),
+    },
+    {
+      'id': 'women',
+      'title_bn': 'নারীর স্বাস্থ্য ও হরমোন',
+      'title_en': 'Women Wellness',
+      'icon': PhosphorIconsFill.flowerLotus,
+      'color': const Color(0xFFBE185D),
+    },
+    {
+      'id': 'fitness',
+      'title_bn': 'ব্যায়াম ও সঠিক ভঙ্গি',
+      'title_en': 'Fitness & Posture',
+      'icon': PhosphorIconsFill.personSimpleWalk,
+      'color': const Color(0xFF16A34A),
     },
     {
       'id': 'emergency',
@@ -56,13 +77,6 @@ class TrendingTopicsBar extends ConsumerWidget {
       'title_en': 'First Aid',
       'icon': PhosphorIconsFill.firstAid,
       'color': const Color(0xFFB91C1C),
-    },
-    {
-      'id': 'lifestyle',
-      'title_bn': 'ব্লাড সুগার ও ওজন',
-      'title_en': 'Blood Sugar & Diet',
-      'icon': PhosphorIconsFill.scales,
-      'color': const Color(0xFF059669),
     },
   ];
 

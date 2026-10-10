@@ -7,6 +7,8 @@ import '../features/splash/splash_screen.dart';
 import 'app_string.dart';
 
 class AppRoutes {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   static const String splashRoute = "/";
   static const String homeScreenRoute = "/homeScreen";
   static const String settingsScreenRoute = "/settingsScreen";

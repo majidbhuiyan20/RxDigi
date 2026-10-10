@@ -22,6 +22,7 @@ class Prescripto extends ConsumerWidget {
         splitScreenMode: true,
       builder: (_,context)  {
         return MaterialApp(
+          navigatorKey: AppRoutes.navigatorKey,
           debugShowCheckedModeBanner: false,
           title: 'Prescripto',
           theme: AppTheme.lightTheme,

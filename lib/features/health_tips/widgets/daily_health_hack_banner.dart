@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../provider/health_tips_provider.dart';
+import '../services/daily_tip_notification_manager.dart';
 import '../view/health_tip_detail_screen.dart';
+import '../../../core/utils/app_feedback.dart';
 
 class DailyHealthHackBanner extends ConsumerWidget {
   const DailyHealthHackBanner({super.key});
@@ -164,23 +166,85 @@ class DailyHealthHackBanner extends ConsumerWidget {
                     ),
                     const SizedBox(height: 10),
 
-                    // Bottom tap to read
+                    // Bottom row: Morning notification action & Read details
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          isBn ? 'বিস্তারিত পড়ুন' : 'Read details',
-                          style: const TextStyle(
-                            color: Color(0xFF93C5FD),
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                        InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: () async {
+                            AppFeedback.playLight();
+                            await DailyTipNotificationManager().sendInstantTestNotification(customTip: tip);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(PhosphorIconsFill.bellRinging, color: Colors.white, size: 16),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          isBn
+                                              ? '🔔 আজকের স্বাস্থ্য টিপস নোটিফিকেশন পাঠানো হয়েছে! ট্যাপ করে বিস্তারিত দেখুন।'
+                                              : '🔔 Daily health tip notification delivered! Tap to view details.',
+                                          style: const TextStyle(fontSize: 12.5),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  backgroundColor: const Color(0xFF0F172A),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  duration: const Duration(seconds: 3),
+                                ),
+                              );
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.18),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  PhosphorIconsFill.bellRinging,
+                                  size: 12,
+                                  color: Color(0xFFFDE047),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  isBn ? 'সকালের অ্যালার্ট (৮:০০ AM)' : 'Morning Alert (8:00 AM)',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 4),
-                        const Icon(
-                          PhosphorIconsRegular.arrowRight,
-                          size: 13,
-                          color: Color(0xFF93C5FD),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              isBn ? 'বিস্তারিত পড়ুন' : 'Read details',
+                              style: const TextStyle(
+                                color: Color(0xFF93C5FD),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(
+                              PhosphorIconsRegular.arrowRight,
+                              size: 13,
+                              color: Color(0xFF93C5FD),
+                            ),
+                          ],
                         ),
                       ],
                     ),
