@@ -10,6 +10,7 @@ import '../../medicine_reminder/provider/medicine_reminder_provider.dart';
 import '../../medicine_reminder/view/add_reminder_sheet.dart';
 import '../../medicine_reminder/view/medicine_reminder_screen.dart';
 import '../../../core/utils/app_feedback.dart';
+import '../../../core/utils/bangla_utility.dart';
 import '../../../core/widgets/perfect_day_celebration.dart';
 
 class TodayMedicineCard extends ConsumerStatefulWidget {
@@ -182,44 +183,28 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          PhosphorIconsFill.bellRinging,
-                          color: AppColors.primaryColor,
-                          size: 20,
+                      Text(
+                        isBn ? 'আজকের ঔষধের রুটিন' : "Today's Medication",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 17,
+                          color: Color(0xFF0F172A),
+                          letterSpacing: -0.3,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isBn ? 'আজকের ঔষধের রুটিন' : "Today's Medication",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                              color: Color(0xFF1E293B),
-                              letterSpacing: -0.2,
-                            ),
-                          ),
-                          Text(
-                            isBn
-                                ? '$totalDoses টির মধ্যে $takenDoses টি সম্পন্ন'
-                                : '$takenDoses of $totalDoses doses taken',
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              color: Colors.grey.shade500,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                      const SizedBox(height: 2),
+                      Text(
+                        isBn
+                            ? '${BanglaUtility.toBn(totalDoses)}টির মধ্যে ${BanglaUtility.toBn(takenDoses)}টি সম্পন্ন'
+                            : '$takenDoses of $totalDoses doses taken',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
@@ -269,7 +254,9 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
                           const Icon(PhosphorIconsFill.warningCircle, size: 12, color: Color(0xFFDC2626)),
                           const SizedBox(width: 4),
                           Text(
-                            isBn ? '$overdueDoses টি সময় পার হয়েছে!' : '$overdueDoses dose overdue!',
+                            isBn
+                                ? '${BanglaUtility.toBn(overdueDoses)}টি সময় পার হয়েছে!'
+                                : '$overdueDoses dose overdue!',
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
@@ -285,7 +272,7 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
                       style: TextStyle(fontSize: 11.5, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
                     ),
                   Text(
-                    '$percent%',
+                    isBn ? '${BanglaUtility.toBn(percent)}%' : '$percent%',
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.bold,
@@ -460,7 +447,7 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                '$count',
+                isBn ? BanglaUtility.toBn(count) : '$count',
                 style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
@@ -577,7 +564,7 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        '${dose.slotTitle} • ${dose.time}',
+                        '${dose.slotTitle} • ${isBn ? BanglaUtility.formatTimeBn(dose.time) : dose.time}',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -601,7 +588,7 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
                         child: Text(
                           med.isOutOfStock
                               ? (isBn ? 'স্টক শেষ' : 'Empty')
-                              : (isBn ? 'বাকি ${med.currentStock}' : '${med.currentStock} left'),
+                              : (isBn ? 'বাকি ${BanglaUtility.toBn(med.currentStock)}' : '${med.currentStock} left'),
                           style: TextStyle(
                             fontSize: 9.5,
                             fontWeight: FontWeight.bold,

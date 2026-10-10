@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
 import '../../../app/app_routes.dart';
 import '../../../core/utils/time_context_helper.dart';
+import '../../../core/utils/bangla_utility.dart';
 import '../../medicines/view/medicines_screen.dart';
 import '../../profile/view/profile_screen.dart';
 
@@ -13,7 +14,9 @@ class HomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
-    final String todayDate = DateFormat('EEEE, d MMMM').format(DateTime.now());
+    final String todayDate = isBn
+        ? BanglaUtility.formatFullDateBn(DateTime.now())
+        : DateFormat('EEEE, d MMMM').format(DateTime.now());
     final gradientColors = TimeContextHelper.getPeriodGradient();
     final greeting = TimeContextHelper.getGreeting(isBn);
     final periodIcon = TimeContextHelper.getPeriodIcon();
@@ -24,7 +27,7 @@ class HomeHeader extends StatelessWidget {
         left: 20,
         right: 20,
         top: MediaQuery.of(context).padding.top + 12,
-        bottom: 22,
+        bottom: 20,
       ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -78,13 +81,35 @@ class HomeHeader extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 3),
-                    Text(
-                      todayDate,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.85),
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          todayDate,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        if (contextPrompt.isNotEmpty) ...[
+                          Text(
+                            ' • ',
+                            style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+                          ),
+                          Flexible(
+                            child: Text(
+                              contextPrompt,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.95),
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
@@ -124,26 +149,7 @@ class HomeHeader extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
-
-          // Contextual Time-of-Day Focus Pill
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
-            ),
-            child: Text(
-              contextPrompt,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11.5,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
 
           // Embedded Quick Search Bar for 21k Medicines
           GestureDetector(

@@ -40,7 +40,7 @@ class QuickActionsRow extends StatelessWidget {
       ),
       _ActionItem(
         title: isBn ? 'প্রেসক্রিপশন' : 'Rx Studio',
-        subtitle: isBn ? 'ডাক্তারি পেপার' : 'Doctor Rx',
+        subtitle: isBn ? 'নতুন তৈরি' : 'Digital Rx',
         icon: PhosphorIconsRegular.fileText,
         bgColor: const Color(0xFFFAF5FF), // Soft Purple
         iconColor: const Color(0xFF9333EA),

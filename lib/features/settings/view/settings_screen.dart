@@ -151,30 +151,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                PhosphorIconsFill.gear,
-                size: 18,
-                color: AppColors.primaryColor,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              l10n.settings,
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 17,
-                color: Color(0xFF0F172A),
-              ),
-            ),
-          ],
+        title: Text(
+          l10n.settings,
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 17,
+            color: Color(0xFF0F172A),
+          ),
         ),
         iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
       ),

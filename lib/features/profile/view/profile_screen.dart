@@ -24,30 +24,13 @@ class ProfileScreen extends ConsumerWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F766E).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                PhosphorIconsFill.identificationCard,
-                size: 18,
-                color: Color(0xFF0F766E),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              isBn ? 'মেডিকেল প্রোফাইল ও হেলথ কার্ড' : 'Health Profile & Medical ID',
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 16.5,
-                color: Color(0xFF0F172A),
-              ),
-            ),
-          ],
+        title: Text(
+          isBn ? 'মেডিকেল প্রোফাইল ও আইডি' : 'Health Profile & ID',
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 17,
+            color: Color(0xFF0F172A),
+          ),
         ),
         iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
         actions: [

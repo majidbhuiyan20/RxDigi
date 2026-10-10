@@ -42,31 +42,14 @@ class FeaturedTipCard extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0D9488).withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          PhosphorIconsFill.lightbulb,
-                          color: Color(0xFF0D9488),
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        isTipBn ? 'দৈনিক স্বাস্থ্য বার্তা' : "Daily Health Insight",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                          color: Color(0xFF1E293B),
-                          letterSpacing: -0.2,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    isTipBn ? 'দৈনিক স্বাস্থ্য বার্তা' : "Daily Health Insight",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 17,
+                      color: Color(0xFF0F172A),
+                      letterSpacing: -0.3,
+                    ),
                   ),
 
                   // Mini Bangla / English Toggle

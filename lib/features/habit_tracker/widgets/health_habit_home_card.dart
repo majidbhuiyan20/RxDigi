@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
 import '../../../core/utils/app_feedback.dart';
+import '../../../core/utils/bangla_utility.dart';
 import '../../../core/widgets/perfect_day_celebration.dart';
 import '../models/health_habit_model.dart';
 import '../provider/health_habit_provider.dart';
@@ -57,35 +58,24 @@ class HealthHabitHomeCard extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(9),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          PhosphorIconsRegular.sparkle,
-                          color: Color(0xFF059669),
-                          size: 20,
+                      Text(
+                        isBn ? 'দৈনিক স্বাস্থ্য অভ্যাস' : 'Daily Health Habits',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 17,
+                          color: Color(0xFF0F172A),
+                          letterSpacing: -0.3,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            isBn ? 'দৈনিক স্বাস্থ্য রুটিন' : 'Daily Health Habits',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                          ),
-                          Text(
-                            isBn
-                                ? '${habits.length}টির মধ্যে ${completed.length}টি সম্পন্ন ($percent%)'
-                                : '${completed.length} of ${habits.length} done ($percent%)',
-                            style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
-                          ),
-                        ],
+                      const SizedBox(height: 2),
+                      Text(
+                        isBn
+                            ? '${BanglaUtility.toBn(habits.length)}টির মধ্যে ${BanglaUtility.toBn(completed.length)}টি সম্পন্ন (${BanglaUtility.toBn(percent)}%)'
+                            : '${completed.length} of ${habits.length} done ($percent%)',
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -106,7 +96,7 @@ class HealthHabitHomeCard extends ConsumerWidget {
                           const Icon(PhosphorIconsFill.fire, color: Colors.white, size: 13),
                           const SizedBox(width: 4),
                           Text(
-                            '$streak ${isBn ? "দিনের স্ট্রিক" : "d streak"}',
+                            '${isBn ? BanglaUtility.toBn(streak) : streak} ${isBn ? "দিনের স্ট্রিক" : "d streak"}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 11,
@@ -169,7 +159,7 @@ class HealthHabitHomeCard extends ConsumerWidget {
                                 ),
                               ),
                               Text(
-                                '$waterGlasses/৮ ${isBn ? "গ্লাস" : "glasses"}',
+                                '${isBn ? BanglaUtility.toBn(waterGlasses) : waterGlasses}/${isBn ? "৮" : "8"} ${isBn ? "গ্লাস" : "glasses"}',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w800,

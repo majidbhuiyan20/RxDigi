@@ -36,31 +36,14 @@ class HomeVitalsCard extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEF4444).withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      PhosphorIconsFill.heartStraight,
-                      color: Color(0xFFEF4444),
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    isBn ? 'স্বাস্থ্য পরিমাপক (Vitals)' : 'My Health Vitals',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                      color: Color(0xFF1E293B),
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                ],
+              Text(
+                isBn ? 'স্বাস্থ্য পরিমাপক (ভাইটালস)' : 'Health Vitals',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 17,
+                  color: Color(0xFF0F172A),
+                  letterSpacing: -0.3,
+                ),
               ),
               InkWell(
                 onTap: () => AddVitalSheet.show(context),

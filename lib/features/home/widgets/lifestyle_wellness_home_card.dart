@@ -19,30 +19,14 @@ class LifestyleWellnessHomeCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    PhosphorIconsFill.heartbeat,
-                    size: 16,
-                    color: AppColors.primaryColor,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  isBn ? 'লাইফস্টাইল ও সুস্থতা হাব' : 'Lifestyle & Wellness Hub',
-                  style: const TextStyle(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
-                  ),
-                ),
-              ],
+            Text(
+              isBn ? 'লাইফস্টাইল ও সুস্থতা' : 'Lifestyle & Wellness',
+              style: const TextStyle(
+                fontSize: 16.5,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF0F172A),
+                letterSpacing: -0.3,
+              ),
             ),
           ],
         ),
@@ -57,7 +41,7 @@ class LifestyleWellnessHomeCard extends StatelessWidget {
                 context: context,
                 title: isBn ? 'দেশীয় খাবার ও ডায়াবেটিস' : 'Bangladeshi Diet & GI',
                 subtitle: isBn ? 'ক্যালোরি ও লো-GI গাইড' : 'Calorie & GI Index',
-                badgeText: isBn ? '৩৫+ খাবার' : '35+ Foods',
+                badgeText: isBn ? '৬০০+ খাবার' : '600+ Foods',
                 emoji: '🍛',
                 gradientColors: const [
                   Color(0xFFECFDF5),

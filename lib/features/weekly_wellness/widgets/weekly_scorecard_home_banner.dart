@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../services/weekly_wellness_service.dart';
 import 'weekly_scorecard_share_sheet.dart';
 import '../../../core/utils/app_feedback.dart';
+import '../../../core/utils/bangla_utility.dart';
 
 class WeeklyScorecardHomeBanner extends ConsumerWidget {
   const WeeklyScorecardHomeBanner({super.key});
@@ -64,7 +65,7 @@ class WeeklyScorecardHomeBanner extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '${model.score}',
+                          isBn ? BanglaUtility.toBn(model.score) : '${model.score}',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
@@ -108,7 +109,7 @@ class WeeklyScorecardHomeBanner extends ConsumerWidget {
                         const SizedBox(height: 3),
                         Text(
                           isBn
-                              ? 'মেডিসিন রুটিন ${model.medicinePercent}% | পানি ${model.waterDaysAchieved}/৭ দিন'
+                              ? 'মেডিসিন রুটিন ${BanglaUtility.toBn(model.medicinePercent)}% | পানি ${BanglaUtility.toBn(model.waterDaysAchieved)}/৭ দিন'
                               : 'Meds ${model.medicinePercent}% | Hydration ${model.waterDaysAchieved}/7d',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

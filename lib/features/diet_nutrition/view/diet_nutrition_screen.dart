@@ -105,32 +105,13 @@ class _DietNutritionScreenState extends State<DietNutritionScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                PhosphorIconsFill.forkKnife,
-                size: 18,
-                color: Color(0xFF10B981),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                isBn ? 'দেশীয় খাবার ও ডায়াবেটিস গাইড' : 'Bangladeshi Diet & GI',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16.5,
-                  color: Color(0xFF0F172A),
-                ),
-              ),
-            ),
-          ],
+        title: Text(
+          isBn ? 'দেশীয় খাবার ও ডায়াবেটিস গাইড' : 'Bangladeshi Diet & GI',
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 17,
+            color: Color(0xFF0F172A),
+          ),
         ),
         iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
         actions: [

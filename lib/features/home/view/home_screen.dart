@@ -27,31 +27,31 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ─── 4 Quick Actions Row (Medicines, Reminder, Vitals, Rx) ───
+                  // ─── 1. 4 Quick Actions Row (Medicines, Reminder, Vitals, Rx) ───
                   QuickActionsRow(),
                   SizedBox(height: 18),
 
-                  // ─── Weekly Wellness Celebration Scorecard ───
-                  WeeklyScorecardHomeBanner(),
-                  SizedBox(height: 18),
-
-                  // ─── Daily Medicine Routine & Adherence Checklist ───
+                  // ─── 2. Daily Medicine Routine & Adherence Checklist (Hero Action) ───
                   TodayMedicineCard(),
                   SizedBox(height: 18),
 
-                  // ─── Lifestyle, Diet & Women Health Hub ───
+                  // ─── 3. Lifestyle, Diet & Women Health Hub ───
                   LifestyleWellnessHomeCard(),
                   SizedBox(height: 18),
 
-                  // ─── Daily Health Habits & Interactive Streak Tracker ───
+                  // ─── 4. Weekly Wellness Celebration Scorecard ───
+                  WeeklyScorecardHomeBanner(),
+                  SizedBox(height: 18),
+
+                  // ─── 5. Daily Health Habits & Interactive Streak Tracker ───
                   HealthHabitHomeCard(),
                   SizedBox(height: 18),
 
-                  // ─── Personal Health Vitals (BP, Sugar, Weight) ───
+                  // ─── 6. Personal Health Vitals (BP, Sugar, Weight) ───
                   HomeVitalsCard(),
                   SizedBox(height: 18),
 
-                  // ─── Daily Featured Bilingual Health Tip ───
+                  // ─── 7. Daily Featured Bilingual Health Tip ───
                   FeaturedTipCard(),
                 ],
               ),

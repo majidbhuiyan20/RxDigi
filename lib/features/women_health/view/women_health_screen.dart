@@ -41,34 +41,13 @@ class WomenHealthScreen extends ConsumerWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF43F5E).withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: const Icon(
-                PhosphorIconsFill.flowerLotus,
-                size: 16,
-                color: Color(0xFFF43F5E),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                isBn ? 'উইমেন হেলথ' : 'Women Health',
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16,
-                  color: Color(0xFF0F172A),
-                ),
-              ),
-            ),
-          ],
+        title: Text(
+          isBn ? 'উইমেন হেলথ ও সাইকেল' : 'Women Health & Cycle',
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 17,
+            color: Color(0xFF0F172A),
+          ),
         ),
         iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
         actions: [
