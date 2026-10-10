@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import '../../../app/app_colors.dart';
 
 class AdherenceProgressCard extends StatelessWidget {
   final int activeCount;

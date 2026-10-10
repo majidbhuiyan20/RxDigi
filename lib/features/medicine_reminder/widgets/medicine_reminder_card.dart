@@ -4,9 +4,11 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/slot_style.dart';
 import '../../../app/app_colors.dart';
 import '../../../core/utils/app_feedback.dart';
+import '../../../core/utils/bangla_utility.dart';
 import '../models/medicine_reminder_model.dart';
 import '../provider/medicine_reminder_provider.dart';
 import '../services/medicine_safety_advisor.dart';
+import '../view/add_reminder_sheet.dart';
 
 class MedicineReminderCard extends ConsumerWidget {
   final MedicineReminderModel reminder;
@@ -262,6 +264,52 @@ class MedicineReminderCard extends ConsumerWidget {
                           ],
                         ),
                       ],
+                      if (reminder.isCourseBased) ...[
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: reminder.isCourseCompleted
+                                ? Colors.green.shade50
+                                : const Color(0xFFEFF6FF),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: reminder.isCourseCompleted
+                                  ? Colors.green.shade200
+                                  : const Color(0xFFBFDBFE),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                reminder.isCourseCompleted
+                                    ? PhosphorIconsFill.checkCircle
+                                    : PhosphorIconsRegular.clockCountdown,
+                                size: 12.5,
+                                color: reminder.isCourseCompleted
+                                    ? Colors.green.shade700
+                                    : const Color(0xFF1D4ED8),
+                              ),
+                              const SizedBox(width: 4.5),
+                              Text(
+                                reminder.isCourseCompleted
+                                    ? (isBn ? 'কোর্স সমাপ্ত (${reminder.durationDays} দিন)' : 'Course Completed (${reminder.durationDays}d)')
+                                    : (isBn
+                                        ? 'কোর্স: ${BanglaUtility.toBn(reminder.currentCourseDay)}/${BanglaUtility.toBn(reminder.durationDays)} দিন'
+                                        : 'Course: Day ${reminder.currentCourseDay} of ${reminder.durationDays}'),
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: reminder.isCourseCompleted
+                                      ? Colors.green.shade700
+                                      : const Color(0xFF1D4ED8),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -302,9 +350,20 @@ class MedicineReminderCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 IconButton(
-                  icon: Icon(PhosphorIconsRegular.trash, size: 20, color: Colors.red.shade400),
+                  icon: Icon(PhosphorIconsRegular.pencilSimple, size: 19, color: Colors.blueGrey.shade600),
+                  tooltip: isBn ? 'সম্পাদনা' : 'Edit',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () {
+                    AppFeedback.playLight();
+                    AddReminderSheet.show(context, existingReminder: reminder);
+                  },
+                ),
+                const SizedBox(width: 10),
+                IconButton(
+                  icon: Icon(PhosphorIconsRegular.trash, size: 19, color: Colors.red.shade400),
                   tooltip: isBn ? 'মুছুন' : 'Delete',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),

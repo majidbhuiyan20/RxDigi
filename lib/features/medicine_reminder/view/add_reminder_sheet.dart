@@ -26,14 +26,16 @@ class DosePreset {
 }
 
 class AddReminderSheet extends ConsumerStatefulWidget {
-  const AddReminderSheet({super.key});
+  final MedicineReminderModel? existingReminder;
 
-  static Future<void> show(BuildContext context) {
+  const AddReminderSheet({super.key, this.existingReminder});
+
+  static Future<void> show(BuildContext context, {MedicineReminderModel? existingReminder}) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const AddReminderSheet(),
+      builder: (context) => AddReminderSheet(existingReminder: existingReminder),
     );
   }
 
@@ -87,6 +89,47 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
   bool _trackStock = false;
   final _stockController = TextEditingController(text: '10');
   int _lowStockThreshold = 2;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existingReminder != null) {
+      final r = widget.existingReminder!;
+      _nameController.text = r.medicineName;
+      _strengthController.text = r.dosageStrength;
+      _dosageForm = r.dosageForm;
+      _instructions = r.instructions;
+      _morning = r.morning;
+      _noon = r.noon;
+      _evening = r.evening;
+      _night = r.night;
+      _morningTime = _parseTimeOfDay(r.morningTime);
+      _noonTime = _parseTimeOfDay(r.noonTime);
+      _eveningTime = _parseTimeOfDay(r.eveningTime);
+      _nightTime = _parseTimeOfDay(r.nightTime);
+      _durationDays = r.durationDays;
+      _trackStock = r.hasStockTracking;
+      _stockController.text = r.currentStock.toString();
+      _lowStockThreshold = r.lowStockThreshold;
+    }
+  }
+
+  TimeOfDay _parseTimeOfDay(String timeStr) {
+    try {
+      final parts = timeStr.trim().split(' ');
+      final timeParts = parts[0].split(':');
+      int hour = int.parse(timeParts[0]);
+      final minute = int.parse(timeParts[1]);
+      if (parts.length > 1) {
+        final period = parts[1].toUpperCase();
+        if (period == 'PM' && hour < 12) hour += 12;
+        if (period == 'AM' && hour == 12) hour = 0;
+      }
+      return TimeOfDay(hour: hour, minute: minute);
+    } catch (_) {
+      return const TimeOfDay(hour: 8, minute: 0);
+    }
+  }
 
   @override
   void dispose() {
@@ -185,8 +228,10 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
     }
 
     final stockVal = _trackStock ? (int.tryParse(_stockController.text.trim()) ?? 10) : 0;
+    final isEditing = widget.existingReminder != null;
 
     final reminder = MedicineReminderModel(
+      id: widget.existingReminder?.id,
       medicineName: name,
       dosageForm: _dosageForm,
       dosageStrength: _strengthController.text.trim(),
@@ -199,20 +244,28 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
       noonTime: _formatTimeOfDay(_noonTime),
       eveningTime: _formatTimeOfDay(_eveningTime),
       nightTime: _formatTimeOfDay(_nightTime),
-      startDate: getTodayDateString(),
+      startDate: widget.existingReminder?.startDate ?? getTodayDateString(),
       durationDays: _durationDays,
-      totalStock: stockVal,
+      totalStock: isEditing && widget.existingReminder!.totalStock > 0 ? widget.existingReminder!.totalStock : stockVal,
       currentStock: stockVal,
       lowStockThreshold: _lowStockThreshold,
       isRefillAlertEnabled: _trackStock,
-      createdAt: DateTime.now().toIso8601String(),
+      isActive: widget.existingReminder?.isActive ?? true,
+      createdAt: widget.existingReminder?.createdAt ?? DateTime.now().toIso8601String(),
     );
 
-    ref.read(medicineReminderNotifierProvider.notifier).addReminder(reminder);
+    final isBn = Localizations.localeOf(context).languageCode == 'bn';
+    if (isEditing) {
+      ref.read(medicineReminderNotifierProvider.notifier).updateReminder(reminder);
+    } else {
+      ref.read(medicineReminderNotifierProvider.notifier).addReminder(reminder);
+    }
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Reminder added for $name'),
+        content: Text(isEditing
+            ? (isBn ? '$name এর তথ্য আপডেট করা হয়েছে' : 'Updated reminder for $name')
+            : (isBn ? '$name এর রিমাইন্ডার যুক্ত করা হয়েছে' : 'Reminder added for $name')),
         backgroundColor: AppColors.primaryColor,
       ),
     );
@@ -260,7 +313,11 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                     color: AppColors.primaryColor.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(PhosphorIconsRegular.alarm, color: AppColors.primaryColor, size: 24),
+                  child: Icon(
+                    widget.existingReminder != null ? PhosphorIconsRegular.pencilSimple : PhosphorIconsRegular.alarm,
+                    color: AppColors.primaryColor,
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -268,11 +325,15 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isBn ? 'নতুন মেডিসিন রিমাইন্ডার' : 'Add Medicine Reminder',
+                        isBn
+                            ? (widget.existingReminder != null ? 'মেডিসিন রিমাইন্ডার সম্পাদনা' : 'নতুন মেডিসিন রিমাইন্ডার')
+                            : (widget.existingReminder != null ? 'Edit Medicine Reminder' : 'Add Medicine Reminder'),
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        isBn ? 'ঔষধের নাম খুঁজুন এবং গ্রহণের সময়সূচী নির্বাচন করুন' : 'Search 21,000+ medicines & schedule doses',
+                        isBn
+                            ? (widget.existingReminder != null ? 'ডোজ, সময়সূচী বা স্টক পরিবর্তন করুন' : 'ঔষধের নাম খুঁজুন এবং গ্রহণের সময়সূচী নির্বাচন করুন')
+                            : (widget.existingReminder != null ? 'Modify schedule, dosage or stock' : 'Search 21,000+ medicines & schedule doses'),
                         style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
                     ],
@@ -722,7 +783,9 @@ class _AddReminderSheetState extends ConsumerState<AddReminderSheet> {
                 onPressed: _save,
                 icon: const Icon(Icons.check_rounded, color: Colors.white),
                 label: Text(
-                  isBn ? 'রিমাইন্ডার সংরক্ষণ করুন' : 'Save Medicine Reminder',
+                  isBn
+                      ? (widget.existingReminder != null ? 'আপডেট সংরক্ষণ করুন' : 'রিমাইন্ডার সংরক্ষণ করুন')
+                      : (widget.existingReminder != null ? 'Save Changes' : 'Save Medicine Reminder'),
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(

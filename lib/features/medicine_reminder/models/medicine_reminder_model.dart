@@ -165,4 +165,20 @@ class MedicineReminderModel {
   bool get isLowStock => hasStockTracking && currentStock <= lowStockThreshold && currentStock > 0;
   bool get isOutOfStock => hasStockTracking && currentStock <= 0;
   double get stockPercent => totalStock > 0 ? (currentStock / totalStock).clamp(0.0, 1.0) : 1.0;
+
+  // Course duration getters
+  bool get isCourseBased => durationDays > 0;
+  int get elapsedDays {
+    try {
+      final start = DateTime.parse(startDate);
+      final now = DateTime.now();
+      final diff = DateTime(now.year, now.month, now.day).difference(DateTime(start.year, start.month, start.day)).inDays;
+      return diff < 0 ? 0 : diff;
+    } catch (_) {
+      return 0;
+    }
+  }
+  int get currentCourseDay => (elapsedDays + 1).clamp(1, durationDays > 0 ? durationDays : 999);
+  bool get isCourseCompleted => isCourseBased && elapsedDays >= durationDays;
+  double get courseProgress => isCourseBased ? (elapsedDays / durationDays).clamp(0.0, 1.0) : 0.0;
 }

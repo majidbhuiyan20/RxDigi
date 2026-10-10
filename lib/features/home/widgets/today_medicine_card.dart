@@ -580,6 +580,28 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
                       med.instructions,
                       style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
                     ),
+                    if (med.isCourseBased) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: med.isCourseCompleted ? Colors.green.shade50 : const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          med.isCourseCompleted
+                              ? (isBn ? 'কোর্স সমাপ্ত' : 'Done')
+                              : (isBn
+                                  ? 'দিন ${BanglaUtility.toBn(med.currentCourseDay)}/${BanglaUtility.toBn(med.durationDays)}'
+                                  : 'Day ${med.currentCourseDay}/${med.durationDays}'),
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.bold,
+                            color: med.isCourseCompleted ? Colors.green.shade700 : const Color(0xFF1D4ED8),
+                          ),
+                        ),
+                      ),
+                    ],
                     if (med.isLowStock || med.isOutOfStock) ...[
                       const SizedBox(width: 6),
                       Container(

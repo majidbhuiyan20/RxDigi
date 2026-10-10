@@ -57,6 +57,21 @@ class MedicineReminderNotifier extends Notifier<void> {
     ref.invalidate(weeklyAdherenceReportProvider);
   }
 
+  Future<void> updateReminder(MedicineReminderModel reminder) async {
+    final repo = ref.read(medicineReminderRepoProvider);
+    await repo.updateReminder(reminder);
+    if (reminder.id != null) {
+      await NotificationService().cancelMedicineReminders(reminder.id!);
+      if (reminder.isActive) {
+        await NotificationService().scheduleMedicineReminder(reminder);
+      }
+    }
+    ref.invalidate(activeRemindersProvider);
+    ref.invalidate(allRemindersProvider);
+    ref.invalidate(todayAdherenceMapProvider);
+    ref.invalidate(weeklyAdherenceReportProvider);
+  }
+
   Future<void> toggleReminderActive(int id, bool isActive) async {
     final repo = ref.read(medicineReminderRepoProvider);
     await repo.toggleReminderActive(id, isActive);
