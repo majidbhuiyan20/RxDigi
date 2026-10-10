@@ -122,7 +122,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:
-  /// **'Setttings'**
+  /// **'Settings'**
   String get settings;
 
   /// No description provided for @home.

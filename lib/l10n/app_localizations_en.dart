@@ -21,7 +21,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bengali => 'বাংলা';
 
   @override
-  String get settings => 'Setttings';
+  String get settings => 'Settings';
 
   @override
   String get home => 'Home Screen';

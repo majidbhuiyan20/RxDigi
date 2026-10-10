@@ -194,7 +194,7 @@ class PcosDietGuidanceCard extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final item = pcosFoods[index];
                 return Container(
-                  width: 200,
+                  width: 235,
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF8FAFC),
@@ -208,25 +208,27 @@ class PcosDietGuidanceCard extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Text(item['emoji']!, style: const TextStyle(fontSize: 16)),
-                              const SizedBox(width: 6),
-                              SizedBox(
-                                width: 105,
-                                child: Text(
-                                  isBn ? item['nameBn']! : item['nameEn']!,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0F172A),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Text(item['emoji']!, style: const TextStyle(fontSize: 16)),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    isBn ? item['nameBn']! : item['nameEn']!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF0F172A),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                             decoration: BoxDecoration(

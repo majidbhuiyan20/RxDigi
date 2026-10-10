@@ -52,7 +52,7 @@ class WomenHealthScreen extends ConsumerWidget {
           isBn ? 'উইমেন হেলথ ও সাইকেল' : 'Women Health & Cycle',
           style: const TextStyle(
             fontWeight: FontWeight.w800,
-            fontSize: 17,
+            fontSize: 16.5,
             color: Color(0xFF0F172A),
           ),
         ),
@@ -66,11 +66,11 @@ class WomenHealthScreen extends ConsumerWidget {
               ref.read(localeProvider.notifier).setLocale(Locale(nextLang));
             },
             child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: Colors.grey.shade300),
               ),
               child: Row(
@@ -90,104 +90,165 @@ class WomenHealthScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(width: 4),
-
-          // ─── Cycle Goal Mode Switcher Pill (Period Track vs Conception Mode) ───
-          GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              ref.read(cycleGoalModeProvider.notifier).toggleMode();
-              final isTTC = goalMode == CycleGoalMode.trackCycle;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(isTTC
-                      ? (isBn ? '🌸 গর্ভধারণ পরিকল্পনা মোড চালু হয়েছে' : '🌸 TTC Conception Mode Activated')
-                      : (isBn ? '🩸 পিরিয়ড ট্র্যাকিং মোড চালু হয়েছে' : '🩸 Period Tracking Mode Activated')),
-                  backgroundColor: isTTC ? const Color(0xFF8B5CF6) : const Color(0xFFF43F5E),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
-            },
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: goalMode == CycleGoalMode.tryToConceive
-                    ? const Color(0xFF8B5CF6).withValues(alpha: 0.12)
-                    : const Color(0xFFF43F5E).withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: goalMode == CycleGoalMode.tryToConceive
-                      ? const Color(0xFF8B5CF6).withValues(alpha: 0.4)
-                      : const Color(0xFFF43F5E).withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    goalMode == CycleGoalMode.tryToConceive
-                        ? PhosphorIconsFill.sparkle
-                        : PhosphorIconsFill.drop,
-                    size: 12,
-                    color: goalMode == CycleGoalMode.tryToConceive
-                        ? const Color(0xFF8B5CF6)
-                        : const Color(0xFFF43F5E),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    goalMode == CycleGoalMode.tryToConceive
-                        ? (isBn ? 'গর্ভধারণ মোড' : 'TTC Mode')
-                        : (isBn ? 'পিরিয়ড মোড' : 'Period Mode'),
-                    style: TextStyle(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.bold,
-                      color: goalMode == CycleGoalMode.tryToConceive
-                          ? const Color(0xFF7C3AED)
-                          : const Color(0xFFE11D48),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
           const SizedBox(width: 2),
 
           // ─── Doctor Clinical Summary PDF Action ───
           IconButton(
             tooltip: isBn ? 'ডাক্তারের রিপোর্ট (PDF)' : 'Doctor Report (PDF)',
-            icon: const Icon(PhosphorIconsRegular.filePdf, size: 20, color: Color(0xFFBE123C)),
+            icon: const Icon(PhosphorIconsRegular.filePdf, size: 21, color: Color(0xFFBE123C)),
             onPressed: () {
               AppFeedback.playLight();
               DoctorCycleReportSheet.show(context, cycle);
             },
           ),
 
-          // ─── Past Cycles History Action ───
-          IconButton(
-            tooltip: isBn ? 'সাইকেল হিস্ট্রি' : 'Cycle History',
-            icon: const Icon(PhosphorIconsRegular.clockCounterClockwise, size: 20, color: Color(0xFF0F172A)),
-            onPressed: () {
+          // ─── More Options Menu (History & Settings) ───
+          PopupMenuButton<String>(
+            icon: const Icon(PhosphorIconsRegular.dotsThreeVertical, size: 20, color: Color(0xFF0F172A)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            onSelected: (val) {
               AppFeedback.playLight();
-              PastCycleHistorySheet.show(context, cycle);
+              if (val == 'history') {
+                PastCycleHistorySheet.show(context, cycle);
+              } else if (val == 'settings') {
+                CycleSettingsSheet.show(context, cycle);
+              }
             },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'history',
+                child: Row(
+                  children: [
+                    const Icon(PhosphorIconsRegular.clockCounterClockwise, size: 18, color: Color(0xFF0F172A)),
+                    const SizedBox(width: 10),
+                    Text(
+                      isBn ? 'সাইকেল হিস্ট্রি' : 'Cycle History',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    const Icon(PhosphorIconsRegular.gear, size: 18, color: Color(0xFF0F172A)),
+                    const SizedBox(width: 10),
+                    Text(
+                      isBn ? 'সাইকেল সেটিংস' : 'Cycle Settings',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-
-          // ─── Settings Action ───
-          IconButton(
-            tooltip: isBn ? 'সাইকেল সেটিংস' : 'Cycle Settings',
-            icon: const Icon(PhosphorIconsRegular.gear, size: 20, color: Color(0xFF0F172A)),
-            onPressed: () {
-              AppFeedback.playLight();
-              CycleSettingsSheet.show(context, cycle);
-            },
-          ),
+          const SizedBox(width: 4),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 80),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
         physics: const BouncingScrollPhysics(),
         children: [
+          // ─── Top Mode Pill & Quick History Row ───
+          Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Goal Mode Switcher (Period Track vs TTC)
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    ref.read(cycleGoalModeProvider.notifier).toggleMode();
+                    final isTTC = goalMode == CycleGoalMode.trackCycle;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(isTTC
+                            ? (isBn ? '🌸 গর্ভধারণ পরিকল্পনা মোড চালু হয়েছে' : '🌸 TTC Conception Mode Activated')
+                            : (isBn ? '🩸 পিরিয়ড ট্র্যাকিং মোড চালু হয়েছে' : '🩸 Period Tracking Mode Activated')),
+                        backgroundColor: isTTC ? const Color(0xFF8B5CF6) : const Color(0xFFF43F5E),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: goalMode == CycleGoalMode.tryToConceive
+                          ? const Color(0xFF8B5CF6).withValues(alpha: 0.12)
+                          : const Color(0xFFF43F5E).withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: goalMode == CycleGoalMode.tryToConceive
+                            ? const Color(0xFF8B5CF6).withValues(alpha: 0.4)
+                            : const Color(0xFFF43F5E).withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          goalMode == CycleGoalMode.tryToConceive
+                              ? PhosphorIconsFill.sparkle
+                              : PhosphorIconsFill.drop,
+                          size: 13,
+                          color: goalMode == CycleGoalMode.tryToConceive
+                              ? const Color(0xFF8B5CF6)
+                              : const Color(0xFFF43F5E),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          goalMode == CycleGoalMode.tryToConceive
+                              ? (isBn ? '🌸 গর্ভধারণ পরিকল্পনা মোড' : '🌸 TTC Conception Mode')
+                              : (isBn ? '🩸 পিরিয়ড ট্র্যাকিং মোড' : '🩸 Period Tracking Mode'),
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.bold,
+                            color: goalMode == CycleGoalMode.tryToConceive
+                                ? const Color(0xFF7C3AED)
+                                : const Color(0xFFE11D48),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Quick History Shortcut Chip
+                InkWell(
+                  onTap: () {
+                    AppFeedback.playLight();
+                    PastCycleHistorySheet.show(context, cycle);
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(PhosphorIconsRegular.clockCounterClockwise, size: 13, color: Color(0xFF475569)),
+                        const SizedBox(width: 4),
+                        Text(
+                          isBn ? 'হিস্ট্রি' : 'History',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF475569),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           // ─── 1. Interactive Horizontal Calendar Date Reel ───
           HorizontalCycleDateStrip(cycle: cycle),
 
