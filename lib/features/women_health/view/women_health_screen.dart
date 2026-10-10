@@ -19,6 +19,11 @@ import '../widgets/doctor_cycle_report_sheet.dart';
 import '../widgets/past_cycle_history_sheet.dart';
 import '../widgets/pcos_diet_guidance_card.dart';
 import '../widgets/women_care_supplements_card.dart';
+import '../widgets/pregnancy_dashboard_view.dart';
+import '../widgets/pregnancy_setup_sheet.dart';
+import '../widgets/fetal_kick_counter_sheet.dart';
+import '../services/pregnancy_notification_service.dart';
+import '../provider/pregnancy_provider.dart';
 
 class WomenHealthScreen extends ConsumerWidget {
   const WomenHealthScreen({super.key});
@@ -112,6 +117,10 @@ class WomenHealthScreen extends ConsumerWidget {
                 PastCycleHistorySheet.show(context, cycle);
               } else if (val == 'settings') {
                 CycleSettingsSheet.show(context, cycle);
+              } else if (val == 'pregnancy_settings') {
+                PregnancySetupSheet.show(context);
+              } else if (val == 'kick_counter') {
+                FetalKickCounterSheet.show(context);
               }
             },
             itemBuilder: (context) => [
@@ -141,6 +150,33 @@ class WomenHealthScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                value: 'pregnancy_settings',
+                child: Row(
+                  children: [
+                    const Icon(PhosphorIconsRegular.baby, size: 18, color: Color(0xFFE11D48)),
+                    const SizedBox(width: 10),
+                    Text(
+                      isBn ? 'গর্ভাবস্থা ও ডিউ ডেট' : 'Pregnancy Settings',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'kick_counter',
+                child: Row(
+                  children: [
+                    const Icon(PhosphorIconsRegular.footprints, size: 18, color: Color(0xFFE11D48)),
+                    const SizedBox(width: 10),
+                    Text(
+                      isBn ? 'ফিটাল কিক কাউন্টার' : 'Kick Counter',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(width: 4),
@@ -150,70 +186,68 @@ class WomenHealthScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
         physics: const BouncingScrollPhysics(),
         children: [
-          // ─── Top Mode Pill & Quick History Row ───
+          // ─── Top 3-Mode Selector Strip & History Chip ───
           Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            margin: const EdgeInsets.only(bottom: 14),
+            height: 36,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
               children: [
-                // Goal Mode Switcher (Period Track vs TTC)
-                GestureDetector(
+                // 1. Period Tracking Mode
+                _buildModeChip(
+                  label: isBn ? '🩸 পিরিয়ড ট্র্যাকিং' : '🩸 Period Track',
+                  isSelected: goalMode == CycleGoalMode.trackCycle,
+                  activeBg: const Color(0xFFF43F5E),
                   onTap: () {
                     HapticFeedback.selectionClick();
-                    ref.read(cycleGoalModeProvider.notifier).toggleMode();
-                    final isTTC = goalMode == CycleGoalMode.trackCycle;
+                    ref.read(cycleGoalModeProvider.notifier).setMode(CycleGoalMode.trackCycle);
+                  },
+                ),
+                const SizedBox(width: 8),
+
+                // 2. TTC Conception Mode
+                _buildModeChip(
+                  label: isBn ? '🌸 গর্ভধারণ পরিকল্পনা' : '🌸 Conception',
+                  isSelected: goalMode == CycleGoalMode.tryToConceive,
+                  activeBg: const Color(0xFF8B5CF6),
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    ref.read(cycleGoalModeProvider.notifier).setMode(CycleGoalMode.tryToConceive);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(isTTC
-                            ? (isBn ? '🌸 গর্ভধারণ পরিকল্পনা মোড চালু হয়েছে' : '🌸 TTC Conception Mode Activated')
-                            : (isBn ? '🩸 পিরিয়ড ট্র্যাকিং মোড চালু হয়েছে' : '🩸 Period Tracking Mode Activated')),
-                        backgroundColor: isTTC ? const Color(0xFF8B5CF6) : const Color(0xFFF43F5E),
+                        content: Text(isBn ? '🌸 গর্ভধারণ পরিকল্পনা মোড চালু হয়েছে' : '🌸 TTC Conception Mode Activated'),
+                        backgroundColor: const Color(0xFF8B5CF6),
                         duration: const Duration(seconds: 2),
                       ),
                     );
                   },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: goalMode == CycleGoalMode.tryToConceive
-                          ? const Color(0xFF8B5CF6).withValues(alpha: 0.12)
-                          : const Color(0xFFF43F5E).withValues(alpha: 0.10),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: goalMode == CycleGoalMode.tryToConceive
-                            ? const Color(0xFF8B5CF6).withValues(alpha: 0.4)
-                            : const Color(0xFFF43F5E).withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          goalMode == CycleGoalMode.tryToConceive
-                              ? PhosphorIconsFill.sparkle
-                              : PhosphorIconsFill.drop,
-                          size: 13,
-                          color: goalMode == CycleGoalMode.tryToConceive
-                              ? const Color(0xFF8B5CF6)
-                              : const Color(0xFFF43F5E),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          goalMode == CycleGoalMode.tryToConceive
-                              ? (isBn ? '🌸 গর্ভধারণ পরিকল্পনা মোড' : '🌸 TTC Conception Mode')
-                              : (isBn ? '🩸 পিরিয়ড ট্র্যাকিং মোড' : '🩸 Period Tracking Mode'),
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.bold,
-                            color: goalMode == CycleGoalMode.tryToConceive
-                                ? const Color(0xFF7C3AED)
-                                : const Color(0xFFE11D48),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
+                const SizedBox(width: 8),
+
+                // 3. Pregnancy Mode (NEW)
+                _buildModeChip(
+                  label: isBn ? '🤰 গর্ভাবস্থা মোড' : '🤰 Pregnancy',
+                  isSelected: goalMode == CycleGoalMode.pregnancy,
+                  activeBg: const Color(0xFFE11D48),
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    ref.read(cycleGoalModeProvider.notifier).setMode(CycleGoalMode.pregnancy);
+                    final preg = ref.read(pregnancyProvider);
+                    PregnancyNotificationService.scheduleDailyNotification(
+                      model: preg,
+                      isBn: isBn,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(isBn ? '🤰 গর্ভাবস্থা ও মাতৃত্ব ট্র্যাকার চালু হয়েছে' : '🤰 Pregnancy Mode Activated'),
+                        backgroundColor: const Color(0xFFE11D48),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
 
                 // Quick History Shortcut Chip
                 InkWell(
@@ -223,7 +257,7 @@ class WomenHealthScreen extends ConsumerWidget {
                   },
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
@@ -249,14 +283,19 @@ class WomenHealthScreen extends ConsumerWidget {
               ],
             ),
           ),
-          // ─── 1. Interactive Horizontal Calendar Date Reel ───
-          HorizontalCycleDateStrip(cycle: cycle),
 
-          // ─── 2. 1-Tap Quick Action Card: "আজ কি পিরিয়ড শুরু/শেষ হয়েছে?" ───
-          QuickPeriodActionCard(cycle: cycle),
+          // ─── Conditional View Based on Selected Mode ───
+          if (goalMode == CycleGoalMode.pregnancy) ...[
+            PregnancyDashboardView(cycle: cycle),
+          ] else ...[
+            // ─── 1. Interactive Horizontal Calendar Date Reel ───
+            HorizontalCycleDateStrip(cycle: cycle),
 
-          // ─── 3. Main Flo-grade Radial Visualizer Card ───
-          Container(
+            // ─── 2. 1-Tap Quick Action Card: "আজ কি পিরিয়ড শুরু/শেষ হয়েছে?" ───
+            QuickPeriodActionCard(cycle: cycle),
+
+            // ─── 3. Main Flo-grade Radial Visualizer Card ───
+            Container(
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -514,7 +553,48 @@ class WomenHealthScreen extends ConsumerWidget {
               ],
             ),
           ),
+          ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildModeChip({
+    required String label,
+    required bool isSelected,
+    required Color activeBg,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? activeBg : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? activeBg : Colors.grey.shade300,
+            width: isSelected ? 1.5 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: activeBg.withValues(alpha: 0.25),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11.5,
+            fontWeight: FontWeight.bold,
+            color: isSelected ? Colors.white : const Color(0xFF475569),
+          ),
+        ),
       ),
     );
   }
@@ -544,3 +624,4 @@ class WomenHealthScreen extends ConsumerWidget {
     );
   }
 }
+

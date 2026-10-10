@@ -9,6 +9,7 @@ import '../models/daily_symptom_log.dart';
 enum CycleGoalMode {
   trackCycle,
   tryToConceive,
+  pregnancy,
 }
 
 class WomenCycleNotifier extends Notifier<MenstrualCycleModel> {
@@ -359,31 +360,31 @@ class CycleGoalModeNotifier extends Notifier<CycleGoalMode> {
     final prefs = await SharedPreferences.getInstance();
     final modeStr = prefs.getString(_prefsKey);
     if (modeStr != null) {
-      state = modeStr == 'tryToConceive'
-          ? CycleGoalMode.tryToConceive
-          : CycleGoalMode.trackCycle;
+      if (modeStr == 'pregnancy') {
+        state = CycleGoalMode.pregnancy;
+      } else if (modeStr == 'tryToConceive') {
+        state = CycleGoalMode.tryToConceive;
+      } else {
+        state = CycleGoalMode.trackCycle;
+      }
     }
   }
 
   Future<void> toggleMode() async {
     final next = state == CycleGoalMode.trackCycle
         ? CycleGoalMode.tryToConceive
-        : CycleGoalMode.trackCycle;
+        : (state == CycleGoalMode.tryToConceive
+            ? CycleGoalMode.pregnancy
+            : CycleGoalMode.trackCycle);
     state = next;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      _prefsKey,
-      next == CycleGoalMode.tryToConceive ? 'tryToConceive' : 'trackCycle',
-    );
+    await prefs.setString(_prefsKey, next.name);
   }
 
   Future<void> setMode(CycleGoalMode mode) async {
     state = mode;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      _prefsKey,
-      mode == CycleGoalMode.tryToConceive ? 'tryToConceive' : 'trackCycle',
-    );
+    await prefs.setString(_prefsKey, mode.name);
   }
 }
 
