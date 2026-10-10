@@ -336,7 +336,7 @@ class _FetalKickCounterSheetState extends ConsumerState<FetalKickCounterSheet> {
                       ),
                     ),
                     Text(
-                      '${history.length} ${isBn ? "টি সেশন" : "logs"}',
+                      '${WomenHealthFormatters.formatDigits(history.length, isBn: isBn)} ${isBn ? "টি সেশন" : "sessions"}',
                       style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
                     ),
                   ],
@@ -345,16 +345,29 @@ class _FetalKickCounterSheetState extends ConsumerState<FetalKickCounterSheet> {
 
                 if (history.isEmpty)
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(14),
+                      color: const Color(0xFFFFF1F2),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: const Color(0xFFFECDD3)),
                     ),
-                    child: Center(
-                      child: Text(
-                        isBn ? 'এখনও কোনো কিক সেশন রেকর্ড করা হয়নি' : 'No recorded sessions yet',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                      ),
+                    child: Column(
+                      children: [
+                        const Icon(PhosphorIconsFill.footprints, color: Color(0xFFE11D48), size: 24),
+                        const SizedBox(height: 6),
+                        Text(
+                          isBn ? 'এখনও কোনো কিক সেশন রেকর্ড করা হয়নি' : 'No recorded sessions yet',
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF9F1239)),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          isBn
+                              ? '২৮তম সপ্তাহ থেকে শান্ত পরিবেশে বসে শিশুর ১০টি লাথি বা নড়াচড়া রেকর্ড করুন।'
+                              : 'Starting from week 28, sit comfortably and count 10 baby kicks to track fetal vitality.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 11.5, color: Color(0xFFBE123C)),
+                        ),
+                      ],
                     ),
                   )
                 else

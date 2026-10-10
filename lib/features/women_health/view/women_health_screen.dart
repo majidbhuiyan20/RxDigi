@@ -45,8 +45,12 @@ class WomenHealthScreen extends ConsumerWidget {
     final targetPhase = cycle.getPhaseFor(selectedDate);
     final targetDay = cycle.getCycleDayFor(selectedDate);
 
-    final nextPeriodFormatted = WomenHealthFormatters.formatDayMonth(cycle.nextPeriodDate, isBn: isBn);
-    final nextOvulationFormatted = WomenHealthFormatters.formatDayMonth(cycle.nextOvulationDate, isBn: isBn);
+    final nextPeriodFormatted = cycle.isConfigured
+        ? WomenHealthFormatters.formatDayMonth(cycle.nextPeriodDate, isBn: isBn)
+        : (isBn ? 'সেট করুন' : 'Not Set');
+    final nextOvulationFormatted = cycle.isConfigured
+        ? WomenHealthFormatters.formatDayMonth(cycle.nextOvulationDate, isBn: isBn)
+        : (isBn ? 'সেট করুন' : 'Not Set');
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF7F9), // Soft Blush Background
@@ -234,10 +238,14 @@ class WomenHealthScreen extends ConsumerWidget {
                     HapticFeedback.selectionClick();
                     ref.read(cycleGoalModeProvider.notifier).setMode(CycleGoalMode.pregnancy);
                     final preg = ref.read(pregnancyProvider);
-                    PregnancyNotificationService.scheduleDailyNotification(
-                      model: preg,
-                      isBn: isBn,
-                    );
+                    if (!preg.isConfigured) {
+                      PregnancySetupSheet.show(context);
+                    } else {
+                      PregnancyNotificationService.scheduleDailyNotification(
+                        model: preg,
+                        isBn: isBn,
+                      );
+                    }
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(isBn ? '🤰 গর্ভাবস্থা ও মাতৃত্ব ট্র্যাকার চালু হয়েছে' : '🤰 Pregnancy Mode Activated'),
@@ -321,65 +329,81 @@ class WomenHealthScreen extends ConsumerWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFF1F2),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFFECDD3)),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              isBn ? 'পরবর্তী পিরিয়ড' : 'Next Period',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFFBE123C),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (!cycle.isConfigured) {
+                            AppFeedback.playLight();
+                            CycleSettingsSheet.show(context, cycle);
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF1F2),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: const Color(0xFFFECDD3)),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                isBn ? 'পরবর্তী পিরিয়ড' : 'Next Period',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFFBE123C),
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              nextPeriodFormatted,
-                              style: const TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFF9F1239),
+                              const SizedBox(height: 2),
+                              Text(
+                                nextPeriodFormatted,
+                                style: const TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF9F1239),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF5F3FF),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFDDD6FE)),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              isBn ? 'সম্ভাব্য ওভুলেশন' : 'Ovulation Window',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF6D28D9),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (!cycle.isConfigured) {
+                            AppFeedback.playLight();
+                            CycleSettingsSheet.show(context, cycle);
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F3FF),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: const Color(0xFFDDD6FE)),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                isBn ? 'সম্ভাব্য ওভুলেশন' : 'Ovulation Window',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF6D28D9),
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              nextOvulationFormatted,
-                              style: const TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFF5B21B6),
+                              const SizedBox(height: 2),
+                              Text(
+                                nextOvulationFormatted,
+                                style: const TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF5B21B6),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -504,55 +528,129 @@ class WomenHealthScreen extends ConsumerWidget {
           const SizedBox(height: 18),
 
           // ─── 8. Flo-Style Daily Body, Skin & Energy Forecast Cards ───
-          DailyBodyForecastSection(phase: targetPhase),
+          if (cycle.isConfigured) ...[
+            DailyBodyForecastSection(phase: targetPhase),
+            const SizedBox(height: 18),
 
-          const SizedBox(height: 18),
-
-          // ─── 9. Phase-Specific Clinical Advice Card ───
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFFFFF1F2),
-                  const Color(0xFFFFE4E6).withValues(alpha: 0.6),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFFECDD3)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(PhosphorIconsFill.lightbulb, size: 20, color: Color(0xFFE11D48)),
-                    const SizedBox(width: 8),
-                    Text(
-                      '${targetPhase.name(isBn)} - ${isBn ? 'স্বাস্থ্য পরামর্শ' : 'Care Tips'}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF9F1239),
-                      ),
-                    ),
+            // ─── 9. Phase-Specific Clinical Advice Card ───
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFFFFF1F2),
+                    const Color(0xFFFFE4E6).withValues(alpha: 0.6),
                   ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  targetPhase.advice(isBn),
-                  style: const TextStyle(
-                    fontSize: 13,
-                    height: 1.5,
-                    color: Color(0xFF881337),
-                    fontWeight: FontWeight.w500,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: const Color(0xFFFECDD3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(PhosphorIconsFill.lightbulb, size: 20, color: Color(0xFFE11D48)),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${targetPhase.name(isBn)} - ${isBn ? 'স্বাস্থ্য পরামর্শ' : 'Care Tips'}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF9F1239),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Text(
+                    targetPhase.advice(isBn),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: Color(0xFF881337),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ] else ...[
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: const Color(0xFFFECDD3)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFF43F5E).withValues(alpha: 0.04),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF1F2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(PhosphorIconsFill.sparkle, size: 20, color: Color(0xFFE11D48)),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          isBn ? 'ব্যক্তিগত পরামর্শ পেতে সাইকেল সেট করুন' : 'Unlock Daily Body Insights',
+                          style: const TextStyle(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF9F1239),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    isBn
+                        ? 'আপনার শেষ পিরিয়ডের তারিখ দিলে আপনার হরমোন চক্র অনুযায়ী প্রতিদিনের কর্মশক্তি, ত্বকের যত্ন ও পুষ্টি সম্পর্কিত সঠিক পূর্বাভাস ও পরামর্শ দেখতে পাবেন।'
+                        : 'Set up your last period date to receive daily personalized guidance on physical stamina, skincare, and nutrition for each hormonal phase.',
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      height: 1.45,
+                      color: Color(0xFF475569),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      AppFeedback.playLight();
+                      CycleSettingsSheet.show(context, cycle);
+                    },
+                    icon: const Icon(PhosphorIconsRegular.calendarPlus, size: 16),
+                    label: Text(
+                      isBn ? 'মাসিক চক্র সেটআপ করুন' : 'Set Up Cycle Now',
+                      style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFFE11D48),
+                      side: const BorderSide(color: Color(0xFFFECDD3)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           ],
         ],
       ),

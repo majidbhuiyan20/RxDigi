@@ -33,8 +33,12 @@ class DoctorCycleReportSheet extends ConsumerWidget {
     final ocpState = ref.watch(womenOCPProvider);
     final ironState = ref.watch(womenIronProvider);
 
-    final lmpStr = WomenHealthFormatters.formatDayMonth(cycle.lastPeriodStartDate, isBn: isBn);
-    final nextPeriodStr = WomenHealthFormatters.formatDayMonth(cycle.nextPeriodDate, isBn: isBn);
+    final lmpStr = cycle.isConfigured
+        ? WomenHealthFormatters.formatDayMonth(cycle.lastPeriodStartDate, isBn: isBn)
+        : (isBn ? 'সেট করা হয়নি' : 'Not Set');
+    final nextPeriodStr = cycle.isConfigured
+        ? WomenHealthFormatters.formatDayMonth(cycle.nextPeriodDate, isBn: isBn)
+        : (isBn ? 'সেট করা হয়নি' : 'Not Set');
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.88,
@@ -160,8 +164,12 @@ class DoctorCycleReportSheet extends ConsumerWidget {
                     Expanded(
                       child: _buildMetricCard(
                         title: isBn ? 'সাইকেলের দৈর্ঘ্য' : 'Cycle Length',
-                        value: WomenHealthFormatters.formatDaysCount(cycle.cycleLength, isBn: isBn),
-                        subtitle: isBn ? 'স্বাভাবিক: ২১-৩৫ দিন' : 'Norm: 21-35 days',
+                        value: cycle.isConfigured
+                            ? WomenHealthFormatters.formatDaysCount(cycle.cycleLength, isBn: isBn)
+                            : (isBn ? 'সেট করা হয়নি' : 'Not Set'),
+                        subtitle: cycle.isConfigured
+                            ? (isBn ? 'স্বাভাবিক: ২১-৩৫ দিন' : 'Norm: 21-35 days')
+                            : (isBn ? 'ডিফল্ট: ২৮ দিন' : 'Default: 28 days'),
                         color: const Color(0xFF0F172A),
                       ),
                     ),
@@ -173,8 +181,12 @@ class DoctorCycleReportSheet extends ConsumerWidget {
                     Expanded(
                       child: _buildMetricCard(
                         title: isBn ? 'ব্লিডিং সময়কাল' : 'Bleeding Duration',
-                        value: WomenHealthFormatters.formatDaysCount(cycle.periodDuration, isBn: isBn),
-                        subtitle: isBn ? 'স্বাভাবিক: ৩-৭ দিন' : 'Norm: 3-7 days',
+                        value: cycle.isConfigured
+                            ? WomenHealthFormatters.formatDaysCount(cycle.periodDuration, isBn: isBn)
+                            : (isBn ? 'সেট করা হয়নি' : 'Not Set'),
+                        subtitle: cycle.isConfigured
+                            ? (isBn ? 'স্বাভাবিক: ৩-৭ দিন' : 'Norm: 3-7 days')
+                            : (isBn ? 'ডিফল্ট: ৫ দিন' : 'Default: 5 days'),
                         color: const Color(0xFF0F172A),
                       ),
                     ),
@@ -182,13 +194,19 @@ class DoctorCycleReportSheet extends ConsumerWidget {
                     Expanded(
                       child: _buildMetricCard(
                         title: isBn ? 'সাইকেল স্ট্যাটাস' : 'Regularity Status',
-                        value: cycle.isIrregularCycle
-                            ? (isBn ? 'অনিয়মিত (Flagged)' : 'Irregular (Flagged)')
-                            : (isBn ? 'স্বাভাবিক ও নিয়মিত' : 'Normal Regular'),
-                        subtitle: cycle.isIrregularCycle
-                            ? (isBn ? 'PCOS / হরমোনাল ঝুঁকি' : 'Suspected Oligo/PCOS')
-                            : (isBn ? 'FIGO মানদণ্ড' : 'FIGO Standard'),
-                        color: cycle.isIrregularCycle ? const Color(0xFFDC2626) : const Color(0xFF16A34A),
+                        value: cycle.isConfigured
+                            ? (cycle.isIrregularCycle
+                                ? (isBn ? 'অনিয়মিত (Flagged)' : 'Irregular (Flagged)')
+                                : (isBn ? 'স্বাভাবিক ও নিয়মিত' : 'Normal Regular'))
+                            : (isBn ? 'তথ্য অপেক্ষমাণ' : 'Pending Setup'),
+                        subtitle: cycle.isConfigured
+                            ? (cycle.isIrregularCycle
+                                ? (isBn ? 'PCOS / হরমোনাল ঝুঁকি' : 'Suspected Oligo/PCOS')
+                                : (isBn ? 'FIGO মানদণ্ড' : 'FIGO Standard'))
+                            : (isBn ? 'লগ করার পর নির্ণয় হবে' : 'Calculated after logging'),
+                        color: cycle.isConfigured
+                            ? (cycle.isIrregularCycle ? const Color(0xFFDC2626) : const Color(0xFF16A34A))
+                            : const Color(0xFF64748B),
                       ),
                     ),
                   ],

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/utils/app_feedback.dart';
 import '../models/pregnancy_model.dart';
+import '../provider/pregnancy_provider.dart';
 import '../utils/women_health_formatters.dart';
 import 'pregnancy_setup_sheet.dart';
 
-class PregnancyHeroCard extends StatelessWidget {
+class PregnancyHeroCard extends ConsumerWidget {
   final PregnancyModel pregnancy;
 
   const PregnancyHeroCard({
@@ -14,7 +16,8 @@ class PregnancyHeroCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(pregnancyWeeksCatalogProvider);
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
     final weekInfo = PregnancyWeekCatalog.getWeekInfo(pregnancy.currentWeek);
     final eddStr = WomenHealthFormatters.formatDayMonth(pregnancy.estimatedDueDate, isBn: isBn);
@@ -61,7 +64,11 @@ class PregnancyHeroCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '🌸 ${pregnancy.babyNickname}${isBn ? "র গর্ভাবস্থা" : "'s Journey"}',
+                      isBn
+                          ? (pregnancy.displayName(true) == 'সোনামণি'
+                              ? '🌸 সোনামণির বিকাশ ও যত্ন'
+                              : '🌸 ${pregnancy.displayName(true)}-এর বিকাশ ও যত্ন')
+                          : "🌸 ${pregnancy.displayName(false)}'s Journey & Care",
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,

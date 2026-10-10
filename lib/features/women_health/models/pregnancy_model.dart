@@ -35,6 +35,7 @@ extension PregnancyTrimesterExt on PregnancyTrimester {
 
 /// Core Pregnancy State Model
 class PregnancyModel {
+  final bool isConfigured;
   final DateTime lastPeriodDate; // LMP
   final DateTime estimatedDueDate; // EDD (usually LMP + 280 days)
   final String babyNickname;
@@ -43,6 +44,7 @@ class PregnancyModel {
   final int notificationMinute;
 
   const PregnancyModel({
+    this.isConfigured = false,
     required this.lastPeriodDate,
     required this.estimatedDueDate,
     this.babyNickname = 'সোনামণি',
@@ -54,11 +56,13 @@ class PregnancyModel {
   /// Factory from LMP (Naegele's rule: LMP + 280 days)
   factory PregnancyModel.fromLmp(
     DateTime lmp, {
+    bool isConfigured = true,
     String nickname = 'সোনামণি',
     bool isNotificationEnabled = true,
   }) {
     final edd = lmp.add(const Duration(days: 280));
     return PregnancyModel(
+      isConfigured: isConfigured,
       lastPeriodDate: lmp,
       estimatedDueDate: edd,
       babyNickname: nickname,
@@ -69,16 +73,26 @@ class PregnancyModel {
   /// Factory from known ultrasound EDD
   factory PregnancyModel.fromEdd(
     DateTime edd, {
+    bool isConfigured = true,
     String nickname = 'সোনামণি',
     bool isNotificationEnabled = true,
   }) {
     final lmp = edd.subtract(const Duration(days: 280));
     return PregnancyModel(
+      isConfigured: isConfigured,
       lastPeriodDate: lmp,
       estimatedDueDate: edd,
       babyNickname: nickname,
       isNotificationEnabled: isNotificationEnabled,
     );
+  }
+
+  /// Bilingual display name for the baby: defaults to 'সোনামণি' in Bangla and 'Baby' in English
+  String displayName(bool isBn) {
+    if (babyNickname.isEmpty || babyNickname == 'সোনামণি' || babyNickname == 'Baby') {
+      return isBn ? 'সোনামণি' : 'Baby';
+    }
+    return babyNickname;
   }
 
   /// Current gestational age calculations based on today
@@ -121,6 +135,7 @@ class PregnancyModel {
       TimeOfDay(hour: notificationHour, minute: notificationMinute);
 
   PregnancyModel copyWith({
+    bool? isConfigured,
     DateTime? lastPeriodDate,
     DateTime? estimatedDueDate,
     String? babyNickname,
@@ -129,6 +144,7 @@ class PregnancyModel {
     int? notificationMinute,
   }) {
     return PregnancyModel(
+      isConfigured: isConfigured ?? this.isConfigured,
       lastPeriodDate: lastPeriodDate ?? this.lastPeriodDate,
       estimatedDueDate: estimatedDueDate ?? this.estimatedDueDate,
       babyNickname: babyNickname ?? this.babyNickname,
@@ -140,6 +156,7 @@ class PregnancyModel {
   }
 
   Map<String, dynamic> toJson() => {
+        'isConfigured': isConfigured,
         'lastPeriodDate': lastPeriodDate.toIso8601String(),
         'estimatedDueDate': estimatedDueDate.toIso8601String(),
         'babyNickname': babyNickname,
@@ -150,6 +167,7 @@ class PregnancyModel {
 
   factory PregnancyModel.fromJson(Map<String, dynamic> json) {
     return PregnancyModel(
+      isConfigured: json['isConfigured'] as bool? ?? false,
       lastPeriodDate: DateTime.parse(json['lastPeriodDate'] as String),
       estimatedDueDate: DateTime.parse(json['estimatedDueDate'] as String),
       babyNickname: json['babyNickname'] as String? ?? 'সোনামণি',

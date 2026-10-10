@@ -110,7 +110,11 @@ class _HormoneCurveChartState extends State<HormoneCurveChart> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  '${isBn ? "দিন " : "Day "}${WomenHealthFormatters.formatDigits(scrubDay, isBn: isBn)}',
+                  widget.cycle.isConfigured
+                      ? '${isBn ? "দিন " : "Day "}${WomenHealthFormatters.formatDigits(scrubDay, isBn: isBn)}'
+                      : (_scrubDay != null
+                          ? '${isBn ? "নমুনা দিন " : "Sample Day "}${WomenHealthFormatters.formatDigits(scrubDay, isBn: isBn)}'
+                          : (isBn ? '২৮ দিনের মডেল' : '28-Day Model')),
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,

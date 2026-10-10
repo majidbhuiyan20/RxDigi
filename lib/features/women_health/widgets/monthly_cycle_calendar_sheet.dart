@@ -152,6 +152,32 @@ class _MonthlyCycleCalendarSheetState
 
           const SizedBox(height: 12),
 
+          if (!widget.cycle.isConfigured) ...[
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF1F2),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFFECDD3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(PhosphorIconsFill.info, size: 16, color: Color(0xFFE11D48)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      isBn
+                          ? 'সাইকেল সেটআপ করা হয়নি। পিরিয়ড ও ওভুলেশনের দিন দেখতে সাইকেল সেট করুন।'
+                          : 'Cycle not configured. Set up your cycle to preview period and fertile windows.',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF9F1239)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           // Weekday Labels
           Row(
             children: [
@@ -189,9 +215,9 @@ class _MonthlyCycleCalendarSheetState
                 final isSelected = WomenHealthFormatters.isSameDay(cellDate, selectedDate);
                 final isToday = WomenHealthFormatters.isSameDay(cellDate, today);
 
-                final isPeriod = widget.cycle.isPeriodDay(cellDate);
-                final isFertile = widget.cycle.isFertileDay(cellDate);
-                final isOvulation = widget.cycle.isOvulationDay(cellDate);
+                final isPeriod = widget.cycle.isConfigured && widget.cycle.isPeriodDay(cellDate);
+                final isFertile = widget.cycle.isConfigured && widget.cycle.isFertileDay(cellDate);
+                final isOvulation = widget.cycle.isConfigured && widget.cycle.isOvulationDay(cellDate);
 
                 final dateKey = WomenHealthFormatters.toDateKey(cellDate);
                 final hasSymptom = symptomsMap.containsKey(dateKey);

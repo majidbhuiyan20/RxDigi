@@ -186,10 +186,15 @@ class PastCycleHistorySheet extends ConsumerWidget {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
     final history = ref.watch(womenCycleHistoryProvider);
 
-    final allLengths = [cycle.cycleLength, ...history.map((h) => h.cycleLength)];
-    final avgLength = (allLengths.reduce((a, b) => a + b) / allLengths.length).round();
-    final minLength = allLengths.reduce((a, b) => a < b ? a : b);
-    final maxLength = allLengths.reduce((a, b) => a > b ? a : b);
+    final hasActiveCycle = cycle.isConfigured;
+    final allLengths = [
+      if (hasActiveCycle) cycle.cycleLength,
+      ...history.map((h) => h.cycleLength),
+    ];
+    final hasData = allLengths.isNotEmpty;
+    final avgLength = hasData ? (allLengths.reduce((a, b) => a + b) / allLengths.length).round() : null;
+    final minLength = hasData ? allLengths.reduce((a, b) => a < b ? a : b) : null;
+    final maxLength = hasData ? allLengths.reduce((a, b) => a > b ? a : b) : null;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -274,7 +279,9 @@ class PastCycleHistorySheet extends ConsumerWidget {
                     Expanded(
                       child: _buildStatTile(
                         label: isBn ? 'গড় সাইকেল' : 'Avg Cycle',
-                        value: '$avgLength ${isBn ? "দিন" : "days"}',
+                        value: avgLength != null
+                            ? '${WomenHealthFormatters.formatDigits(avgLength, isBn: isBn)} ${isBn ? "দিন" : "days"}'
+                            : '—',
                         color: const Color(0xFF0F172A),
                       ),
                     ),
@@ -282,7 +289,9 @@ class PastCycleHistorySheet extends ConsumerWidget {
                     Expanded(
                       child: _buildStatTile(
                         label: isBn ? 'সর্বনিম্ন' : 'Shortest',
-                        value: '$minLength ${isBn ? "দিন" : "days"}',
+                        value: minLength != null
+                            ? '${WomenHealthFormatters.formatDigits(minLength, isBn: isBn)} ${isBn ? "দিন" : "days"}'
+                            : '—',
                         color: const Color(0xFF0284C7),
                       ),
                     ),
@@ -290,7 +299,9 @@ class PastCycleHistorySheet extends ConsumerWidget {
                     Expanded(
                       child: _buildStatTile(
                         label: isBn ? 'সর্বোচ্চ' : 'Longest',
-                        value: '$maxLength ${isBn ? "দিন" : "days"}',
+                        value: maxLength != null
+                            ? '${WomenHealthFormatters.formatDigits(maxLength, isBn: isBn)} ${isBn ? "দিন" : "days"}'
+                            : '—',
                         color: const Color(0xFFD97706),
                       ),
                     ),
@@ -327,18 +338,19 @@ class PastCycleHistorySheet extends ConsumerWidget {
                 ),
                 const SizedBox(height: 10),
 
-                // Current Active Cycle Tile
-                _buildHistoryTile(
-                  context: context,
-                  ref: ref,
-                  title: isBn ? 'চলমান সাইকেল (বর্তমান)' : 'Current Active Cycle',
-                  startDate: cycle.lastPeriodStartDate,
-                  cycleLength: cycle.cycleLength,
-                  periodDays: cycle.periodDuration,
-                  isIrregular: cycle.isIrregularCycle,
-                  isBn: isBn,
-                  isCurrent: true,
-                ),
+                // Current Active Cycle Tile (only if configured!)
+                if (hasActiveCycle)
+                  _buildHistoryTile(
+                    context: context,
+                    ref: ref,
+                    title: isBn ? 'চলমান সাইকেল (বর্তমান)' : 'Current Active Cycle',
+                    startDate: cycle.lastPeriodStartDate,
+                    cycleLength: cycle.cycleLength,
+                    periodDays: cycle.periodDuration,
+                    isIrregular: cycle.isIrregularCycle,
+                    isBn: isBn,
+                    isCurrent: true,
+                  ),
 
                 // History entries
                 ...history.map((h) => _buildHistoryTile(
@@ -353,6 +365,54 @@ class PastCycleHistorySheet extends ConsumerWidget {
                       isBn: isBn,
                       isCurrent: false,
                     )),
+
+                if (!hasActiveCycle && history.isEmpty)
+                  Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF1F2),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: const Color(0xFFFECDD3)),
+                    ),
+                    child: Column(
+                      children: [
+                        const Icon(PhosphorIconsFill.calendarHeart, size: 28, color: Color(0xFFE11D48)),
+                        const SizedBox(height: 8),
+                        Text(
+                          isBn ? 'এখনও কোনো সাইকেল রেকর্ড নেই' : 'No cycle records yet',
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF9F1239)),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          isBn
+                              ? 'আপনার বর্তমান সাইকেল সেটআপ করতে হোম স্ক্রিনে যান অথবা পূর্ববর্তী সাইকেলের তথ্য যোগ করতে উপরের বাটনে চাপুন।'
+                              : 'Set up your current cycle on the home screen, or tap above to log past cycles.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 11.5, color: Color(0xFFBE123C)),
+                        ),
+                      ],
+                    ),
+                  )
+                else if (history.isEmpty)
+                  Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: Center(
+                      child: Text(
+                        isBn
+                            ? 'পূর্বে সেভ করা কোনো সাইকেল হিস্ট্রি নেই। বিগত মাসের সাইকেল রেকর্ড করতে উপরের বাটনে চাপুন।'
+                            : 'No past cycle history recorded yet. Tap "+ Log Past Cycle Record" above to add previous cycles.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

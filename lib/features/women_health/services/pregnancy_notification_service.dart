@@ -50,8 +50,8 @@ class PregnancyNotificationService {
 
     final weekInfo = PregnancyWeekCatalog.getWeekInfo(model.currentWeek);
     final title = isBn
-        ? '🌸 ${model.babyNickname}র যত্ন • সপ্তাহ ${model.currentWeek}'
-        : '🌸 Baby Care • Week ${model.currentWeek}';
+        ? '🌸 ${model.displayName(true)}র যত্ন • সপ্তাহ ${model.currentWeek}'
+        : '🌸 ${model.displayName(false)} Care • Week ${model.currentWeek}';
 
     final body = isBn
         ? weekInfo.notificationTextBn
@@ -119,8 +119,8 @@ class PregnancyNotificationService {
 
     final weekInfo = PregnancyWeekCatalog.getWeekInfo(model.currentWeek);
     final title = isBn
-        ? '🌸 ${model.babyNickname}র যত্ন • সপ্তাহ ${model.currentWeek}'
-        : '🌸 Baby Care • Week ${model.currentWeek}';
+        ? '🌸 ${model.displayName(true)}র যত্ন • সপ্তাহ ${model.currentWeek}'
+        : '🌸 ${model.displayName(false)} Care • Week ${model.currentWeek}';
 
     final body = isBn
         ? weekInfo.notificationTextBn

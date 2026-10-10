@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../core/utils/app_feedback.dart';
 import '../models/menstrual_cycle_model.dart';
 import '../provider/women_health_provider.dart';
+import 'cycle_settings_sheet.dart';
 
 class QuickPeriodActionCard extends ConsumerWidget {
   final MenstrualCycleModel cycle;
@@ -122,6 +123,71 @@ class QuickPeriodActionCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
+
+    if (!cycle.isConfigured) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF1F2),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0xFFFECDD3)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF43F5E),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(PhosphorIconsFill.calendarHeart, color: Colors.white, size: 16),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isBn ? 'আপনার মাসিক চক্র সেটআপ করুন' : 'Set Up Menstrual Cycle',
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF9F1239),
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    isBn ? 'সঠিক হিসাব পেতে শেষ পিরিয়ডের তারিখ দিন' : 'Log last period date for accurate predictions',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFFBE123C),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                AppFeedback.playLight();
+                CycleSettingsSheet.show(context, cycle);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFF43F5E),
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: Text(
+                isBn ? 'তারিখ দিন' : 'Set Date',
+                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     final isPeriodNow = cycle.currentPhase == CyclePhase.menstrual;
 
     if (isPeriodNow) {

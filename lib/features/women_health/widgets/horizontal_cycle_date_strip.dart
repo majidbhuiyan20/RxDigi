@@ -181,9 +181,9 @@ class _HorizontalCycleDateStripState
                 final isSelected = WomenHealthFormatters.isSameDay(date, selectedDate);
                 final isToday = WomenHealthFormatters.isSameDay(date, today);
 
-                final isPeriod = widget.cycle.isPeriodDay(date);
-                final isFertile = widget.cycle.isFertileDay(date);
-                final isOvulation = widget.cycle.isOvulationDay(date);
+                final isPeriod = widget.cycle.isConfigured && widget.cycle.isPeriodDay(date);
+                final isFertile = widget.cycle.isConfigured && widget.cycle.isFertileDay(date);
+                final isOvulation = widget.cycle.isConfigured && widget.cycle.isOvulationDay(date);
 
                 final dateKey = WomenHealthFormatters.toDateKey(date);
                 final hasSymptom = symptomsMap.containsKey(dateKey);

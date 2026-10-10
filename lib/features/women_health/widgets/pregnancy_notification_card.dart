@@ -98,7 +98,7 @@ class PregnancyNotificationCard extends ConsumerWidget {
 
           Text(
             isBn
-                ? 'সোনামণির বৃদ্ধির নিয়মিত আপডেট, পুষ্টিকর খাবার এবং সুস্বাস্থ্যের টিপস আপনার নির্বাচিত ভাষায় ($timeStr টায়) স্বয়ংক্রিয়ভাবে পাঠানো হয়।'
+                ? '${pregnancy.displayName(true)}র বৃদ্ধির নিয়মিত আপডেট, পুষ্টিকর খাবার এবং সুস্বাস্থ্যের টিপস আপনার নির্বাচিত ভাষায় ($timeStr টায়) স্বয়ংক্রিয়ভাবে পাঠানো হয়।'
                 : 'Fetal growth milestones, maternal hydration, and care tips are delivered daily at $timeStr in your chosen language.',
             style: TextStyle(fontSize: 11.5, height: 1.4, color: Colors.grey.shade600),
           ),

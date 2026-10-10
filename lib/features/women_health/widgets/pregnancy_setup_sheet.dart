@@ -36,8 +36,15 @@ class _PregnancySetupSheetState extends ConsumerState<PregnancySetupSheet> {
   void initState() {
     super.initState();
     final current = ref.read(pregnancyProvider);
-    _selectedDate = current.lastPeriodDate;
-    _nicknameController = TextEditingController(text: current.babyNickname);
+    _selectedDate = current.isConfigured
+        ? current.lastPeriodDate
+        : DateTime.now().subtract(const Duration(days: 28));
+    final isCustomNickname = current.babyNickname.isNotEmpty &&
+        current.babyNickname != 'সোনামণি' &&
+        current.babyNickname != 'Baby';
+    _nicknameController = TextEditingController(
+      text: isCustomNickname ? current.babyNickname : '',
+    );
     _notificationsEnabled = current.isNotificationEnabled;
     _notificationTime = current.notificationTime;
   }
@@ -259,10 +266,10 @@ class _PregnancySetupSheetState extends ConsumerState<PregnancySetupSheet> {
                         label: Text(isBn ? 'শেষ পিরিয়ড (LMP)' : 'Last Period (LMP)'),
                         selected: _useLmp,
                         onSelected: (val) {
-                          if (val) {
+                          if (val && !_useLmp) {
                             setState(() {
                               _useLmp = true;
-                              _selectedDate = DateTime.now().subtract(const Duration(days: 112));
+                              _selectedDate = _selectedDate.subtract(const Duration(days: 280));
                             });
                           }
                         },
@@ -274,10 +281,10 @@ class _PregnancySetupSheetState extends ConsumerState<PregnancySetupSheet> {
                         label: Text(isBn ? 'আল্ট্রাসাউন্ড ডিউ ডেট' : 'Ultrasound EDD'),
                         selected: !_useLmp,
                         onSelected: (val) {
-                          if (val) {
+                          if (val && _useLmp) {
                             setState(() {
                               _useLmp = false;
-                              _selectedDate = DateTime.now().add(const Duration(days: 168));
+                              _selectedDate = _selectedDate.add(const Duration(days: 280));
                             });
                           }
                         },
@@ -335,7 +342,7 @@ class _PregnancySetupSheetState extends ConsumerState<PregnancySetupSheet> {
                 TextField(
                   controller: _nicknameController,
                   decoration: InputDecoration(
-                    hintText: isBn ? 'যেমন: সোনামণি, লিটল অ্যাঞ্জেল' : 'e.g., Little Angel, Baby',
+                    hintText: isBn ? 'সোনামণি (ডিফল্ট)' : 'Baby (Default)',
                     prefixIcon: const Icon(PhosphorIconsRegular.heart, size: 18, color: Color(0xFFE11D48)),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),

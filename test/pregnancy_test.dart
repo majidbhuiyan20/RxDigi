@@ -9,10 +9,19 @@ void main() {
       final lmp = now.subtract(const Duration(days: 70));
       final pregnancy = PregnancyModel.fromLmp(lmp);
 
+      expect(pregnancy.isConfigured, true);
       expect(pregnancy.currentWeek, 11); // (70/7).floor() + 1 = 11th week
       expect(pregnancy.currentDayOfWeek, 1);
       expect(pregnancy.currentTrimester, PregnancyTrimester.first);
       expect(pregnancy.progressFraction, greaterThan(0.2));
+    });
+
+    test('Default PregnancyModel has isConfigured as false', () {
+      final unconfigured = PregnancyModel(
+        lastPeriodDate: DateTime.now(),
+        estimatedDueDate: DateTime.now().add(const Duration(days: 280)),
+      );
+      expect(unconfigured.isConfigured, false);
     });
 
     test('Calculates EDD as LMP + 280 days', () {

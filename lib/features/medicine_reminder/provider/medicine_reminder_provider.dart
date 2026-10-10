@@ -28,14 +28,14 @@ String getTodayDateString() {
 
 // Adherence map for today: Map<"${reminderId}_${slot}", bool>
 final todayAdherenceMapProvider = FutureProvider<Map<String, bool>>((ref) async {
-  final repo = ref.watch(medicineReminderRepoProvider);
+  final repo = ref.read(medicineReminderRepoProvider);
   final today = getTodayDateString();
   return await repo.getAdherenceMapForDate(today);
 });
 
 // Weekly Adherence Report for Analytics & Consistency tracking
 final weeklyAdherenceReportProvider = FutureProvider<WeeklyAdherenceReport>((ref) async {
-  final repo = ref.watch(medicineReminderRepoProvider);
+  final repo = ref.read(medicineReminderRepoProvider);
   return await repo.getWeeklyAdherenceReport();
 });
 

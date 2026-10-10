@@ -1,8 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import '../../../core/utils/app_feedback.dart';
 import '../models/menstrual_cycle_model.dart';
 import '../provider/women_health_provider.dart';
 import '../utils/women_health_formatters.dart';
+import 'cycle_settings_sheet.dart';
 
 class CycleVisualizerRing extends StatelessWidget {
   final MenstrualCycleModel cycle;
@@ -12,8 +15,8 @@ class CycleVisualizerRing extends StatelessWidget {
   const CycleVisualizerRing({
     super.key,
     required this.cycle,
-    required this.selectedDate,
     this.goalMode = CycleGoalMode.trackCycle,
+    required this.selectedDate,
   });
 
   Color _getPhaseColor(CyclePhase phase) {
@@ -32,6 +35,106 @@ class CycleVisualizerRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
+
+    if (!cycle.isConfigured) {
+      return GestureDetector(
+        onTap: () {
+          AppFeedback.playLight();
+          CycleSettingsSheet.show(context, cycle);
+        },
+        child: Container(
+          width: 250,
+          height: 250,
+          alignment: Alignment.center,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 230,
+                height: 230,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFFF43F5E).withValues(alpha: 0.05),
+                ),
+              ),
+              CustomPaint(
+                size: const Size(220, 220),
+                painter: _CycleRingPainter(
+                  progress: 0.0,
+                  phaseColor: const Color(0xFFF43F5E),
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF1F2),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFFFECDD3)),
+                    ),
+                    child: const Icon(
+                      PhosphorIconsFill.calendarPlus,
+                      color: Color(0xFFE11D48),
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    isBn ? 'সাইকেল শুরু করুন' : 'Start Cycle',
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    isBn ? 'শেষ পিরিয়ডের তারিখ দিন' : 'Set last period date',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF43F5E),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFF43F5E).withValues(alpha: 0.25),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(PhosphorIconsFill.pencilSimple, size: 11, color: Colors.white),
+                        const SizedBox(width: 4),
+                        Text(
+                          isBn ? 'তারিখ নির্বাচন' : 'Set Date',
+                          style: const TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     final targetDay = cycle.getCycleDayFor(selectedDate);
     final targetPhase = cycle.getPhaseFor(selectedDate);
     final phaseColor = _getPhaseColor(targetPhase);
@@ -201,22 +304,24 @@ class _CycleRingPainter extends CustomPainter {
       activePaint,
     );
 
-    // Thumb dot indicator at the current day position
-    final thumbAngle = -pi / 2 + sweepAngle;
-    final thumbX = center.dx + radius * cos(thumbAngle);
-    final thumbY = center.dy + radius * sin(thumbAngle);
+    // Thumb dot indicator at the current day position (only if progress > 0)
+    if (progress > 0.0) {
+      final thumbAngle = -pi / 2 + sweepAngle;
+      final thumbX = center.dx + radius * cos(thumbAngle);
+      final thumbY = center.dy + radius * sin(thumbAngle);
 
-    final thumbPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
+      final thumbPaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
 
-    final thumbBorderPaint = Paint()
-      ..color = phaseColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.2;
+      final thumbBorderPaint = Paint()
+        ..color = phaseColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3.2;
 
-    canvas.drawCircle(Offset(thumbX, thumbY), 8, thumbPaint);
-    canvas.drawCircle(Offset(thumbX, thumbY), 8, thumbBorderPaint);
+      canvas.drawCircle(Offset(thumbX, thumbY), 8, thumbPaint);
+      canvas.drawCircle(Offset(thumbX, thumbY), 8, thumbBorderPaint);
+    }
   }
 
   @override

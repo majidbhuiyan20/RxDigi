@@ -5,7 +5,7 @@ import '../models/weekly_wellness_score_model.dart';
 
 final weeklyWellnessScoreProvider = FutureProvider<WeeklyWellnessScoreModel>((ref) async {
   // 1. Medicine Adherence
-  final adherenceReport = await ref.watch(weeklyAdherenceReportProvider.future);
+  final adherenceReport = await ref.read(weeklyAdherenceReportProvider.future);
   final medPercent = (adherenceReport.adherenceRate * 100).round();
   final medTaken = adherenceReport.totalTaken;
   final medTotal = adherenceReport.totalScheduled;

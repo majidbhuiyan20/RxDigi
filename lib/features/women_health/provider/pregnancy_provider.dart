@@ -6,15 +6,16 @@ import '../models/pregnancy_model.dart';
 
 // ─── 1. Core Pregnancy State Notifier ───
 class PregnancyNotifier extends Notifier<PregnancyModel> {
-  static const String _prefsKey = 'rxdigi_pregnancy_state_v1';
+  static const String _prefsKey = 'rxdigi_pregnancy_state_v2';
 
   @override
   PregnancyModel build() {
     _loadFromPrefs();
-    // Default sensible demo state: 16 weeks pregnant (LMP was 112 days ago)
-    final defaultLmp = DateTime.now().subtract(const Duration(days: 112));
+    // Default unconfigured state for brand-new users
+    final defaultLmp = DateTime.now().subtract(const Duration(days: 28));
     final defaultEdd = defaultLmp.add(const Duration(days: 280));
     return PregnancyModel(
+      isConfigured: false,
       lastPeriodDate: defaultLmp,
       estimatedDueDate: defaultEdd,
       babyNickname: 'সোনামণি',
@@ -47,6 +48,7 @@ class PregnancyNotifier extends Notifier<PregnancyModel> {
   }) async {
     final edd = lmp.add(const Duration(days: 280));
     final updated = state.copyWith(
+      isConfigured: true,
       lastPeriodDate: lmp,
       estimatedDueDate: edd,
       babyNickname: nickname,
@@ -63,6 +65,7 @@ class PregnancyNotifier extends Notifier<PregnancyModel> {
   }) async {
     final lmp = edd.subtract(const Duration(days: 280));
     final updated = state.copyWith(
+      isConfigured: true,
       lastPeriodDate: lmp,
       estimatedDueDate: edd,
       babyNickname: nickname,
@@ -94,9 +97,10 @@ class PregnancyNotifier extends Notifier<PregnancyModel> {
   }
 
   Future<void> reset() async {
-    final defaultLmp = DateTime.now().subtract(const Duration(days: 112));
+    final defaultLmp = DateTime.now().subtract(const Duration(days: 28));
     final defaultEdd = defaultLmp.add(const Duration(days: 280));
     final initial = PregnancyModel(
+      isConfigured: false,
       lastPeriodDate: defaultLmp,
       estimatedDueDate: defaultEdd,
       babyNickname: 'সোনামণি',
@@ -134,28 +138,12 @@ final selectedPregnancyWeekProvider =
 
 // ─── 3. Fetal Kick Counter History Notifier ───
 class KickCounterLogsNotifier extends Notifier<List<KickCounterLog>> {
-  static const String _prefsKey = 'rxdigi_kick_counter_logs_v1';
+  static const String _prefsKey = 'rxdigi_kick_counter_logs_v2';
 
   @override
   List<KickCounterLog> build() {
     _loadFromPrefs();
-    // Default seeded session for realistic medical UI feel
-    return [
-      KickCounterLog(
-        id: 'kick_seed_1',
-        timestamp: DateTime.now().subtract(const Duration(hours: 18)),
-        durationMinutes: 24,
-        kickCount: 10,
-        notes: 'সন্ধ্যায় খাবার খাওয়ার পর সক্রিয় নড়াচড়া',
-      ),
-      KickCounterLog(
-        id: 'kick_seed_2',
-        timestamp: DateTime.now().subtract(const Duration(days: 1, hours: 2)),
-        durationMinutes: 32,
-        kickCount: 10,
-        notes: '১০টি পূর্ণ নড়াচড়া সম্পন্ন',
-      ),
-    ];
+    return [];
   }
 
   Future<void> _loadFromPrefs() async {
@@ -205,7 +193,7 @@ final pregnancyWeeksCatalogProvider =
 
 // ─── 5. Antenatal Care (ANC) Visits & Ultrasound Tracker Notifier ───
 class ANCVisitsNotifier extends Notifier<List<ANCVisitItem>> {
-  static const String _prefsKey = 'rxdigi_anc_visits_v1';
+  static const String _prefsKey = 'rxdigi_anc_visits_v2';
   static const String _assetPath = 'assets/data/anc_visits.json';
 
   @override
@@ -222,7 +210,7 @@ class ANCVisitsNotifier extends Notifier<List<ANCVisitItem>> {
       titleEn: '1st ANC Visit & Dating Scan',
       descriptionBn: 'রক্তের গ্রুপ, হিমোগ্লোবিন, সুগার, ইউরিন আর/ই টেস্ট এবং ইডিডি (EDD) নিশ্চিতকরণ।',
       descriptionEn: 'Blood grouping, Hb, blood glucose, urine R/E, and gestational dating confirmation.',
-      isCompleted: true,
+      isCompleted: false,
     ),
     ANCVisitItem(
       visitNumber: 2,

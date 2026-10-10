@@ -282,11 +282,13 @@ class IronSupplementState {
 }
 
 class MenstrualCycleModel {
+  final bool isConfigured;
   final int cycleLength; // e.g., 28 days (standard 21-35)
   final int periodDuration; // e.g., 5 days (standard 3-7)
   final DateTime lastPeriodStartDate;
 
   const MenstrualCycleModel({
+    this.isConfigured = false,
     this.cycleLength = 28,
     this.periodDuration = 5,
     required this.lastPeriodStartDate,
@@ -414,6 +416,7 @@ class MenstrualCycleModel {
 
   Map<String, dynamic> toJson() {
     return {
+      'isConfigured': isConfigured,
       'cycleLength': cycleLength,
       'periodDuration': periodDuration,
       'lastPeriodStartDate': lastPeriodStartDate.toIso8601String(),
@@ -422,19 +425,22 @@ class MenstrualCycleModel {
 
   factory MenstrualCycleModel.fromJson(Map<String, dynamic> map) {
     return MenstrualCycleModel(
+      isConfigured: map['isConfigured'] as bool? ?? false,
       cycleLength: map['cycleLength'] as int? ?? 28,
       periodDuration: map['periodDuration'] as int? ?? 5,
       lastPeriodStartDate: DateTime.tryParse(map['lastPeriodStartDate'] as String? ?? '') ??
-          DateTime.now().subtract(const Duration(days: 10)),
+          DateTime.now(),
     );
   }
 
   MenstrualCycleModel copyWith({
+    bool? isConfigured,
     int? cycleLength,
     int? periodDuration,
     DateTime? lastPeriodStartDate,
   }) {
     return MenstrualCycleModel(
+      isConfigured: isConfigured ?? this.isConfigured,
       cycleLength: cycleLength ?? this.cycleLength,
       periodDuration: periodDuration ?? this.periodDuration,
       lastPeriodStartDate: lastPeriodStartDate ?? this.lastPeriodStartDate,

@@ -35,7 +35,9 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
   @override
   void initState() {
     super.initState();
-    _lastPeriodDate = widget.currentCycle.lastPeriodStartDate;
+    _lastPeriodDate = widget.currentCycle.isConfigured
+        ? widget.currentCycle.lastPeriodStartDate
+        : DateTime.now();
     _cycleLength = widget.currentCycle.cycleLength;
     _periodDuration = widget.currentCycle.periodDuration;
   }

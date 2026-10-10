@@ -13,16 +13,17 @@ enum CycleGoalMode {
 }
 
 class WomenCycleNotifier extends Notifier<MenstrualCycleModel> {
-  static const String _prefsKey = 'rxdigi_menstrual_cycle_settings_v1';
+  static const String _prefsKey = 'rxdigi_menstrual_cycle_settings_v2';
 
   @override
   MenstrualCycleModel build() {
     _loadFromPrefs();
-    // Sensible default: last period 10 days ago, cycle 28 days
+    // Brand new user: not configured until user sets their actual period date
     return MenstrualCycleModel(
+      isConfigured: false,
       cycleLength: 28,
       periodDuration: 5,
-      lastPeriodStartDate: DateTime.now().subtract(const Duration(days: 10)),
+      lastPeriodStartDate: DateTime.now(),
     );
   }
 
@@ -43,6 +44,7 @@ class WomenCycleNotifier extends Notifier<MenstrualCycleModel> {
     required DateTime lastPeriodStartDate,
   }) async {
     final updated = MenstrualCycleModel(
+      isConfigured: true,
       cycleLength: cycleLength,
       periodDuration: periodDuration,
       lastPeriodStartDate: lastPeriodStartDate,
@@ -56,6 +58,7 @@ class WomenCycleNotifier extends Notifier<MenstrualCycleModel> {
   /// 1-Tap Quick Action: Mark today (or any date) as Period Start Day
   Future<void> recordPeriodStarted(DateTime date) async {
     final updated = state.copyWith(
+      isConfigured: true,
       lastPeriodStartDate: date,
     );
     state = updated;
@@ -85,47 +88,12 @@ final womenCycleProvider =
 
 /// Past Recorded Cycles History Notifier
 class WomenCycleHistoryNotifier extends Notifier<List<HistoricalCycleEntry>> {
-  static const String _prefsKey = 'rxdigi_menstrual_cycle_history_v1';
+  static const String _prefsKey = 'rxdigi_menstrual_cycle_history_v2';
 
   @override
   List<HistoricalCycleEntry> build() {
     _loadFromPrefs();
-    return _generateDefaultHistoricalCycles();
-  }
-
-  List<HistoricalCycleEntry> _generateDefaultHistoricalCycles() {
-    final now = DateTime.now();
-    // Default 3 previous authentic cycles for realistic analytics and doctor summary
-    final c1Start = now.subtract(const Duration(days: 38));
-    final c2Start = now.subtract(const Duration(days: 66));
-    final c3Start = now.subtract(const Duration(days: 95));
-
-    return [
-      HistoricalCycleEntry(
-        id: 'hist_1',
-        startDate: c1Start,
-        endDate: c1Start.add(const Duration(days: 5)),
-        cycleLength: 28,
-        periodDuration: 5,
-        notes: 'স্বাভাবিক প্রবাহ, হালকা ক্র্যাম্প',
-      ),
-      HistoricalCycleEntry(
-        id: 'hist_2',
-        startDate: c2Start,
-        endDate: c2Start.add(const Duration(days: 5)),
-        cycleLength: 29,
-        periodDuration: 5,
-        notes: 'মাঝারি ব্যথা, পিএমএস ছিল',
-      ),
-      HistoricalCycleEntry(
-        id: 'hist_3',
-        startDate: c3Start,
-        endDate: c3Start.add(const Duration(days: 4)),
-        cycleLength: 28,
-        periodDuration: 4,
-        notes: 'নিয়মিত চক্র',
-      ),
-    ];
+    return [];
   }
 
   Future<void> _loadFromPrefs() async {

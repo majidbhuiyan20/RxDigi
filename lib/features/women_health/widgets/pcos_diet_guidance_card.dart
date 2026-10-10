@@ -17,7 +17,7 @@ class PcosDietGuidanceCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
-    final isIrregular = cycle.isIrregularCycle;
+    final isIrregular = cycle.isConfigured && cycle.isIrregularCycle;
 
     final List<Map<String, String>> pcosFoods = [
       {
