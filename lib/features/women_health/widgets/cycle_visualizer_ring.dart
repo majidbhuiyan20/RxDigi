@@ -1,13 +1,19 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/menstrual_cycle_model.dart';
+import '../provider/women_health_provider.dart';
+import '../utils/women_health_formatters.dart';
 
 class CycleVisualizerRing extends StatelessWidget {
   final MenstrualCycleModel cycle;
+  final DateTime selectedDate;
+  final CycleGoalMode goalMode;
 
   const CycleVisualizerRing({
     super.key,
     required this.cycle,
+    required this.selectedDate,
+    this.goalMode = CycleGoalMode.trackCycle,
   });
 
   Color _getPhaseColor(CyclePhase phase) {
@@ -26,7 +32,11 @@ class CycleVisualizerRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
-    final phaseColor = _getPhaseColor(cycle.currentPhase);
+    final targetDay = cycle.getCycleDayFor(selectedDate);
+    final targetPhase = cycle.getPhaseFor(selectedDate);
+    final phaseColor = _getPhaseColor(targetPhase);
+    final progress = (targetDay / cycle.cycleLength).clamp(0.0, 1.0);
+    final isToday = WomenHealthFormatters.isSameDay(selectedDate, DateTime.now());
 
     return Container(
       width: 250,
@@ -41,7 +51,7 @@ class CycleVisualizerRing extends StatelessWidget {
             height: 230,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: phaseColor.withOpacity(0.04),
+              color: phaseColor.withValues(alpha: 0.05),
             ),
           ),
 
@@ -49,7 +59,7 @@ class CycleVisualizerRing extends StatelessWidget {
           CustomPaint(
             size: const Size(220, 220),
             painter: _CycleRingPainter(
-              progress: cycle.cycleProgress,
+              progress: progress,
               phaseColor: phaseColor,
             ),
           ),
@@ -58,8 +68,28 @@ class CycleVisualizerRing extends StatelessWidget {
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (!isToday) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F172A).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    WomenHealthFormatters.formatDayMonthBn(selectedDate),
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF334155),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 3),
+              ],
               Text(
-                isBn ? 'দিন ${cycle.currentCycleDay}' : 'Day ${cycle.currentCycleDay}',
+                isBn
+                    ? 'দিন ${WomenHealthFormatters.toBengaliDigits(targetDay)}'
+                    : 'Day $targetDay',
                 style: TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.w900,
@@ -68,15 +98,15 @@ class CycleVisualizerRing extends StatelessWidget {
                   height: 1.1,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 3),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: phaseColor.withOpacity(0.12),
+                  color: phaseColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  isBn ? cycle.currentPhase.nameBn : cycle.currentPhase.nameEn,
+                  isBn ? targetPhase.nameBn : targetPhase.nameEn,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -88,9 +118,13 @@ class CycleVisualizerRing extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                isBn
-                    ? 'পরবর্তী পিরিয়ড ${cycle.daysUntilNextPeriod} দিন পর'
-                    : 'Next period in ${cycle.daysUntilNextPeriod}d',
+                isToday
+                    ? (isBn
+                        ? 'পরবর্তী পিরিয়ড ${WomenHealthFormatters.toBengaliDigits(cycle.daysUntilNextPeriod)} দিন পর'
+                        : 'Next period in ${cycle.daysUntilNextPeriod}d')
+                    : (isBn
+                        ? 'সাইকেলের স্থায়িত্ব: ${WomenHealthFormatters.toBengaliDigits(cycle.cycleLength)} দিন'
+                        : 'Cycle Length: ${cycle.cycleLength}d'),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -99,11 +133,18 @@ class CycleVisualizerRing extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                cycle.currentPhase.pregnancyChanceBn,
+                goalMode == CycleGoalMode.tryToConceive
+                    ? (targetPhase == CyclePhase.fertileOvulation
+                        ? '🌸 গর্ভধারণের সর্বোচ্চ সুযোগ'
+                        : 'গর্ভধারণের সম্ভাবনা: কম')
+                    : targetPhase.pregnancyChanceBn,
                 style: TextStyle(
                   fontSize: 10.5,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey.shade500,
+                  fontWeight: FontWeight.w600,
+                  color: goalMode == CycleGoalMode.tryToConceive &&
+                          targetPhase == CyclePhase.fertileOvulation
+                      ? const Color(0xFF8B5CF6)
+                      : Colors.grey.shade500,
                 ),
               ),
             ],
@@ -143,7 +184,7 @@ class _CycleRingPainter extends CustomPainter {
         startAngle: -pi / 2,
         endAngle: 3 * pi / 2,
         colors: [
-          phaseColor.withOpacity(0.4),
+          phaseColor.withValues(alpha: 0.35),
           phaseColor,
         ],
       ).createShader(Rect.fromCircle(center: center, radius: radius))
@@ -172,7 +213,7 @@ class _CycleRingPainter extends CustomPainter {
     final thumbBorderPaint = Paint()
       ..color = phaseColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
+      ..strokeWidth = 3.2;
 
     canvas.drawCircle(Offset(thumbX, thumbY), 8, thumbPaint);
     canvas.drawCircle(Offset(thumbX, thumbY), 8, thumbBorderPaint);
@@ -183,4 +224,3 @@ class _CycleRingPainter extends CustomPainter {
     return oldDelegate.progress != progress || oldDelegate.phaseColor != phaseColor;
   }
 }
-

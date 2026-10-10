@@ -5,20 +5,31 @@ import '../models/daily_symptom_log.dart';
 import '../provider/women_health_provider.dart';
 import '../../../core/utils/app_feedback.dart';
 
+import '../utils/women_health_formatters.dart';
+
 class SymptomLoggerSheet extends ConsumerStatefulWidget {
   final DailySymptomLog? initialLog;
+  final DateTime? targetDate;
 
   const SymptomLoggerSheet({
     super.key,
     this.initialLog,
+    this.targetDate,
   });
 
-  static Future<void> show(BuildContext context, {DailySymptomLog? initialLog}) {
+  static Future<void> show(
+    BuildContext context, {
+    DailySymptomLog? initialLog,
+    DateTime? targetDate,
+  }) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => SymptomLoggerSheet(initialLog: initialLog),
+      builder: (_) => SymptomLoggerSheet(
+        initialLog: initialLog,
+        targetDate: targetDate,
+      ),
     );
   }
 
@@ -55,9 +66,10 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
 
   void _save() {
     AppFeedback.playSuccess();
-    final today = getTodayKey();
+    final target = widget.targetDate ?? DateTime.now();
+    final dateKey = WomenHealthFormatters.toDateKey(target);
     final newLog = DailySymptomLog(
-      dateKey: today,
+      dateKey: dateKey,
       flow: _flow,
       cramp: _cramp,
       mood: _mood,
@@ -112,7 +124,7 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF43F5E).withOpacity(0.12),
+                      color: const Color(0xFFF43F5E).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -123,9 +135,13 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    isBn ? 'দৈনিক লক্ষণ ও অনুভূতি রেকর্ড' : 'Log Symptoms & Mood',
+                    widget.targetDate != null &&
+                            !WomenHealthFormatters.isSameDay(
+                                widget.targetDate!, DateTime.now())
+                        ? '${WomenHealthFormatters.formatDayMonthBn(widget.targetDate!)} এর লক্ষণ'
+                        : (isBn ? 'আজকের লক্ষণ ও অনুভূতি রেকর্ড' : 'Log Symptoms & Mood'),
                     style: const TextStyle(
-                      fontSize: 17,
+                      fontSize: 16.5,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFF0F172A),
                     ),

@@ -116,7 +116,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF43F5E).withOpacity(0.12),
+                      color: const Color(0xFFF43F5E).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -208,7 +208,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF43F5E).withOpacity(0.1),
+                  color: const Color(0xFFF43F5E).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -255,7 +255,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF8B5CF6).withOpacity(0.1),
+                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(

@@ -124,6 +124,49 @@ class MenstrualCycleModel {
     return nextPeriod.subtract(const Duration(days: 14));
   }
 
+  /// Day in the cycle for ANY specified date (past, today, or future)
+  int getCycleDayFor(DateTime targetDate) {
+    final target = DateTime(targetDate.year, targetDate.month, targetDate.day);
+    final start = DateTime(
+      lastPeriodStartDate.year,
+      lastPeriodStartDate.month,
+      lastPeriodStartDate.day,
+    );
+    final diff = target.difference(start).inDays;
+    final mod = diff % cycleLength;
+    return mod >= 0 ? (mod + 1) : ((mod + cycleLength) % cycleLength + 1);
+  }
+
+  /// Phase for ANY specified date
+  CyclePhase getPhaseFor(DateTime targetDate) {
+    final day = getCycleDayFor(targetDate);
+    if (day <= periodDuration) {
+      return CyclePhase.menstrual;
+    } else if (day < (ovulationDay - 4)) {
+      return CyclePhase.follicular;
+    } else if (day <= (ovulationDay + 1)) {
+      return CyclePhase.fertileOvulation;
+    } else {
+      return CyclePhase.luteal;
+    }
+  }
+
+  /// Check if date is a period bleeding day
+  bool isPeriodDay(DateTime targetDate) {
+    return getCycleDayFor(targetDate) <= periodDuration;
+  }
+
+  /// Check if date is inside the fertile window
+  bool isFertileDay(DateTime targetDate) {
+    final day = getCycleDayFor(targetDate);
+    return day >= (ovulationDay - 4) && day <= (ovulationDay + 1);
+  }
+
+  /// Check if date is the peak ovulation day
+  bool isOvulationDay(DateTime targetDate) {
+    return getCycleDayFor(targetDate) == ovulationDay;
+  }
+
   /// Progress of current cycle (0.0 to 1.0)
   double get cycleProgress => (currentCycleDay / cycleLength).clamp(0.0, 1.0);
 
