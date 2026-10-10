@@ -76,7 +76,7 @@ class FoodDetailSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      food.nameBn,
+                      isBn ? food.nameBn : food.nameEn,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -85,7 +85,7 @@ class FoodDetailSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      food.nameEn,
+                      isBn ? food.nameEn : food.nameBn,
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey.shade600,
@@ -94,7 +94,7 @@ class FoodDetailSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${isBn ? 'পরিমাণ:' : 'Portion:'} ${food.servingSizeBn}',
+                      '${isBn ? 'পরিমাণ:' : 'Portion:'} ${isBn ? food.servingSizeBn : food.servingSizeEn}',
                       style: TextStyle(
                         fontSize: 11.5,
                         color: AppColors.primaryColor.withOpacity(0.9),
@@ -192,7 +192,7 @@ class FoodDetailSheet extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        food.diabeticRisk.labelBn,
+                        isBn ? food.diabeticRisk.labelBn : food.diabeticRisk.labelEn,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,

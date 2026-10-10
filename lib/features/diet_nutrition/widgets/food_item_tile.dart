@@ -76,7 +76,7 @@ class FoodItemTile extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            food.nameBn,
+                            isBn ? food.nameBn : food.nameEn,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -106,7 +106,7 @@ class FoodItemTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      food.servingSizeBn,
+                      isBn ? food.servingSizeBn : food.servingSizeEn,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -153,7 +153,7 @@ class FoodItemTile extends StatelessWidget {
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            food.diabeticRisk.labelBn,
+                            isBn ? food.diabeticRisk.labelBn : food.diabeticRisk.labelEn,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(

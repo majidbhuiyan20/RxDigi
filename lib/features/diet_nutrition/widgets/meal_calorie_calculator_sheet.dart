@@ -283,7 +283,7 @@ class _MealCalorieCalculatorSheetState extends State<MealCalorieCalculatorSheet>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    food.nameBn,
+                                    isBn ? food.nameBn : food.nameEn,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
@@ -293,7 +293,7 @@ class _MealCalorieCalculatorSheetState extends State<MealCalorieCalculatorSheet>
                                     ),
                                   ),
                                   Text(
-                                    '${food.calories * qty} kcal (${food.servingSizeBn})',
+                                    '${food.calories * qty} kcal (${isBn ? food.servingSizeBn : food.servingSizeEn})',
                                     style: TextStyle(
                                       fontSize: 11.5,
                                       color: Colors.grey.shade600,

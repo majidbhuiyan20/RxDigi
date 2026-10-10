@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../../app/app_colors.dart';
+import '../../../l10n/local_provider.dart';
 import '../models/bangladeshi_food_model.dart';
 import '../data/bangladeshi_food_database.dart';
 import '../widgets/food_item_tile.dart';
 import '../widgets/meal_calorie_calculator_sheet.dart';
 import '../../../core/utils/app_feedback.dart';
 
-class DietNutritionScreen extends StatefulWidget {
+class DietNutritionScreen extends ConsumerStatefulWidget {
   const DietNutritionScreen({super.key});
 
   @override
-  State<DietNutritionScreen> createState() => _DietNutritionScreenState();
+  ConsumerState<DietNutritionScreen> createState() => _DietNutritionScreenState();
 }
 
-class _DietNutritionScreenState extends State<DietNutritionScreen> {
+class _DietNutritionScreenState extends ConsumerState<DietNutritionScreen> {
   final TextEditingController _searchController = TextEditingController();
   FoodCategory? _selectedCategory;
   bool _onlyDiabeticSafe = false;
@@ -97,7 +99,8 @@ class _DietNutritionScreenState extends State<DietNutritionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isBn = Localizations.localeOf(context).languageCode == 'bn';
+    final currentLocale = ref.watch(localeProvider);
+    final isBn = currentLocale.languageCode == 'bn';
     final foods = _filteredFoods;
 
     return Scaffold(
@@ -115,6 +118,40 @@ class _DietNutritionScreenState extends State<DietNutritionScreen> {
         ),
         iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
         actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: () {
+                AppFeedback.playLight();
+                final nextLang = isBn ? 'en' : 'bn';
+                ref.read(localeProvider.notifier).setLocale(Locale(nextLang));
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFCBD5E1)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(PhosphorIconsRegular.translate, size: 14, color: Color(0xFF0F172A)),
+                    const SizedBox(width: 4),
+                    Text(
+                      isBn ? 'EN' : 'বাং',
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0F172A),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           if (_selectedMeal.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(right: 12),

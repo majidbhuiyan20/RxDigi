@@ -11,7 +11,6 @@ import '../../medicine_reminder/view/add_reminder_sheet.dart';
 import '../../medicine_reminder/view/medicine_reminder_screen.dart';
 import '../../../core/utils/app_feedback.dart';
 import '../../../core/utils/bangla_utility.dart';
-import '../../../core/widgets/perfect_day_celebration.dart';
 
 class TodayMedicineCard extends ConsumerStatefulWidget {
   const TodayMedicineCard({super.key});
@@ -23,7 +22,6 @@ class TodayMedicineCard extends ConsumerStatefulWidget {
 class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
   // Filters: 'current', 'pending', 'taken', 'all'
   String _selectedFilter = 'current';
-  bool _showAnalytics = false;
 
   String _getCurrentSlotKey() {
     final hour = DateTime.now().hour;
@@ -307,6 +305,7 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
                           ? 'এখনকার (${_getSlotTitle(currentSlot, isBn)})'
                           : 'Next Up (${_getSlotTitle(currentSlot, isBn)})',
                       count: currentSlotDoses.length,
+                      isBn: isBn,
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
@@ -314,18 +313,21 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
                       label: isBn ? 'খাওয়া বাকি' : 'Pending',
                       count: pendingDoses,
                       alert: overdueDoses > 0,
+                      isBn: isBn,
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
                       key: 'taken',
                       label: isBn ? 'গৃহীত' : 'Taken',
                       count: takenDoses,
+                      isBn: isBn,
                     ),
                     const SizedBox(width: 8),
                     _buildFilterChip(
                       key: 'all',
                       label: isBn ? 'সব' : 'All Doses',
                       count: totalDoses,
+                      isBn: isBn,
                     ),
                   ],
                 ),
@@ -398,6 +400,7 @@ class _TodayMedicineCardState extends ConsumerState<TodayMedicineCard> {
     required String key,
     required String label,
     required int count,
+    required bool isBn,
     bool alert = false,
   }) {
     final isSelected = _selectedFilter == key;
