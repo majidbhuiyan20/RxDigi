@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/pregnancy_model.dart';
@@ -196,59 +197,63 @@ final kickCounterLogsProvider =
   return KickCounterLogsNotifier();
 });
 
-// ─── 4. Antenatal Care (ANC) Visits & Ultrasound Tracker Notifier ───
+/// ─── 4. Asynchronous JSON Catalog Provider ───
+final pregnancyWeeksCatalogProvider =
+    FutureProvider<List<PregnancyWeekInfo>>((ref) async {
+  return await PregnancyWeekCatalog.loadAllWeeks();
+});
+
+// ─── 5. Antenatal Care (ANC) Visits & Ultrasound Tracker Notifier ───
 class ANCVisitsNotifier extends Notifier<List<ANCVisitItem>> {
   static const String _prefsKey = 'rxdigi_anc_visits_v1';
+  static const String _assetPath = 'assets/data/anc_visits.json';
 
   @override
   List<ANCVisitItem> build() {
-    _loadFromPrefs();
-    return _defaultVisits();
+    _loadVisits();
+    return _fallbackVisits;
   }
 
-  static List<ANCVisitItem> _defaultVisits() {
-    return [
-      ANCVisitItem(
-        visitNumber: 1,
-        weekRange: '৮-১২ সপ্তাহ',
-        titleBn: '১ম চেকআপ ও ডেটিং আল্ট্রাসাউন্ড',
-        titleEn: '1st ANC Visit & Dating Scan',
-        descriptionBn: 'রক্তের গ্রুপ, হিমোগ্লোবিন, সুগার, ইউরিন আর/ই টেস্ট এবং ইডিডি (EDD) নিশ্চিতকরণ।',
-        descriptionEn: 'Blood grouping, Hb, blood glucose, urine R/E, and gestational dating confirmation.',
-        isCompleted: true,
-        completedDate: DateTime.now().subtract(const Duration(days: 45)),
-      ),
-      ANCVisitItem(
-        visitNumber: 2,
-        weekRange: '১৮-২২ সপ্তাহ',
-        titleBn: '২য় চেকআপ ও এনোমালি স্ক্যান',
-        titleEn: '2nd ANC Visit & Anomaly Scan',
-        descriptionBn: 'শিশুর শরীরের সমস্ত অঙ্গপ্রত্যঙ্গের পূর্ণাঙ্গ বিকাশ নিরীক্ষণ এবং টিটি (TT) টিকা গ্রহণ।',
-        descriptionEn: 'Level II detailed anatomical scan for congenital markers, plus Tetanus Toxoid (TT).',
-        isCompleted: false,
-      ),
-      ANCVisitItem(
-        visitNumber: 3,
-        weekRange: '২৮-৩২ সপ্তাহ',
-        titleBn: '৩য় চেকআপ ও ডায়াবেটিস স্ক্রিনিং',
-        titleEn: '3rd ANC Visit & GDM Screen',
-        descriptionBn: 'রক্তচাপ, প্রি-এক্লাম্পসিয়া পরীক্ষা, ওজিটিটি (OGTT) ডায়াবেটিস টেস্ট ও বাচ্চার গ্রোথ স্ক্যান।',
-        descriptionEn: 'Blood pressure, pre-eclampsia screening, OGTT glucose test, and fetal growth curve.',
-        isCompleted: false,
-      ),
-      ANCVisitItem(
-        visitNumber: 4,
-        weekRange: '৩৬-৩৮ সপ্তাহ',
-        titleBn: '৪র্থ চেকআপ ও ডেলিভারি পরিকল্পনা',
-        titleEn: '4th ANC Visit & Birth Plan',
-        descriptionBn: 'শিশুর মাথা নিচে (Cephalic) অবস্থান নিশ্চিতকরণ, প্লাসেন্টার পজিশন ও নরমাল/সিজারিয়ান বার্থ প্ল্যান।',
-        descriptionEn: 'Presentation (cephalic check), placental grading, hospital bag, and birth plan.',
-        isCompleted: false,
-      ),
-    ];
-  }
+  static const List<ANCVisitItem> _fallbackVisits = [
+    ANCVisitItem(
+      visitNumber: 1,
+      weekRange: '৮-১২ সপ্তাহ',
+      titleBn: '১ম চেকআপ ও ডেটিং আল্ট্রাসাউন্ড',
+      titleEn: '1st ANC Visit & Dating Scan',
+      descriptionBn: 'রক্তের গ্রুপ, হিমোগ্লোবিন, সুগার, ইউরিন আর/ই টেস্ট এবং ইডিডি (EDD) নিশ্চিতকরণ।',
+      descriptionEn: 'Blood grouping, Hb, blood glucose, urine R/E, and gestational dating confirmation.',
+      isCompleted: true,
+    ),
+    ANCVisitItem(
+      visitNumber: 2,
+      weekRange: '১৮-২২ সপ্তাহ',
+      titleBn: '২য় চেকআপ ও এনোমালি স্ক্যান',
+      titleEn: '2nd ANC Visit & Anomaly Scan',
+      descriptionBn: 'শিশুর শরীরের সমস্ত অঙ্গপ্রত্যঙ্গের পূর্ণাঙ্গ বিকাশ নিরীক্ষণ এবং টিটি (TT) টিকা গ্রহণ।',
+      descriptionEn: 'Level II detailed anatomical scan for congenital markers, plus Tetanus Toxoid (TT).',
+      isCompleted: false,
+    ),
+    ANCVisitItem(
+      visitNumber: 3,
+      weekRange: '২৮-৩২ সপ্তাহ',
+      titleBn: '৩য় চেকআপ ও ডায়াবেটিস স্ক্রিনিং',
+      titleEn: '3rd ANC Visit & GDM Screen',
+      descriptionBn: 'রক্তচাপ, প্রি-এক্লাম্পসিয়া পরীক্ষা, ওজিটিটি (OGTT) ডায়াবেটিস টেস্ট ও বাচ্চার গ্রোথ স্ক্যান।',
+      descriptionEn: 'Blood pressure, pre-eclampsia screening, OGTT glucose test, and fetal growth curve.',
+      isCompleted: false,
+    ),
+    ANCVisitItem(
+      visitNumber: 4,
+      weekRange: '৩৬-৩৮ সপ্তাহ',
+      titleBn: '৪র্থ চেকআপ ও ডেলিভারি পরিকল্পনা',
+      titleEn: '4th ANC Visit & Birth Plan',
+      descriptionBn: 'শিশুর মাথা নিচে (Cephalic) অবস্থান নিশ্চিতকরণ, প্লাসেন্টার পজিশন ও নরমাল/সিজারিয়ান বার্থ প্ল্যান।',
+      descriptionEn: 'Presentation (cephalic check), placental grading, hospital bag, and birth plan.',
+      isCompleted: false,
+    ),
+  ];
 
-  Future<void> _loadFromPrefs() async {
+  Future<void> _loadVisits() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonStr = prefs.getString(_prefsKey);
     if (jsonStr != null) {
@@ -257,8 +262,18 @@ class ANCVisitsNotifier extends Notifier<List<ANCVisitItem>> {
         state = list
             .map((e) => ANCVisitItem.fromJson(e as Map<String, dynamic>))
             .toList();
+        return;
       } catch (_) {}
     }
+
+    // Load defaults from JSON asset if not found in SharedPreferences
+    try {
+      final assetJson = await rootBundle.loadString(_assetPath);
+      final list = jsonDecode(assetJson) as List;
+      state = list
+          .map((e) => ANCVisitItem.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {}
   }
 
   Future<void> toggleVisit(int visitNumber, {DateTime? date}) async {
@@ -285,3 +300,4 @@ final ancVisitsProvider =
     NotifierProvider<ANCVisitsNotifier, List<ANCVisitItem>>(() {
   return ANCVisitsNotifier();
 });
+

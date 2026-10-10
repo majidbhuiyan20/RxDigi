@@ -25,17 +25,30 @@ void main() {
       expect(pregnancy.estimatedDueDate.day, expectedEdd.day);
     });
 
-    test('PregnancyWeekCatalog returns valid milestone data for week 12', () {
-      final weekInfo = PregnancyWeekCatalog.getWeekInfo(12);
-      expect(weekInfo.week, 12);
-      expect(weekInfo.fruitNameBn, isNotEmpty);
-      expect(weekInfo.fruitNameEn, isNotEmpty);
-      expect(weekInfo.babyDevelopmentBn, isNotEmpty);
-      expect(weekInfo.babyDevelopmentEn, isNotEmpty);
-      expect(weekInfo.motherChangesBn, isNotEmpty);
-      expect(weekInfo.motherChangesEn, isNotEmpty);
-      expect(weekInfo.notificationTextBn, isNotEmpty);
-      expect(weekInfo.notificationTextEn, isNotEmpty);
+    test('PregnancyWeekInfo json serialization works accurately', () {
+      final json = {
+        'week': 14,
+        'fruitEmoji': '🍋',
+        'fruitNameBn': 'একটি পাকা লেবুর সমান',
+        'fruitNameEn': 'a ripe Lemon',
+        'lengthCm': 8.7,
+        'weightGrams': 43.0,
+        'babyDevelopmentBn': 'শিশুর অঙ্গপ্রত্যঙ্গ দ্রুত বাড়ছে',
+        'babyDevelopmentEn': 'Rapid fetal development',
+        'motherChangesBn': 'পেট বড় হচ্ছে',
+        'motherChangesEn': 'Bump is growing',
+        'careTipBn': 'আরামদায়ক জুতো পরুন',
+        'careTipEn': 'Wear comfy shoes',
+        'notificationTextBn': '১৪তম সপ্তাহ শুরু',
+        'notificationTextEn': 'Week 14 has begun',
+      };
+      final item = PregnancyWeekInfo.fromJson(json);
+      expect(item.week, 14);
+      expect(item.fruitEmoji, '🍋');
+      expect(item.fruitNameBn, 'একটি পাকা লেবুর সমান');
+      expect(item.lengthCm, 8.7);
+      expect(item.weightGrams, 43.0);
+      expect(item.toJson()['week'], 14);
     });
 
     test('PregnancyWeekCatalog handles boundary weeks', () {

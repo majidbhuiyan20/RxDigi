@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Trimester of pregnancy
 enum PregnancyTrimester {
@@ -287,13 +289,90 @@ class PregnancyWeekInfo {
     required this.notificationTextBn,
     required this.notificationTextEn,
   });
+
+  factory PregnancyWeekInfo.fromJson(Map<String, dynamic> json) =>
+      PregnancyWeekInfo(
+        week: json['week'] as int,
+        fruitEmoji: json['fruitEmoji'] as String? ?? '🌱',
+        fruitNameBn: json['fruitNameBn'] as String? ?? '',
+        fruitNameEn: json['fruitNameEn'] as String? ?? '',
+        lengthCm: (json['lengthCm'] as num?)?.toDouble() ?? 0.0,
+        weightGrams: (json['weightGrams'] as num?)?.toDouble() ?? 0.0,
+        babyDevelopmentBn: json['babyDevelopmentBn'] as String? ?? '',
+        babyDevelopmentEn: json['babyDevelopmentEn'] as String? ?? '',
+        motherChangesBn: json['motherChangesBn'] as String? ?? '',
+        motherChangesEn: json['motherChangesEn'] as String? ?? '',
+        careTipBn: json['careTipBn'] as String? ?? '',
+        careTipEn: json['careTipEn'] as String? ?? '',
+        notificationTextBn: json['notificationTextBn'] as String? ?? '',
+        notificationTextEn: json['notificationTextEn'] as String? ?? '',
+      );
+
+  Map<String, dynamic> toJson() => {
+        'week': week,
+        'fruitEmoji': fruitEmoji,
+        'fruitNameBn': fruitNameBn,
+        'fruitNameEn': fruitNameEn,
+        'lengthCm': lengthCm,
+        'weightGrams': weightGrams,
+        'babyDevelopmentBn': babyDevelopmentBn,
+        'babyDevelopmentEn': babyDevelopmentEn,
+        'motherChangesBn': motherChangesBn,
+        'motherChangesEn': motherChangesEn,
+        'careTipBn': careTipBn,
+        'careTipEn': careTipEn,
+        'notificationTextBn': notificationTextBn,
+        'notificationTextEn': notificationTextEn,
+      };
 }
 
-/// Clinical Week-by-Week Catalog (Weeks 1 to 40)
+/// Clinical Week-by-Week Catalog (Loaded dynamically from assets/data/pregnancy_weeks.json)
 class PregnancyWeekCatalog {
   PregnancyWeekCatalog._();
 
-  static const List<PregnancyWeekInfo> weeks = [
+  static const String assetPath = 'assets/data/pregnancy_weeks.json';
+  static List<PregnancyWeekInfo> _cachedWeeks = [];
+  static bool _isLoaded = false;
+
+  /// Loads all week records from JSON asset and caches them in memory
+  static Future<List<PregnancyWeekInfo>> loadAllWeeks() async {
+    if (_isLoaded && _cachedWeeks.isNotEmpty) {
+      return _cachedWeeks;
+    }
+
+    try {
+      final jsonStr = await rootBundle.loadString(assetPath);
+      final List<dynamic> list = jsonDecode(jsonStr) as List<dynamic>;
+      _cachedWeeks = list
+          .map((e) => PregnancyWeekInfo.fromJson(e as Map<String, dynamic>))
+          .toList();
+      _isLoaded = true;
+    } catch (e) {
+      debugPrint('Error loading pregnancy weeks json from $assetPath: $e');
+    }
+
+    return weeks;
+  }
+
+  /// Sets weeks directly (useful for tests or mocking)
+  @visibleForTesting
+  static void setMockWeeks(List<PregnancyWeekInfo> mockWeeks) {
+    _cachedWeeks = mockWeeks;
+    _isLoaded = true;
+  }
+
+  /// Synchronous getter with safe fallback if not yet loaded
+  static List<PregnancyWeekInfo> get weeks {
+    if (_cachedWeeks.isNotEmpty) {
+      return _cachedWeeks;
+    }
+    return _fallbackWeeks;
+  }
+
+  static bool get isLoaded => _isLoaded;
+
+  /// Baseline fallback entry so UI never crashes before async load finishes
+  static const List<PregnancyWeekInfo> _fallbackWeeks = [
     PregnancyWeekInfo(
       week: 4,
       fruitEmoji: '🌱',
@@ -309,278 +388,6 @@ class PregnancyWeekCatalog {
       careTipEn: 'Take 400 mcg daily folic acid. Avoid unpasteurized foods and all alcohol.',
       notificationTextBn: '🌸 শুভ সকাল! ৪ সপ্তাহ শুরু হয়েছে। আপনার সোনামণি এখন একটি ছোট্ট বীজের মতো। ফলিক এসিড খেতে ভুলবেন না!',
       notificationTextEn: '🌸 Good morning! Week 4 has begun. Your baby is the size of a poppy seed. Remember your daily folic acid!',
-    ),
-    PregnancyWeekInfo(
-      week: 6,
-      fruitEmoji: '🫘',
-      fruitNameBn: 'একটি মিষ্টি মটরদানার সমান',
-      fruitNameEn: 'a sweet Sweet Pea',
-      lengthCm: 0.5,
-      weightGrams: 0.3,
-      babyDevelopmentBn: 'শিশুর ক্ষুদ্র হৃৎপিণ্ড প্রতি মিনিটে ১০০-১৬০ বার স্পন্দিত হতে শুরু করেছে। চোখ ও কানের সূক্ষ্ম খাঁজ তৈরি হচ্ছে।',
-      babyDevelopmentEn: 'The tiny heart begins beating at 100-160 BPM. Tiny facial features and optic vesicles start forming.',
-      motherChangesBn: 'মর্নিং সিকনেস ও গন্ধের প্রতি তীব্র সংবেদনশীলতা দেখা দিতে পারে। ঘন ঘন প্রস্রাবের বেগ হতে পারে।',
-      motherChangesEn: 'Morning sickness and heightened sense of smell peak. Frequent urination is very common.',
-      careTipBn: 'সকালে বিছানা ছাড়ার আগে ড্রাই টোস্ট বা বিস্কুট খান। একবারে বেশি না খেয়ে অল্প অল্প করে বারবার খান।',
-      careTipEn: 'Eat dry crackers before rising. Eat small, frequent meals to soothe gastric nausea.',
-      notificationTextBn: '🌸 ৬ষ্ঠ সপ্তাহ: আপনার সোনামণির ছোট্ট হৃৎস্পন্দন শুরু হয়েছে! হালকা নাস্তা ও পর্যাপ্ত পানি পান করুন।',
-      notificationTextEn: '🌸 Week 6: Baby\'s tiny heartbeat is active! Sip water often and enjoy gentle nourishing snacks.',
-    ),
-    PregnancyWeekInfo(
-      week: 8,
-      fruitEmoji: '🍇',
-      fruitNameBn: 'একটি লাল আঙ্গুরের সমান',
-      fruitNameEn: 'a plump Kidney Bean / Grape',
-      lengthCm: 1.6,
-      weightGrams: 1.0,
-      babyDevelopmentBn: 'হাত ও পায়ের পাতা ও ক্ষুদ্র আঙুলগুলো স্পষ্ট হচ্ছে। স্নায়ুতন্ত্র ও মস্তিষ্কের কোষ দ্রুত বিভাজিত হচ্ছে।',
-      babyDevelopmentEn: 'Tiny webbed fingers and toes develop. Nerve pathways in the brain branch out rapidly.',
-      motherChangesBn: 'জরায়ু এখন একটি লেবুর মতো বড়। হরমোনের কারণে অতিরিক্ত ক্লান্তি ও মেজাজের পরিবর্তন হতে পারে।',
-      motherChangesEn: 'Your uterus is the size of a lemon. Fatigue, vivid dreams, and mood swings are frequent.',
-      careTipBn: 'প্রথম এএনসি (ANC) ডাক্তারের ভিজিট ও ডেটিং আল্ট্রাসাউন্ড করানোর এটি মোক্ষম সময়।',
-      careTipEn: 'Ideal timing for your 1st Antenatal Care doctor visit and baseline dating ultrasound.',
-      notificationTextBn: '🌸 ৮ম সপ্তাহ: শিশুর হাতের আঙুলগুলো তৈরি হচ্ছে! ডাক্তারের সাথে প্রথম ভিজিটের অ্যাপয়েন্টমেন্ট নিশ্চিত করুন।',
-      notificationTextEn: '🌸 Week 8: Baby\'s fingers are forming! A great time for your first dating ultrasound appointment.',
-    ),
-    PregnancyWeekInfo(
-      week: 10,
-      fruitEmoji: '🍓',
-      fruitNameBn: 'একটি মিষ্টি স্ট্রবেরির সমান',
-      fruitNameEn: 'a fresh Strawberry',
-      lengthCm: 3.1,
-      weightGrams: 4.0,
-      babyDevelopmentBn: 'ভ্রূণ পর্যায় পেরিয়ে শিশু এখন চিকিৎসাবিজ্ঞানে পূর্ণাঙ্গ "ফিটাস" (Fetus)। সকল প্রধান অঙ্গ গঠিত হয়ে কাজ শুরু করেছে।',
-      babyDevelopmentEn: 'The embryo is now officially a fetus! All vital organs are formed and beginning to function.',
-      motherChangesBn: 'রক্তের পরিমাণ প্রায় ৫০% বৃদ্ধি পেতে শুরু করায় ত্বকে শিরার রেখা স্পষ্ট হতে পারে।',
-      motherChangesEn: 'Blood volume expands significantly. You may notice visible veins on chest and belly.',
-      careTipBn: 'আয়রন ও ভিটামিন সি সমৃদ্ধ খাবার (যেমন শাক, ডাল, পেয়ারা) গ্রহণ করুন যাতে রক্তস্বল্পতা না হয়।',
-      careTipEn: 'Prioritize iron-rich foods combined with vitamin C (lentils, amla, guava) to support blood volume.',
-      notificationTextBn: '🌸 ১০ম সপ্তাহ: আপনার শিশু এখন পূর্ণাঙ্গ ফিটাস! শরীরে রক্তের ঘাটতি রোধে পুষ্টিকর দেশি খাবার খান।',
-      notificationTextEn: '🌸 Week 10: Your baby has graduated to fetus! Support circulation with fresh fruit and hydration.',
-    ),
-    PregnancyWeekInfo(
-      week: 12,
-      fruitEmoji: '🍋',
-      fruitNameBn: 'একটি রসালো কাগজি লেবুর সমান',
-      fruitNameEn: 'a juicy Lime',
-      lengthCm: 5.4,
-      weightGrams: 14.0,
-      babyDevelopmentBn: 'শিশুর নখের গঠন শুরু হয়েছে। কিডনি অ্যামনিওটিক ফ্লুইড ফিল্টার করে মূত্র তৈরি করছে এবং শিশু ঢোক গিলতে পারে।',
-      babyDevelopmentEn: 'Tiny fingernails form. Kidneys produce amniotic fluid and the baby practice-swallows.',
-      motherChangesBn: '১ম ট্রাইমেস্টারের শেষ প্রান্তে বমিভাব কমতে পারে এবং কর্মশক্তি ধীরে ধীরে ফিরে আসবে।',
-      motherChangesEn: 'Morning sickness typically starts subsiding as placenta takes over hormone synthesis.',
-      careTipBn: '১১-১৩ সপ্তাহের NT স্ক্যান (Nuchal Translucency) আল্ট্রাসাউন্ড করিয়ে জেনে নিন শিশুর বিকাশ স্বাভাবিক কিনা।',
-      careTipEn: 'Schedule your NT ultrasound scan to evaluate fetal genetic and chromosomal markers.',
-      notificationTextBn: '🌸 ১২তম সপ্তাহ: ১ম ট্রাইমেস্টারের দ্বারপ্রান্তে! বমিভাব কমবে, শিশুর জন্য সুষম ডায়েট বজায় রাখুন।',
-      notificationTextEn: '🌸 Week 12: Approaching the second trimester! Energy will return; keep eating wholesome foods.',
-    ),
-    PregnancyWeekInfo(
-      week: 14,
-      fruitEmoji: '🍋',
-      fruitNameBn: 'একটি পাকা লেবুর সমান',
-      fruitNameEn: 'a ripe Lemon',
-      lengthCm: 8.7,
-      weightGrams: 43.0,
-      babyDevelopmentBn: '২য় ট্রাইমেস্টারে স্বাগতম! শিশু মুখে হাসি, ভ্রু কুঁচকানো বা আঙুল চোষার মতো রিফ্লেক্স প্র্যাকটিস করছে।',
-      babyDevelopmentEn: 'Welcome to the 2nd trimester! Baby can squint, frown, and make facial grimaces.',
-      motherChangesBn: 'পেট হালকা উঁচু হতে শুরু করেছে। "প্রেগন্যান্সি গ্লো" ও ত্বকে রক্তসঞ্চালন বৃদ্ধি পায়।',
-      motherChangesEn: 'Your baby bump begins to show gently. Increased blood circulation brings the pregnancy glow.',
-      careTipBn: 'ঢিলেঢালা আরামদায়ক পোশাক পরিধান করুন এবং পিঠব্যথা এড়াতে আরামদায়ক পাদুকা বেছে নিন।',
-      careTipEn: 'Switch to comfortable maternity clothing and supportive flat shoes to support posture.',
-      notificationTextBn: '🌸 ১৪তম সপ্তাহ: ২য় ট্রাইমেস্টারে পদার্পণ! শিশুর হাত-পা এখন দারুণ কর্মক্ষম। মা ও শিশুর যত্ন নিন।',
-      notificationTextEn: '🌸 Week 14: Welcome to the energetic 2nd Trimester! Baby is practicing tiny hand and mouth movements.',
-    ),
-    PregnancyWeekInfo(
-      week: 16,
-      fruitEmoji: '🥑',
-      fruitNameBn: 'একটি মাঝারি অ্যাভোকাডোর সমান',
-      fruitNameEn: 'an Avocado',
-      lengthCm: 11.6,
-      weightGrams: 100.0,
-      babyDevelopmentBn: 'শিশুর ক্ষুদ্র কানের গঠন সম্পন্ন হয়েছে—সে এখন মায়ের হৃৎস্পন্দন ও কণ্ঠস্বর শুনতে পায়!',
-      babyDevelopmentEn: 'Baby\'s inner ear bones are hardened; baby can now hear your voice and heartbeat!',
-      motherChangesBn: 'পেটের ভেতর মৃদু প্রজাপতির পাখার মতো নড়াচড়া (Quickening) প্রথম অনুভব হতে পারে।',
-      motherChangesEn: 'You might feel tiny fluttery sensations known as quickening for the first time.',
-      careTipBn: 'শিশুর সাথে মিষ্টি সুরে কথা বলুন বা গান শোনান। ক্যালসিয়াম ও আয়রন ট্যাবলেট নিয়মিত চালু রাখুন।',
-      careTipEn: 'Talk and hum to your baby! Ensure your prenatal calcium and iron supplements are taken on time.',
-      notificationTextBn: '🌸 ১৬তম সপ্তাহ: আপনার সোনামণি এখন আপনার কণ্ঠ শুনতে পায়! তার সাথে কথা বলুন ও গান শোনান।',
-      notificationTextEn: '🌸 Week 16: Your baby can hear your voice now! Talk, read, and hum gentle melodies to your bump.',
-    ),
-    PregnancyWeekInfo(
-      week: 18,
-      fruitEmoji: '🫑',
-      fruitNameBn: 'একটি বড় মিষ্টি ক্যাপসিকামের সমান',
-      fruitNameEn: 'a Bell Pepper',
-      lengthCm: 14.2,
-      weightGrams: 190.0,
-      babyDevelopmentBn: 'শিশুর স্নায়ুগুলোর ওপর মায়োলিন প্রলেপ তৈরি হচ্ছে। আঙুলের ডগায় অনন্য ও স্থায়ী ফিঙ্গারপ্রিন্ট বসে গেছে।',
-      babyDevelopmentEn: 'Myelin forms around nerves. Unique, permanent fingerprints are fully set on tiny fingers.',
-      motherChangesBn: 'হঠাৎ দাঁড়ালে মাথা ঘোরা বা পিঠের নিচের অংশে টান লাগতে পারে। ঘুমানোর সময় বাম কাতে শোয়া শুরু করুন।',
-      motherChangesEn: 'Lower back strain or mild postural dizziness may occur. Sleep on your left side with pillows.',
-      careTipBn: '১৮-২২ সপ্তাহের মধ্যে অত্যন্ত গুরুত্বপূর্ণ "এনোমালি স্ক্যান" (Anomaly Ultrasound) সম্পন্ন করুন।',
-      careTipEn: 'Schedule your comprehensive mid-pregnancy Level II Anomaly Ultrasound Scan this week.',
-      notificationTextBn: '🌸 ১৮তম সপ্তাহ: এনোমালি স্ক্যান করানোর গুরুত্বপূর্ণ সময়। শিশুর অঙ্গ-প্রত্যঙ্গের গঠন আল্ট্রাসাউন্ডে দেখে নিন।',
-      notificationTextEn: '🌸 Week 18: Time for the detailed Anomaly Scan. Verify your baby\'s anatomical milestones with your doctor.',
-    ),
-    PregnancyWeekInfo(
-      week: 20,
-      fruitEmoji: '🍌',
-      fruitNameBn: 'একটি মিষ্টি কলার সমান',
-      fruitNameEn: 'a ripe Banana',
-      lengthCm: 25.6,
-      weightGrams: 300.0,
-      babyDevelopmentBn: 'অভিনন্দন! আপনি গর্ভাবস্থার ঠিক অর্ধেক পথ অতিক্রম করেছেন (২০/৪০ সপ্তাহ)। শিশু এখন নিয়মিত ঘুমানো ও জাগার চক্র তৈরি করছে।',
-      babyDevelopmentEn: 'Halfway milestone (20/40 weeks)! Baby has established circadian sleep and wake cycles.',
-      motherChangesBn: 'নাভি সামান্য বাইরের দিকে আসতে পারে। পেট এখন সুনির্দিষ্ট ও সুন্দরভাবে দৃশ্যমান।',
-      motherChangesEn: 'Your belly button may pop outward gently. Uterus reaches right up to belly-button level.',
-      careTipBn: 'হাফওয়ে মাইলস্টোন উদযাপন করুন! পর্যাপ্ত প্রোটিন (ডিম, মাছ, দুধ) ও সবুজ শাকসবজি খান।',
-      careTipEn: 'Celebrate the halfway mark! Nourish with balanced proteins, milk, lentils, and fresh fruits.',
-      notificationTextBn: '🎉 ২০তম সপ্তাহ: গর্ভাবস্থার ঠিক অর্ধেক পথ সম্পন্ন! আপনার সোনামণি এখন ২৫ সেমি দীর্ঘ। অভিনন্দন!',
-      notificationTextEn: '🎉 Week 20: Halfway there! Baby is ~25 cm long. Celebrate this milestone with nutritious nourishment.',
-    ),
-    PregnancyWeekInfo(
-      week: 22,
-      fruitEmoji: '🥥',
-      fruitNameBn: 'একটি রসালো পাকা পেঁপের সমান',
-      fruitNameEn: 'a Papaya',
-      lengthCm: 27.8,
-      weightGrams: 430.0,
-      babyDevelopmentBn: 'শিশুর চোখের পাতা ও ভ্রুর স্পষ্ট গঠন তৈরি হয়েছে। স্বাদগ্রন্থি (Taste buds) কাজ শুরু করেছে।',
-      babyDevelopmentEn: 'Eyelashes and distinct eyebrows form. Baby taste buds are active in amniotic fluid.',
-      motherChangesBn: 'পায়ে বা গোড়ালিতে মৃদু পানি আসা (Edema) বা রাতে পায়ে টান লাগতে পারে।',
-      motherChangesEn: 'Mild ankle swelling and nighttime leg cramps may surface due to pelvic pressure.',
-      careTipBn: 'লবণের অতিরিক্ত ব্যবহার এড়িয়ে চলুন, পা উঁচু করে রাখুন এবং ম্যাগনেসিয়াম সমৃদ্ধ খাবার খান।',
-      careTipEn: 'Limit processed salt, elevate legs while seated, and consume bananas or nuts for magnesium.',
-      notificationTextBn: '🌸 ২২তম সপ্তাহ: শিশুর চোখের ভ্রু ও পাপড়ি ফুটে উঠছে! পায়ে টান লাগলে সামান্য পা উঁচু করে বিশ্রাম নিন।',
-      notificationTextEn: '🌸 Week 22: Baby has eyebrows and eyelashes! Rest with your feet slightly elevated after meals.',
-    ),
-    PregnancyWeekInfo(
-      week: 24,
-      fruitEmoji: '🌽',
-      fruitNameBn: 'একটি বড় ভুট্টার মোচার সমান',
-      fruitNameEn: 'an Ear of Corn',
-      lengthCm: 30.0,
-      weightGrams: 600.0,
-      babyDevelopmentBn: 'শিশুর ফুসফুসে সারফ্যাকট্যান্ট (Surfactant) তৈরি শুরু হচ্ছে যা জন্মের পর শ্বাস নিতে সাহায্য করবে।',
-      babyDevelopmentEn: 'Surfactant production initiates in tiny lungs, paving the way for eventual breathing.',
-      motherChangesBn: 'গর্ভকালীন ডায়াবেটিস (GDM) স্ক্রিনিং ও ওজিটিটি (OGTT) ব্লাড টেস্টের আদর্শ সময়।',
-      motherChangesEn: 'Window for the Oral Glucose Tolerance Test (OGTT) to screen for gestational diabetes.',
-      careTipBn: 'ডাক্তারের পরামর্শে ওজিটিটি রক্তের সুগার টেস্ট করান। মিষ্টি ও অতিরিক্ত চিনিযুক্ত পানীয় পরিহার করুন।',
-      careTipEn: 'Get your OGTT blood glucose test done. Avoid sweetened drinks and refined sugars.',
-      notificationTextBn: '🌸 ২৪তম সপ্তাহ: ডায়াবেটিস স্ক্রিনিং করানোর সময়। রক্তের সুগার নিয়ন্ত্রণে পুষ্টিকর ও লো-জিআই খাবার খান।',
-      notificationTextEn: '🌸 Week 24: Ideal time for gestational diabetes screening. Keep sugars balanced with fiber-rich carbs.',
-    ),
-    PregnancyWeekInfo(
-      week: 26,
-      fruitEmoji: '🥬',
-      fruitNameBn: 'একটি তাজা লাল বাঁধাকপির সমান',
-      fruitNameEn: 'a Red Cabbage',
-      lengthCm: 35.6,
-      weightGrams: 760.0,
-      babyDevelopmentBn: 'শিশু প্রথমবারের মতো চোখের পাতা খুলতে ও বন্ধ করতে পারে। শব্দের তীব্রতায় শিশু চমকে প্রতিক্রিয়া জানাতে পারে।',
-      babyDevelopmentEn: 'Baby opens eyes for the first time. Baby responds with startle kicks to loud external sounds.',
-      motherChangesBn: 'পেটের চামড়ায় টান ধরা বা চুলকানি (Stretch marks) হতে পারে। পিঠে হালকা ব্যথা হতে পারে।',
-      motherChangesEn: 'Stretching abdominal skin can cause itching. Warm coconut oil or gentle lotion helps immensely.',
-      careTipBn: 'পেটে খাঁটি নারিকেল তেল বা ময়েশ্চারাইজার লাগান। ভারী জিনিস তোলা পরিহার করুন।',
-      careTipEn: 'Moisturize your belly with pure coconut oil or shea butter. Never lift heavy loads.',
-      notificationTextBn: '🌸 ২৬তম সপ্তাহ: শিশু এখন চোখ খুলতে পারে! পেটের চামড়ায় টান লাগলে ময়েশ্চারাইজার ব্যবহার করুন।',
-      notificationTextEn: '🌸 Week 26: Baby can open tiny eyes! Keep your belly skin moisturized with gentle nourishing oils.',
-    ),
-    PregnancyWeekInfo(
-      week: 28,
-      fruitEmoji: '🍆',
-      fruitNameBn: 'একটি বড় মিষ্টি বেগুন বা কপির সমান',
-      fruitNameEn: 'a large Eggplant',
-      lengthCm: 37.6,
-      weightGrams: 1000.0,
-      babyDevelopmentBn: '৩য় ও চূড়ান্ত ট্রাইমেস্টারে পদার্পণ! শিশুর ওজন ১ কেজি স্পর্শ করেছে। মস্তিষ্কে বিলিয়ন বিলিয়ন নিউরোন সক্রিয়।',
-      babyDevelopmentEn: 'Welcome to the 3rd Trimester! Baby weighs over 1 kg. Billions of active neurons develop.',
-      motherChangesBn: 'শিশুর লাথি ও নড়াচড়া এখন পেট বাইরে থেকেও স্পষ্টভাবে দেখা যায়। দ্রুত হাঁপিয়ে উঠতে পারেন।',
-      motherChangesEn: 'Kicks and rolls are distinct from outside. Shortness of breath occurs as uterus presses diaphragm.',
-      careTipBn: 'এখন থেকে প্রতিদিন "ফিটাল কিক কাউন্টার" (Baby Kick Counter) ব্যবহার করে শিশুর নড়াচড়া ট্র্যাক করা শুরু করুন।',
-      careTipEn: 'Start daily baby kick counting sessions! A minimum of 10 movements in 2 hours is expected.',
-      notificationTextBn: '👣 ২৮তম সপ্তাহ: ৩য় ট্রাইমেস্টার শুরু! প্রতিদিন অ্যাপের কিক কাউন্টারে শিশুর নড়াচড়া রেকর্ড করুন।',
-      notificationTextEn: '👣 Week 28: 3rd Trimester milestone! Track your baby\'s daily movements with RxDigi Kick Counter.',
-    ),
-    PregnancyWeekInfo(
-      week: 30,
-      fruitEmoji: '🥬',
-      fruitNameBn: 'একটি বড় ফুলকপির সমান',
-      fruitNameEn: 'a Cabbage / Cauliflower',
-      lengthCm: 39.9,
-      weightGrams: 1320.0,
-      babyDevelopmentBn: 'শিশুর অস্থিমজ্জা (Bone marrow) এখন নিজে থেকেই লোহিত রক্তকণিকা তৈরিতে সক্ষম। দৃষ্টিশক্তি পরিপক্ক হচ্ছে।',
-      babyDevelopmentEn: 'Bone marrow completely takes over RBC production. Vision sharpens to track light through the belly.',
-      motherChangesBn: 'বুকে জ্বালাপোড়া (Heartburn) এবং ঘুমের ব্যাঘাত হতে পারে। পেটের ওপর বেশি চাপ অনুভব হতে পারে।',
-      motherChangesEn: 'Heartburn and restless sleep are common. Use pregnancy pillows between legs and under belly.',
-      careTipBn: 'রাতে খাওয়ার অন্তত ২ ঘণ্টা পর ঘুমাতে যান এবং মসলাযুক্ত বা অতিরিক্ত তৈলাক্ত খাবার এড়িয়ে চলুন।',
-      careTipEn: 'Dine 2 hours before bedtime. Avoid spicy, heavy greasy curries to minimize nocturnal reflux.',
-      notificationTextBn: '🌸 ৩০তম সপ্তাহ: শিশুর অস্থিমজ্জা রক্তকণিকা তৈরি করছে। রাতে মসলা কম খেয়ে আরামদায়ক ঘুম নিশ্চিত করুন।',
-      notificationTextEn: '🌸 Week 30: Baby is growing fast! Support digestion with early light dinner and pregnancy pillow rest.',
-    ),
-    PregnancyWeekInfo(
-      week: 32,
-      fruitEmoji: '🍍',
-      fruitNameBn: 'একটি বড় রসালো আনারসের সমান',
-      fruitNameEn: 'a Pineapple',
-      lengthCm: 42.4,
-      weightGrams: 1700.0,
-      babyDevelopmentBn: 'শিশুর নখ আঙুলের ডগা পর্যন্ত পৌঁছেছে। শিশু এখন মায়ের পেটের ভেতর নিয়মিত মাথা নিচে (Cephalic) ঘুরানোর প্রস্তুতি নিচ্ছে।',
-      babyDevelopmentEn: 'Toenails and fingernails are complete. Baby typically rotates into the head-down cephalic position.',
-      motherChangesBn: 'ব্র্যাক্সটন হিকস (Braxton Hicks) বা মৃদু অনিয়মিত পেট শক্ত হওয়ার অনুভূতি হতে পারে।',
-      motherChangesEn: 'Braxton Hicks false labor contractions may tighten the uterus irregularly. Hydration eases them.',
-      careTipBn: '৩য় এএনসি চেকআপ ও গ্রোথ আল্ট্রাসাউন্ড করানোর সময় হয়েছে। পর্যাপ্ত পানি পান পেট টানটান হওয়া কমায়।',
-      careTipEn: 'Visit your obstetrician for the 3rd trimester growth ultrasound and blood pressure checkup.',
-      notificationTextBn: '🌸 ৩২তম সপ্তাহ: শিশু মাথা নিচের দিকে ঘুরাচ্ছে। পেট শক্ত হলে পানি খেয়ে বিশ্রাম নিন।',
-      notificationTextEn: '🌸 Week 32: Baby is practicing delivery positioning. Sip water and relax if Braxton Hicks tighten.',
-    ),
-    PregnancyWeekInfo(
-      week: 34,
-      fruitEmoji: '🍈',
-      fruitNameBn: 'একটি মিষ্টি খরমুজ বা বাঙ্গির সমান',
-      fruitNameEn: 'a Cantaloupe Melon',
-      lengthCm: 45.0,
-      weightGrams: 2150.0,
-      babyDevelopmentBn: 'শিশুর রোগপ্রতিরোধ ক্ষমতা (Immune system) মায়ের শরীর থেকে অ্যান্টিবডি গ্রহণের মাধ্যমে শক্তিশালী হচ্ছে।',
-      babyDevelopmentEn: 'Maternal antibodies actively cross the placenta, building baby\'s innate immune defense.',
-      motherChangesBn: 'শ্রোণিচক্র বা পেলভিক অংশে চাপ বৃদ্ধি পায়। বারবার টয়লেটে যাওয়ার প্রয়োজন হতে পারে।',
-      motherChangesEn: 'Pelvic heaviness increases as baby drops into the pelvic inlet. Frequent bathroom trips continue.',
-      careTipBn: 'হাসপাতালে যাওয়ার ব্যাগ (Hospital Bag) গুছিয়ে রাখা শুরু করুন এবং জরুরি যোগাযোগের নম্বর লিখে রাখুন।',
-      careTipEn: 'Begin packing your Hospital Delivery Bag with baby clothes, blankets, pads, and medical files.',
-      notificationTextBn: '🌸 ৩৪তম সপ্তাহ: হাসপাতালের প্রয়োজনীয় ফাইল ও ব্যাগ প্রস্তুত করা শুরু করার দারুণ সময়!',
-      notificationTextEn: '🌸 Week 34: Time to pack your delivery bag! Keep medical records and baby essentials ready.',
-    ),
-    PregnancyWeekInfo(
-      week: 36,
-      fruitEmoji: '🥥',
-      fruitNameBn: 'একটি পাকা পেঁপে বা ডাবের সমান',
-      fruitNameEn: 'a large Papaya',
-      lengthCm: 47.4,
-      weightGrams: 2620.0,
-      babyDevelopmentBn: 'শিশুর ফুসফুস ও পরিপাকতন্ত্র প্রায় সম্পূর্ণ পরিপক্ক! শিশু প্রতিদিন প্রায় ৩০ গ্রাম করে চর্বি জমাচ্ছে।',
-      babyDevelopmentEn: 'Lungs and digestive system are almost fully mature! Baby gains about 30 grams of fat daily.',
-      motherChangesBn: 'শিশু শ্রোণিগহ্বরে নিচে নেমে যাওয়ায় (Lightening) শ্বাস নেওয়া আগের চেয়ে কিছুটা সহজ মনে হতে পারে।',
-      motherChangesEn: 'Lightening occurs as baby descends, easing breathing slightly while increasing bladder pressure.',
-      careTipBn: 'এখন থেকে প্রতি সপ্তাহে একবার ডাক্তারের কাছে ভিজিট করা জরুরি। প্রসবের লক্ষণগুলো জেনে নিন।',
-      careTipEn: 'Weekly obstetrician visits begin now. Learn to distinguish true labor pains from false alarms.',
-      notificationTextBn: '🌸 ৩৬তম সপ্তাহ: শিশু এখন প্রায় পূর্ণাঙ্গ! প্রতি সপ্তাহে চিকিৎসকের পরামর্শ ও প্রেশার চেক করুন।',
-      notificationTextEn: '🌸 Week 36: Baby is almost full term! Weekly checkups start now to monitor BP and baby drops.',
-    ),
-    PregnancyWeekInfo(
-      week: 38,
-      fruitEmoji: '🎃',
-      fruitNameBn: 'একটি মিষ্টি কুমড়ার সমান',
-      fruitNameEn: 'a Winter Melon',
-      lengthCm: 49.8,
-      weightGrams: 3080.0,
-      babyDevelopmentBn: 'শিশু এখন ফুল-টার্ম (Full Term)! শিশু যেকোনো দিন পৃথিবীতে আসার জন্য সম্পূর্ণ শারীরিকভাবে প্রস্তুত।',
-      babyDevelopmentEn: 'Full term milestone! Baby is physically ready for life outside the womb at any moment.',
-      motherChangesBn: 'মিউকাস প্লাগ নির্গমন বা পানির মতো তরল নির্গত হতে পারে। অনিয়মিত প্রসববেদনা অনুভূত হতে পারে।',
-      motherChangesEn: 'Loss of the mucus plug and nesting instinct peak. Contractions may become rhythmic.',
-      careTipBn: 'নিয়মিত ৫ মিনিট পরপর সংকোচন বা পানি ভেঙে গেলে কালবিলম্ব না করে দ্রুত হাসপাতালে রওনা হন।',
-      careTipEn: 'If contractions occur every 5 mins or water breaks, head straight to your hospital.',
-      notificationTextBn: '🌸 ৩৮তম সপ্তাহ: পূর্ণ মেয়াদের গর্ব! সোনামণি যেকোনো দিন কোলে আসতে পারে। মানসিকভাবে শান্ত থাকুন।',
-      notificationTextEn: '🌸 Week 38: Full term! Baby can arrive any day now. Keep your hospital bag and transport ready.',
     ),
     PregnancyWeekInfo(
       week: 40,
@@ -601,11 +408,11 @@ class PregnancyWeekCatalog {
   ];
 
   static PregnancyWeekInfo getWeekInfo(int week) {
-    if (week < 4) return weeks.first;
-    if (week >= 40) return weeks.last;
-    // Find closest or exact
-    PregnancyWeekInfo closest = weeks.first;
-    for (final w in weeks) {
+    final list = weeks;
+    if (week < list.first.week) return list.first;
+    if (week >= list.last.week) return list.last;
+    PregnancyWeekInfo closest = list.first;
+    for (final w in list) {
       if (w.week <= week) {
         closest = w;
       }
@@ -613,3 +420,5 @@ class PregnancyWeekCatalog {
     return closest;
   }
 }
+
+

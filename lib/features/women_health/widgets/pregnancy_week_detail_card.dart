@@ -27,6 +27,8 @@ class _PregnancyWeekDetailCardState
   @override
   Widget build(BuildContext context) {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
+    final catalogAsync = ref.watch(pregnancyWeeksCatalogProvider);
+    final allWeeks = catalogAsync.asData?.value ?? PregnancyWeekCatalog.weeks;
     final selectedWeek = ref.watch(selectedPregnancyWeekProvider);
     final weekInfo = PregnancyWeekCatalog.getWeekInfo(selectedWeek);
     final isCurrentWeek = selectedWeek == widget.pregnancy.currentWeek;
@@ -116,10 +118,10 @@ class _PregnancyWeekDetailCardState
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
-              itemCount: PregnancyWeekCatalog.weeks.length,
+              itemCount: allWeeks.length,
               separatorBuilder: (_, __) => const SizedBox(width: 6),
               itemBuilder: (context, index) {
-                final w = PregnancyWeekCatalog.weeks[index];
+                final w = allWeeks[index];
                 final isSelected = w.week == selectedWeek;
                 final isActualCurrent = w.week == widget.pregnancy.currentWeek;
 
@@ -362,3 +364,4 @@ class _PregnancyWeekDetailCardState
     }
   }
 }
+
