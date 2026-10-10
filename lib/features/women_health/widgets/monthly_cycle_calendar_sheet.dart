@@ -55,6 +55,7 @@ class _MonthlyCycleCalendarSheetState
 
   @override
   Widget build(BuildContext context) {
+    final isBn = Localizations.localeOf(context).languageCode == 'bn';
     final selectedDate = ref.watch(selectedCycleDateProvider);
     final symptomsMap = ref.watch(dailySymptomProvider);
     final today = DateTime.now();
@@ -69,8 +70,9 @@ class _MonthlyCycleCalendarSheetState
     final totalGridCells = startingWeekdayOffset + daysInMonth;
     final rowCount = (totalGridCells / 7).ceil();
 
-    final monthTitle =
-        '${WomenHealthFormatters.formatDayMonthBn(firstDayOfMonth).split(' ').last} ${WomenHealthFormatters.toBengaliDigits(year)}';
+    final monthTitle = isBn
+        ? '${WomenHealthFormatters.formatDayMonth(firstDayOfMonth, isBn: true).split(' ').last} ${WomenHealthFormatters.formatDigits(year, isBn: true)}'
+        : '${WomenHealthFormatters.formatDayMonth(firstDayOfMonth, isBn: false).split(' ').last} $year';
 
     return Container(
       constraints: BoxConstraints(
@@ -132,12 +134,12 @@ class _MonthlyCycleCalendarSheetState
                   IconButton(
                     icon: const Icon(PhosphorIconsBold.caretLeft, size: 18),
                     onPressed: _prevMonth,
-                    tooltip: 'পূর্ববর্তী মাস',
+                    tooltip: isBn ? 'পূর্ববর্তী মাস' : 'Previous Month',
                   ),
                   IconButton(
                     icon: const Icon(PhosphorIconsBold.caretRight, size: 18),
                     onPressed: _nextMonth,
-                    tooltip: 'পরবর্তী মাস',
+                    tooltip: isBn ? 'পরবর্তী মাস' : 'Next Month',
                   ),
                   IconButton(
                     icon: const Icon(PhosphorIconsRegular.x, size: 18),
@@ -150,16 +152,16 @@ class _MonthlyCycleCalendarSheetState
 
           const SizedBox(height: 12),
 
-          // Weekday Labels (সোম to রবি)
+          // Weekday Labels
           Row(
-            children: const [
-              _WeekdayLabel('সোম'),
-              _WeekdayLabel('মঙ্গল'),
-              _WeekdayLabel('বুধ'),
-              _WeekdayLabel('বৃহঃ'),
-              _WeekdayLabel('শুক্র'),
-              _WeekdayLabel('শনি'),
-              _WeekdayLabel('রবি'),
+            children: [
+              _WeekdayLabel(isBn ? 'সোম' : 'Mon'),
+              _WeekdayLabel(isBn ? 'মঙ্গল' : 'Tue'),
+              _WeekdayLabel(isBn ? 'বুধ' : 'Wed'),
+              _WeekdayLabel(isBn ? 'বৃহঃ' : 'Thu'),
+              _WeekdayLabel(isBn ? 'শুক্র' : 'Fri'),
+              _WeekdayLabel(isBn ? 'শনি' : 'Sat'),
+              _WeekdayLabel(isBn ? 'রবি' : 'Sun'),
             ],
           ),
 
@@ -239,10 +241,10 @@ class _MonthlyCycleCalendarSheetState
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          WomenHealthFormatters.toBengaliDigits(dayNumber),
+                          WomenHealthFormatters.formatDigits(dayNumber, isBn: isBn),
                           style: TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: isToday || isSelected ? FontWeight.w900 : FontWeight.w700,
+                            fontSize: 13,
+                            fontWeight: isToday || isSelected ? FontWeight.w900 : FontWeight.w600,
                             color: textColor,
                           ),
                         ),
@@ -308,10 +310,10 @@ class _MonthlyCycleCalendarSheetState
               spacing: 14,
               runSpacing: 6,
               children: [
-                _buildLegendItem(const Color(0xFFF43F5E), 'পিরিয়ড দিন'),
-                _buildLegendItem(const Color(0xFFA855F7), 'উর্বর সময় (Fertile)'),
-                _buildLegendItem(const Color(0xFF6D28D9), 'ডিম্বস্ফোটন (Peak)'),
-                _buildLegendItem(const Color(0xFF0284C7), 'লক্ষণ রেকর্ডকৃত'),
+                _buildLegendItem(const Color(0xFFF43F5E), isBn ? 'পিরিয়ড দিন' : 'Period Day'),
+                _buildLegendItem(const Color(0xFFA855F7), isBn ? 'উর্বর সময়' : 'Fertile Window'),
+                _buildLegendItem(const Color(0xFF6D28D9), isBn ? 'ডিম্বস্ফোটন (Peak)' : 'Ovulation (Peak)'),
+                _buildLegendItem(const Color(0xFF0284C7), isBn ? 'লক্ষণ রেকর্ডকৃত' : 'Logged Symptoms'),
               ],
             ),
           ),
@@ -363,4 +365,3 @@ class _WeekdayLabel extends StatelessWidget {
     );
   }
 }
-

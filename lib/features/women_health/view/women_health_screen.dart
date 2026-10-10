@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import '../../../core/utils/app_feedback.dart';
+import '../../../l10n/local_provider.dart';
 import '../models/daily_symptom_log.dart';
 import '../models/menstrual_cycle_model.dart';
 import '../provider/women_health_provider.dart';
@@ -13,14 +15,19 @@ import '../widgets/quick_period_action_card.dart';
 import '../widgets/daily_body_forecast_section.dart';
 import '../widgets/symptom_logger_sheet.dart';
 import '../widgets/cycle_settings_sheet.dart';
-import '../../../core/utils/app_feedback.dart';
+import '../widgets/doctor_cycle_report_sheet.dart';
+import '../widgets/past_cycle_history_sheet.dart';
+import '../widgets/pcos_diet_guidance_card.dart';
+import '../widgets/women_care_supplements_card.dart';
 
 class WomenHealthScreen extends ConsumerWidget {
   const WomenHealthScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isBn = Localizations.localeOf(context).languageCode == 'bn';
+    final currentLocale = ref.watch(localeProvider);
+    final isBn = currentLocale.languageCode == 'bn';
+
     final cycle = ref.watch(womenCycleProvider);
     final selectedDate = ref.watch(selectedCycleDateProvider);
     final goalMode = ref.watch(cycleGoalModeProvider);
@@ -33,8 +40,8 @@ class WomenHealthScreen extends ConsumerWidget {
     final targetPhase = cycle.getPhaseFor(selectedDate);
     final targetDay = cycle.getCycleDayFor(selectedDate);
 
-    final nextPeriodFormatted = WomenHealthFormatters.formatDayMonthBn(cycle.nextPeriodDate);
-    final nextOvulationFormatted = WomenHealthFormatters.formatDayMonthBn(cycle.nextOvulationDate);
+    final nextPeriodFormatted = WomenHealthFormatters.formatDayMonth(cycle.nextPeriodDate, isBn: isBn);
+    final nextOvulationFormatted = WomenHealthFormatters.formatDayMonth(cycle.nextOvulationDate, isBn: isBn);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF7F9), // Soft Blush Background
@@ -51,7 +58,41 @@ class WomenHealthScreen extends ConsumerWidget {
         ),
         iconTheme: const IconThemeData(color: Color(0xFF0F172A)),
         actions: [
-          // Cycle Goal Mode Switcher Pill (Period Track vs Conception Mode)
+          // ─── Direct Language Switcher Toggle Pill [ 文A EN / বাং ] ───
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              final nextLang = isBn ? 'en' : 'bn';
+              ref.read(localeProvider.notifier).setLocale(Locale(nextLang));
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.translate, size: 12, color: Color(0xFF0F172A)),
+                  const SizedBox(width: 3),
+                  Text(
+                    isBn ? 'EN' : 'বাং',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+
+          // ─── Cycle Goal Mode Switcher Pill (Period Track vs Conception Mode) ───
           GestureDetector(
             onTap: () {
               HapticFeedback.selectionClick();
@@ -60,8 +101,8 @@ class WomenHealthScreen extends ConsumerWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(isTTC
-                      ? '🌸 গর্ভধারণ পরিকল্পনা মোড চালু হয়েছে'
-                      : '🩸 পিরিয়ড ট্র্যাকিং মোড চালু হয়েছে'),
+                      ? (isBn ? '🌸 গর্ভধারণ পরিকল্পনা মোড চালু হয়েছে' : '🌸 TTC Conception Mode Activated')
+                      : (isBn ? '🩸 পিরিয়ড ট্র্যাকিং মোড চালু হয়েছে' : '🩸 Period Tracking Mode Activated')),
                   backgroundColor: isTTC ? const Color(0xFF8B5CF6) : const Color(0xFFF43F5E),
                   duration: const Duration(seconds: 2),
                 ),
@@ -69,7 +110,7 @@ class WomenHealthScreen extends ConsumerWidget {
             },
             child: Container(
               margin: const EdgeInsets.symmetric(vertical: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: goalMode == CycleGoalMode.tryToConceive
                     ? const Color(0xFF8B5CF6).withValues(alpha: 0.12)
@@ -95,9 +136,11 @@ class WomenHealthScreen extends ConsumerWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    goalMode == CycleGoalMode.tryToConceive ? 'গর্ভধারণ মোড' : 'পিরিয়ড মোড',
+                    goalMode == CycleGoalMode.tryToConceive
+                        ? (isBn ? 'গর্ভধারণ মোড' : 'TTC Mode')
+                        : (isBn ? 'পিরিয়ড মোড' : 'Period Mode'),
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 10.5,
                       fontWeight: FontWeight.bold,
                       color: goalMode == CycleGoalMode.tryToConceive
                           ? const Color(0xFF7C3AED)
@@ -108,10 +151,32 @@ class WomenHealthScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 2),
+
+          // ─── Doctor Clinical Summary PDF Action ───
+          IconButton(
+            tooltip: isBn ? 'ডাক্তারের রিপোর্ট (PDF)' : 'Doctor Report (PDF)',
+            icon: const Icon(PhosphorIconsRegular.filePdf, size: 20, color: Color(0xFFBE123C)),
+            onPressed: () {
+              AppFeedback.playLight();
+              DoctorCycleReportSheet.show(context, cycle);
+            },
+          ),
+
+          // ─── Past Cycles History Action ───
+          IconButton(
+            tooltip: isBn ? 'সাইকেল হিস্ট্রি' : 'Cycle History',
+            icon: const Icon(PhosphorIconsRegular.clockCounterClockwise, size: 20, color: Color(0xFF0F172A)),
+            onPressed: () {
+              AppFeedback.playLight();
+              PastCycleHistorySheet.show(context, cycle);
+            },
+          ),
+
+          // ─── Settings Action ───
           IconButton(
             tooltip: isBn ? 'সাইকেল সেটিংস' : 'Cycle Settings',
-            icon: const Icon(PhosphorIconsRegular.gear, size: 21, color: Color(0xFF0F172A)),
+            icon: const Icon(PhosphorIconsRegular.gear, size: 20, color: Color(0xFF0F172A)),
             onPressed: () {
               AppFeedback.playLight();
               CycleSettingsSheet.show(context, cycle);
@@ -234,7 +299,13 @@ class WomenHealthScreen extends ConsumerWidget {
 
           const SizedBox(height: 18),
 
-          // ─── 5. Daily Logged Symptoms & Mood Status Card ───
+          // ─── 5. Clinical PCOS & Irregular Cycle Guidance + Bangladeshi Diet Card ───
+          PcosDietGuidanceCard(cycle: cycle),
+
+          // ─── 6. Women's Care & Supplements (Birth Control OCP & Iron Routine) ───
+          WomenCareSupplementsCard(cycle: cycle),
+
+          // ─── 7. Daily Logged Symptoms & Mood Status Card ───
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
@@ -262,7 +333,7 @@ class WomenHealthScreen extends ConsumerWidget {
                         Text(
                           isSelectedToday
                               ? (isBn ? 'আজকের অনুভূতি ও লক্ষণ' : 'Today\'s Symptoms')
-                              : '${WomenHealthFormatters.formatDayMonthBn(selectedDate)} এর লক্ষণ',
+                              : '${WomenHealthFormatters.formatDayMonth(selectedDate, isBn: isBn)} ${isBn ? "এর লক্ষণ" : "Symptoms"}',
                           style: const TextStyle(
                             fontSize: 14.5,
                             fontWeight: FontWeight.bold,
@@ -305,12 +376,13 @@ class WomenHealthScreen extends ConsumerWidget {
                     spacing: 8,
                     runSpacing: 6,
                     children: [
-                      _buildPill(selectedLog.mood.emoji, selectedLog.mood.labelBn, const Color(0xFF0F172A)),
+                      _buildPill(selectedLog.mood.emoji, selectedLog.mood.label(isBn), const Color(0xFF0F172A)),
                       if (selectedLog.flow != FlowLevel.none)
-                        _buildPill(selectedLog.flow.emoji, selectedLog.flow.labelBn, const Color(0xFFF43F5E)),
+                        _buildPill(selectedLog.flow.emoji, selectedLog.flow.label(isBn), const Color(0xFFF43F5E)),
                       if (selectedLog.cramp != CrampLevel.none)
-                        _buildPill('⚡', selectedLog.cramp.labelBn, const Color(0xFF8B5CF6)),
-                      ...selectedLog.physicalSymptoms.map((s) => _buildPill('🩺', s, const Color(0xFF0284C7))),
+                        _buildPill('⚡', selectedLog.cramp.label(isBn), const Color(0xFF8B5CF6)),
+                      ...selectedLog.physicalSymptoms.map((s) =>
+                          _buildPill('🩺', SymptomCatalog.getLabel(s, isBn), const Color(0xFF0284C7))),
                     ],
                   ),
                 ] else ...[
@@ -319,7 +391,9 @@ class WomenHealthScreen extends ConsumerWidget {
                         ? (isBn
                             ? 'আজকের কোনো লক্ষণ এখনও রেকর্ড করা হয়নি। আপনার শরীর কেমন অনুভব করছে তা রেকর্ড করুন।'
                             : 'No symptoms logged today. Record how your body feels.')
-                        : '${WomenHealthFormatters.formatDayMonthBn(selectedDate)}-এর কোনো লক্ষণ রেকর্ড করা নেই।',
+                        : (isBn
+                            ? '${WomenHealthFormatters.formatDayMonth(selectedDate, isBn: true)}-এর কোনো লক্ষণ রেকর্ড করা নেই।'
+                            : 'No symptoms logged for ${WomenHealthFormatters.formatDayMonth(selectedDate, isBn: false)}.'),
                     style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
                   ),
                 ],
@@ -329,12 +403,12 @@ class WomenHealthScreen extends ConsumerWidget {
 
           const SizedBox(height: 18),
 
-          // ─── 6. Flo-Style Daily Body, Skin & Energy Forecast Cards ───
+          // ─── 8. Flo-Style Daily Body, Skin & Energy Forecast Cards ───
           DailyBodyForecastSection(phase: targetPhase),
 
           const SizedBox(height: 18),
 
-          // ─── 7. Phase-Specific Clinical Advice Card ───
+          // ─── 9. Phase-Specific Clinical Advice Card ───
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
@@ -357,7 +431,7 @@ class WomenHealthScreen extends ConsumerWidget {
                     const Icon(PhosphorIconsFill.lightbulb, size: 20, color: Color(0xFFE11D48)),
                     const SizedBox(width: 8),
                     Text(
-                      '${targetPhase.nameBn} - ${isBn ? 'স্বাস্থ্য পরামর্শ' : 'Care Tips'}',
+                      '${targetPhase.name(isBn)} - ${isBn ? 'স্বাস্থ্য পরামর্শ' : 'Care Tips'}',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -368,7 +442,7 @@ class WomenHealthScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  targetPhase.adviceBn,
+                  targetPhase.advice(isBn),
                   style: const TextStyle(
                     fontSize: 13,
                     height: 1.5,

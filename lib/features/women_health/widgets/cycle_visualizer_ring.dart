@@ -76,7 +76,7 @@ class CycleVisualizerRing extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    WomenHealthFormatters.formatDayMonthBn(selectedDate),
+                    WomenHealthFormatters.formatDayMonth(selectedDate, isBn: isBn),
                     style: const TextStyle(
                       fontSize: 10.5,
                       fontWeight: FontWeight.bold,
@@ -88,7 +88,7 @@ class CycleVisualizerRing extends StatelessWidget {
               ],
               Text(
                 isBn
-                    ? 'দিন ${WomenHealthFormatters.toBengaliDigits(targetDay)}'
+                    ? 'দিন ${WomenHealthFormatters.formatDigits(targetDay, isBn: true)}'
                     : 'Day $targetDay',
                 style: TextStyle(
                   fontSize: 34,
@@ -106,7 +106,7 @@ class CycleVisualizerRing extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  isBn ? targetPhase.nameBn : targetPhase.nameEn,
+                  targetPhase.name(isBn),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -120,10 +120,10 @@ class CycleVisualizerRing extends StatelessWidget {
               Text(
                 isToday
                     ? (isBn
-                        ? 'পরবর্তী পিরিয়ড ${WomenHealthFormatters.toBengaliDigits(cycle.daysUntilNextPeriod)} দিন পর'
+                        ? 'পরবর্তী পিরিয়ড ${WomenHealthFormatters.formatDigits(cycle.daysUntilNextPeriod, isBn: true)} দিন পর'
                         : 'Next period in ${cycle.daysUntilNextPeriod}d')
                     : (isBn
-                        ? 'সাইকেলের স্থায়িত্ব: ${WomenHealthFormatters.toBengaliDigits(cycle.cycleLength)} দিন'
+                        ? 'সাইকেলের স্থায়িত্ব: ${WomenHealthFormatters.formatDigits(cycle.cycleLength, isBn: true)} দিন'
                         : 'Cycle Length: ${cycle.cycleLength}d'),
                 style: TextStyle(
                   fontSize: 12,
@@ -135,9 +135,9 @@ class CycleVisualizerRing extends StatelessWidget {
               Text(
                 goalMode == CycleGoalMode.tryToConceive
                     ? (targetPhase == CyclePhase.fertileOvulation
-                        ? '🌸 গর্ভধারণের সর্বোচ্চ সুযোগ'
-                        : 'গর্ভধারণের সম্ভাবনা: কম')
-                    : targetPhase.pregnancyChanceBn,
+                        ? (isBn ? '🌸 গর্ভধারণের সর্বোচ্চ সুযোগ' : '🌸 Peak Conception Window')
+                        : (isBn ? 'গর্ভধারণের সম্ভাবনা: কম' : 'Chance of Pregnancy: Low'))
+                    : targetPhase.pregnancyChance(isBn),
                 style: TextStyle(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w600,

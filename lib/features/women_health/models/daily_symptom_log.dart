@@ -16,6 +16,23 @@ extension FlowLevelExtension on FlowLevel {
     }
   }
 
+  String get labelEn {
+    switch (this) {
+      case FlowLevel.none:
+        return 'None';
+      case FlowLevel.spotting:
+        return 'Spotting';
+      case FlowLevel.light:
+        return 'Light Flow';
+      case FlowLevel.medium:
+        return 'Medium Flow';
+      case FlowLevel.heavy:
+        return 'Heavy Flow';
+    }
+  }
+
+  String label(bool isBn) => isBn ? labelBn : labelEn;
+
   String get emoji {
     switch (this) {
       case FlowLevel.none:
@@ -47,6 +64,21 @@ extension CrampLevelExtension on CrampLevel {
         return 'তীব্র ক্র্যাম্প';
     }
   }
+
+  String get labelEn {
+    switch (this) {
+      case CrampLevel.none:
+        return 'No Cramps';
+      case CrampLevel.mild:
+        return 'Mild Discomfort';
+      case CrampLevel.moderate:
+        return 'Moderate Cramps';
+      case CrampLevel.severe:
+        return 'Severe Cramps';
+    }
+  }
+
+  String label(bool isBn) => isBn ? labelBn : labelEn;
 }
 
 enum MoodType { happy, calm, tired, irritable, anxious, sad }
@@ -69,6 +101,25 @@ extension MoodTypeExtension on MoodType {
     }
   }
 
+  String get labelEn {
+    switch (this) {
+      case MoodType.happy:
+        return 'Happy & Energetic';
+      case MoodType.calm:
+        return 'Calm & Balanced';
+      case MoodType.tired:
+        return 'Tired / Drowsy';
+      case MoodType.irritable:
+        return 'Irritable / Moody';
+      case MoodType.anxious:
+        return 'Anxious / Restless';
+      case MoodType.sad:
+        return 'Low / Sad';
+    }
+  }
+
+  String label(bool isBn) => isBn ? labelBn : labelEn;
+
   String get emoji {
     switch (this) {
       case MoodType.happy:
@@ -87,12 +138,48 @@ extension MoodTypeExtension on MoodType {
   }
 }
 
+class SymptomItem {
+  final String id;
+  final String nameBn;
+  final String nameEn;
+
+  const SymptomItem({
+    required this.id,
+    required this.nameBn,
+    required this.nameEn,
+  });
+
+  String label(bool isBn) => isBn ? nameBn : nameEn;
+}
+
+class SymptomCatalog {
+  static const List<SymptomItem> items = [
+    SymptomItem(id: 'headache', nameBn: 'মাথাব্যথা', nameEn: 'Headache'),
+    SymptomItem(id: 'bloating', nameBn: 'পেট ফাঁপা', nameEn: 'Bloating'),
+    SymptomItem(id: 'backache', nameBn: 'কোমর ব্যথা', nameEn: 'Lower Back Pain'),
+    SymptomItem(id: 'acne', nameBn: 'ব্রণ / র‍্যাশ', nameEn: 'Acne / Breakouts'),
+    SymptomItem(id: 'tender_breasts', nameBn: 'স্তন সংবেদনশীলতা', nameEn: 'Breast Tenderness'),
+    SymptomItem(id: 'insomnia', nameBn: 'অনিদ্রা', nameEn: 'Insomnia / Sleep Disturbance'),
+    SymptomItem(id: 'cravings', nameBn: 'মিষ্টি খাওয়ার তীব্র ইচ্ছা', nameEn: 'Sugar / Food Cravings'),
+    SymptomItem(id: 'nausea', nameBn: 'বমি ভাব', nameEn: 'Nausea'),
+  ];
+
+  static String getLabel(String raw, bool isBn) {
+    for (final item in items) {
+      if (item.id == raw || item.nameBn == raw || item.nameEn == raw) {
+        return item.label(isBn);
+      }
+    }
+    return raw;
+  }
+}
+
 class DailySymptomLog {
   final String dateKey; // YYYY-MM-DD
   final FlowLevel flow;
   final CrampLevel cramp;
   final MoodType mood;
-  final List<String> physicalSymptoms; // e.g. 'মাথাব্যথা', 'পেট ফাঁপা', 'ব্রণ'
+  final List<String> physicalSymptoms; // e.g. 'headache' or 'মাথাব্যথা'
 
   const DailySymptomLog({
     required this.dateKey,
@@ -138,4 +225,3 @@ class DailySymptomLog {
     );
   }
 }
-

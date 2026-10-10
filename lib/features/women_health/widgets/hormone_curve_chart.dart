@@ -25,26 +25,37 @@ class _HormoneCurveChartState extends State<HormoneCurveChart> {
 
   int get _currentScrubDay => _scrubDay ?? widget.selectedDay.clamp(1, widget.cycle.cycleLength);
 
-  String _getHormoneInsight(int day, int cycleLength) {
+  String _getHormoneInsight(int day, int cycleLength, bool isBn) {
     final ovulation = cycleLength - 14;
     if (day <= 5) {
-      return 'এস্ট্রোজেন ও প্রজেস্টেরন সর্বনিম্ন: শরীর বিশ্রাম চাইছে, আয়রন ও উষ্ণ পানীয় গ্রহণ করুন।';
+      return isBn
+          ? 'এস্ট্রোজেন ও প্রজেস্টেরন সর্বনিম্ন: শরীর বিশ্রাম চাইছে, আয়রন ও উষ্ণ পানীয় গ্রহণ করুন।'
+          : 'Estrogen & Progesterone are at baseline: Prioritize restful sleep, warm hydration, and iron-dense nourishment.';
     } else if (day < ovulation - 2) {
-      return 'এস্ট্রোজেন ক্রমাগত বাড়ছে: কর্মশক্তি, শারীরিক স্ট্যামিনা ও আত্মবিশ্বাস তুঙ্গে থাকবে।';
+      return isBn
+          ? 'এস্ট্রোজেন ক্রমাগত বাড়ছে: কর্মশক্তি, শারীরিক স্ট্যামিনা ও আত্মবিশ্বাস তুঙ্গে থাকবে।'
+          : 'Estrogen is steadily rising: Peak physical endurance, cognitive focus, and workout stamina.';
     } else if (day <= ovulation + 1) {
-      return 'LH স্পাইক ও এস্ট্রোজেন সর্বোচ্চ: ডিম্বস্ফোটন ঘটছে, ন্যাচারাল গ্লো ও উর্বরতা শীর্ষে।';
+      return isBn
+          ? 'LH স্পাইক ও এস্ট্রোজেন সর্বোচ্চ: ডিম্বস্ফোটন ঘটছে, ন্যাচারাল গ্লো ও উর্বরতা শীর্ষে।'
+          : 'Luteinizing Hormone (LH) surge & peak Estrogen: Ovulation window, elevated mood, and maximal fertility.';
     } else if (day <= ovulation + 8) {
-      return 'প্রজেস্টেরন হরমোন সর্বোচ্চ: শরীর শান্ত ও বিশ্রামের মোডে থাকে, তবে ঘুম ঘুম ভাব হতে পারে।';
+      return isBn
+          ? 'প্রজেস্টেরন হরমোন সর্বোচ্চ: শরীর শান্ত ও বিশ্রামের মোডে থাকে, তবে ঘুম ঘুম ভাব হতে পারে।'
+          : 'Progesterone dominates: Metabolism increases, calming effect on the nervous system, potential mild fatigue.';
     } else {
-      return 'হরমোনের মাত্রা দ্রুত নামছে: পিএমএস (PMS) বা মিষ্টির ক্র্যাভিংস হতে পারে, ডার্ক চকলেট ও ফল খান।';
+      return isBn
+          ? 'হরমোনের মাত্রা দ্রুত নামছে: পিএমএস (PMS) বা মিষ্টির ক্র্যাভিংস হতে পারে, ডার্ক চকলেট ও ফল খান।'
+          : 'Hormones drop pre-period: PMS or cravings may occur; magnesium-rich foods and light stretching recommended.';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isBn = Localizations.localeOf(context).languageCode == 'bn';
     final scrubDay = _currentScrubDay;
     final totalDays = widget.cycle.cycleLength;
-    final insight = _getHormoneInsight(scrubDay, totalDays);
+    final insight = _getHormoneInsight(scrubDay, totalDays, isBn);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -82,9 +93,9 @@ class _HormoneCurveChartState extends State<HormoneCurveChart> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    'হরমোন লেভেল ও বায়ো-কার্ভ',
-                    style: TextStyle(
+                  Text(
+                    isBn ? 'হরমোন লেভেল ও বায়ো-কার্ভ' : 'Hormone Curve & Bio-Chart',
+                    style: const TextStyle(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFF0F172A),
@@ -99,7 +110,7 @@ class _HormoneCurveChartState extends State<HormoneCurveChart> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  'দিন ${WomenHealthFormatters.toBengaliDigits(scrubDay)}',
+                  '${isBn ? "দিন " : "Day "}${WomenHealthFormatters.formatDigits(scrubDay, isBn: isBn)}',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
@@ -115,13 +126,13 @@ class _HormoneCurveChartState extends State<HormoneCurveChart> {
           // Filter Chips (All, Estrogen, Progesterone, LH)
           Row(
             children: [
-              _buildFilterChip(0, 'সকল হরমোন', const Color(0xFF0F172A)),
+              _buildFilterChip(0, isBn ? 'সকল' : 'All', const Color(0xFF0F172A)),
               const SizedBox(width: 6),
-              _buildFilterChip(1, 'এস্ট্রোজেন', const Color(0xFFEC4899)),
+              _buildFilterChip(1, isBn ? 'এস্ট্রোজেন' : 'Estrogen', const Color(0xFFEC4899)),
               const SizedBox(width: 6),
-              _buildFilterChip(2, 'প্রজেস্টেরন', const Color(0xFFF59E0B)),
+              _buildFilterChip(2, isBn ? 'প্রজেস্টেরন' : 'Progesterone', const Color(0xFFF59E0B)),
               const SizedBox(width: 6),
-              _buildFilterChip(3, 'এলএইচ', const Color(0xFF8B5CF6)),
+              _buildFilterChip(3, isBn ? 'এলএইচ' : 'LH', const Color(0xFF8B5CF6)),
             ],
           ),
 
@@ -170,10 +181,19 @@ class _HormoneCurveChartState extends State<HormoneCurveChart> {
           // X-Axis Phase Labels
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text('দিন ১ (পিরিয়ড)', style: TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600)),
-              Text('দিন ১৪ (ওভুলেশন)', style: TextStyle(fontSize: 10.5, color: Color(0xFF8B5CF6), fontWeight: FontWeight.w700)),
-              Text('দিন ২৮ (পরবর্তী)', style: TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600)),
+            children: [
+              Text(
+                isBn ? 'দিন ১ (পিরিয়ড)' : 'Day 1 (Period)',
+                style: const TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
+              ),
+              Text(
+                isBn ? 'দিন ১৪ (ওভুলেশন)' : 'Day 14 (Ovulation)',
+                style: const TextStyle(fontSize: 10.5, color: Color(0xFF8B5CF6), fontWeight: FontWeight.w700),
+              ),
+              Text(
+                '${isBn ? "দিন " : "Day "}${WomenHealthFormatters.formatDigits(totalDays, isBn: isBn)}',
+                style: const TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
+              ),
             ],
           ),
 
@@ -245,7 +265,7 @@ class _HormoneCurveChartState extends State<HormoneCurveChart> {
 class _HormoneGraphPainter extends CustomPainter {
   final int cycleLength;
   final int scrubDay;
-  final int filterMode; // 0: All, 1: Estrogen, 2: Progesterone, 3: LH
+  final int filterMode;
 
   _HormoneGraphPainter({
     required this.cycleLength,
@@ -257,146 +277,91 @@ class _HormoneGraphPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
+    final ovulationDay = (cycleLength - 14).toDouble();
 
-    // Draw baseline horizontal dashed grid lines
-    final gridPaint = Paint()
-      ..color = const Color(0xFFF1F5F9)
-      ..strokeWidth = 1.0;
-    canvas.drawLine(Offset(0, h * 0.25), Offset(w, h * 0.25), gridPaint);
-    canvas.drawLine(Offset(0, h * 0.50), Offset(w, h * 0.50), gridPaint);
-    canvas.drawLine(Offset(0, h * 0.75), Offset(w, h * 0.75), gridPaint);
+    // Estrogen Curve: Peaks around Day (ovulation - 1), dips, secondary mid-luteal wave
+    final estrogenPath = Path();
+    // Progesterone Curve: Low during follicular, surges mid-luteal
+    final progesteronePath = Path();
+    // LH (Luteinizing Hormone): Flat, sharp spike 24-36h before ovulation
+    final lhPath = Path();
 
-    // Fertile window background glow
-    final ovDay = cycleLength - 14;
-    final ovStartRatio = ((ovDay - 4) / cycleLength).clamp(0.0, 1.0);
-    final ovEndRatio = ((ovDay + 1) / cycleLength).clamp(0.0, 1.0);
-    final fertileRect = Rect.fromLTRB(w * ovStartRatio, 0, w * ovEndRatio, h);
-    final fertilePaint = Paint()
-      ..color = const Color(0xFF8B5CF6).withValues(alpha: 0.05)
-      ..style = PaintingStyle.fill;
-    canvas.drawRRect(RRect.fromRectAndRadius(fertileRect, const Radius.circular(8)), fertilePaint);
+    for (int day = 1; day <= cycleLength; day++) {
+      final x = ((day - 1) / (cycleLength - 1)) * w;
 
-    // Draw Curves
-    if (filterMode == 0 || filterMode == 1) {
-      _drawHormoneCurve(
-        canvas: canvas,
-        size: size,
-        color: const Color(0xFFEC4899),
-        generator: (day) => _getEstrogenValue(day, cycleLength),
-      );
-    }
-    if (filterMode == 0 || filterMode == 2) {
-      _drawHormoneCurve(
-        canvas: canvas,
-        size: size,
-        color: const Color(0xFFF59E0B),
-        generator: (day) => _getProgesteroneValue(day, cycleLength),
-      );
-    }
-    if (filterMode == 0 || filterMode == 3) {
-      _drawHormoneCurve(
-        canvas: canvas,
-        size: size,
-        color: const Color(0xFF8B5CF6),
-        generator: (day) => _getLhValue(day, cycleLength),
-      );
+      // Estrogen normalization (0.0 to 1.0)
+      final dOvu = (day - (ovulationDay - 1));
+      final folPeak = 0.85 * exp(-pow(dOvu / 3.5, 2));
+      final lutPeak = 0.50 * exp(-pow((day - (ovulationDay + 7)) / 4.0, 2));
+      final estrogenVal = (0.15 + folPeak + lutPeak).clamp(0.08, 0.95);
+      final yEstrogen = h - (estrogenVal * h * 0.85) - 6;
+
+      // Progesterone normalization
+      final progPeak = 0.90 * exp(-pow((day - (ovulationDay + 7)) / 3.8, 2));
+      final progVal = (0.05 + progPeak).clamp(0.05, 0.95);
+      final yProg = h - (progVal * h * 0.85) - 6;
+
+      // LH normalization: sharp spike on ovulation day
+      final lhSpike = 0.95 * exp(-pow((day - ovulationDay) / 1.1, 2));
+      final lhVal = (0.06 + lhSpike).clamp(0.06, 0.95);
+      final yLh = h - (lhVal * h * 0.85) - 6;
+
+      if (day == 1) {
+        estrogenPath.moveTo(x, yEstrogen);
+        progesteronePath.moveTo(x, yProg);
+        lhPath.moveTo(x, yLh);
+      } else {
+        estrogenPath.lineTo(x, yEstrogen);
+        progesteronePath.lineTo(x, yProg);
+        lhPath.lineTo(x, yLh);
+      }
     }
 
-    // Scrubber indicator line
-    final scrubRatio = ((scrubDay - 1) / (cycleLength - 1)).clamp(0.0, 1.0);
-    final scrubX = w * scrubRatio;
-
-    final scrubLinePaint = Paint()
-      ..color = const Color(0xFF0F172A)
-      ..strokeWidth = 1.6;
-
-    // Draw dashed scrubber line
-    const dashHeight = 4.0;
-    const dashSpace = 3.0;
-    double startY = 0;
-    while (startY < h) {
-      canvas.drawLine(
-        Offset(scrubX, startY),
-        Offset(scrubX, min(startY + dashHeight, h)),
-        scrubLinePaint,
-      );
-      startY += dashHeight + dashSpace;
-    }
-
-    // Thumb dot on scrubber top
-    final dotPaint = Paint()..color = const Color(0xFF0F172A);
-    canvas.drawCircle(Offset(scrubX, h - 4), 4.5, dotPaint);
-  }
-
-  void _drawHormoneCurve({
-    required Canvas canvas,
-    required Size size,
-    required Color color,
-    required double Function(double day) generator,
-  }) {
-    final path = Path();
-    final points = <Offset>[];
-    const steps = 60;
-
-    for (int i = 0; i <= steps; i++) {
-      final day = 1 + (i / steps) * (cycleLength - 1);
-      final val = generator(day).clamp(0.0, 1.0); // 0.0 bottom, 1.0 peak
-      final x = (i / steps) * size.width;
-      final y = size.height - (val * (size.height - 18)) - 8;
-      points.add(Offset(x, y));
-    }
-
-    if (points.isEmpty) return;
-    path.moveTo(points[0].dx, points[0].dy);
-    for (int i = 0; i < points.length - 1; i++) {
-      final p0 = points[i];
-      final p1 = points[i + 1];
-      final midX = (p0.dx + p1.dx) / 2;
-      final midY = (p0.dy + p1.dy) / 2;
-      path.quadraticBezierTo(p0.dx, p0.dy, midX, midY);
-    }
-    path.lineTo(points.last.dx, points.last.dy);
-
+    // Paint Lines
     final linePaint = Paint()
-      ..color = color
-      ..strokeWidth = 2.4
       ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 2.8;
 
-    canvas.drawPath(path, linePaint);
-  }
+    // Draw Estrogen (Pink)
+    if (filterMode == 0 || filterMode == 1) {
+      linePaint.color = const Color(0xFFEC4899);
+      canvas.drawPath(estrogenPath, linePaint);
+    }
 
-  // Estrogen mathematical model: peak at ovulation, moderate peak in luteal
-  double _getEstrogenValue(double day, int total) {
-    final ov = total - 14.0;
-    // Pre-ovulation peak at (ov - 1)
-    final peak1 = exp(-pow((day - (ov - 1)) / 3.0, 2)) * 0.95;
-    // Luteal peak around (ov + 7)
-    final peak2 = exp(-pow((day - (ov + 6.5)) / 3.5, 2)) * 0.60;
-    return max(0.12, max(peak1, peak2));
-  }
+    // Draw Progesterone (Amber)
+    if (filterMode == 0 || filterMode == 2) {
+      linePaint.color = const Color(0xFFF59E0B);
+      canvas.drawPath(progesteronePath, linePaint);
+    }
 
-  // Progesterone model: flat during follicular, big surge during mid-luteal
-  double _getProgesteroneValue(double day, int total) {
-    final ov = total - 14.0;
-    if (day <= ov) return 0.06;
-    // Surges between ov and total, peaking at ov + 7
-    final lutealPeak = exp(-pow((day - (ov + 6.5)) / 4.0, 2)) * 0.88;
-    return max(0.06, lutealPeak);
-  }
+    // Draw LH (Purple)
+    if (filterMode == 0 || filterMode == 3) {
+      linePaint.color = const Color(0xFF8B5CF6);
+      canvas.drawPath(lhPath, linePaint);
+    }
 
-  // LH model: baseline ~0.08, extreme narrow spike at (ov - 1)
-  double _getLhValue(double day, int total) {
-    final ov = total - 14.0;
-    final spike = exp(-pow((day - (ov - 1)) / 1.0, 2)) * 1.0;
-    return max(0.06, spike);
+    // Draw Scrub Indicator Vertical Line & Day Pin
+    final scrubX = ((scrubDay - 1) / (cycleLength - 1)) * w;
+    final scrubPaint = Paint()
+      ..color = const Color(0xFF0F172A).withValues(alpha: 0.8)
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    canvas.drawLine(Offset(scrubX, 4), Offset(scrubX, h), scrubPaint);
+
+    final pinPaint = Paint()
+      ..color = const Color(0xFF0F172A)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(scrubX, 4), 4.5, pinPaint);
+    pinPaint.color = Colors.white;
+    canvas.drawCircle(Offset(scrubX, 4), 2.2, pinPaint);
   }
 
   @override
   bool shouldRepaint(covariant _HormoneGraphPainter oldDelegate) {
-    return oldDelegate.scrubDay != scrubDay ||
-        oldDelegate.filterMode != filterMode ||
-        oldDelegate.cycleLength != cycleLength;
+    return oldDelegate.cycleLength != cycleLength ||
+        oldDelegate.scrubDay != scrubDay ||
+        oldDelegate.filterMode != filterMode;
   }
 }
-

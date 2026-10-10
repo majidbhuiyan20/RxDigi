@@ -86,7 +86,7 @@ class _HorizontalCycleDateStripState
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      WomenHealthFormatters.formatDayMonthBn(selectedDate),
+                      WomenHealthFormatters.formatDayMonth(selectedDate, isBn: isBn),
                       style: const TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w800,
@@ -241,7 +241,7 @@ class _HorizontalCycleDateStripState
                       children: [
                         // Weekday text
                         Text(
-                          WomenHealthFormatters.getBengaliWeekday(date),
+                          WomenHealthFormatters.getWeekday(date, isBn: isBn),
                           style: TextStyle(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w600,
@@ -263,7 +263,7 @@ class _HorizontalCycleDateStripState
                                 )
                               : null,
                           child: Text(
-                            WomenHealthFormatters.toBengaliDigits(date.day),
+                            WomenHealthFormatters.formatDigits(date.day, isBn: isBn),
                             style: TextStyle(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w800,

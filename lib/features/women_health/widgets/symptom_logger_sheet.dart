@@ -4,7 +4,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../models/daily_symptom_log.dart';
 import '../provider/women_health_provider.dart';
 import '../../../core/utils/app_feedback.dart';
-
 import '../utils/women_health_formatters.dart';
 
 class SymptomLoggerSheet extends ConsumerStatefulWidget {
@@ -43,17 +42,6 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
   late MoodType _mood;
   late List<String> _selectedSymptoms;
 
-  final List<String> _allSymptoms = [
-    'মাথাব্যথা',
-    'পেট ফাঁপা',
-    'কোমর ব্যথা',
-    'ব্রণ / র‍্যাশ',
-    'স্তন সংবেদনশীলতা',
-    'অনিদ্রা',
-    'মিষ্টি খাওয়ার তীব্র ইচ্ছা',
-    'বমি ভাব',
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -64,7 +52,7 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
     _selectedSymptoms = List.from(log?.physicalSymptoms ?? []);
   }
 
-  void _save() {
+  void _save(bool isBn) {
     AppFeedback.playSuccess();
     final target = widget.targetDate ?? DateTime.now();
     final dateKey = WomenHealthFormatters.toDateKey(target);
@@ -78,10 +66,10 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
     ref.read(dailySymptomProvider.notifier).saveLog(newLog);
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('আজকের লক্ষণ ও মুড সফলভাবে সেভ করা হয়েছে'),
-        backgroundColor: Color(0xFF10B981),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(isBn ? 'আজকের লক্ষণ ও মুড সফলভাবে সেভ করা হয়েছে' : 'Symptoms and mood saved successfully'),
+        backgroundColor: const Color(0xFF10B981),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -138,7 +126,9 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
                     widget.targetDate != null &&
                             !WomenHealthFormatters.isSameDay(
                                 widget.targetDate!, DateTime.now())
-                        ? '${WomenHealthFormatters.formatDayMonthBn(widget.targetDate!)} এর লক্ষণ'
+                        ? (isBn
+                            ? '${WomenHealthFormatters.formatDayMonth(widget.targetDate!, isBn: true)} এর লক্ষণ'
+                            : 'Symptoms for ${WomenHealthFormatters.formatDayMonth(widget.targetDate!, isBn: false)}')
                         : (isBn ? 'আজকের লক্ষণ ও অনুভূতি রেকর্ড' : 'Log Symptoms & Mood'),
                     style: const TextStyle(
                       fontSize: 16.5,
@@ -201,7 +191,7 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
                             Text(f.emoji, style: const TextStyle(fontSize: 14)),
                             const SizedBox(width: 6),
                             Text(
-                              f.labelBn,
+                              f.label(isBn),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -252,7 +242,7 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
                           ),
                         ),
                         child: Text(
-                          c.labelBn,
+                          c.label(isBn),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -306,7 +296,7 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
                             Text(m.emoji, style: const TextStyle(fontSize: 16)),
                             const SizedBox(width: 6),
                             Text(
-                              m.labelBn,
+                              m.label(isBn),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -335,12 +325,14 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: _allSymptoms.map((symptom) {
-                    final isSelected = _selectedSymptoms.contains(symptom);
+                  children: SymptomCatalog.items.map((item) {
+                    final isSelected = _selectedSymptoms.contains(item.id) ||
+                        _selectedSymptoms.contains(item.nameBn) ||
+                        _selectedSymptoms.contains(item.nameEn);
                     return FilterChip(
                       selected: isSelected,
                       label: Text(
-                        symptom,
+                        item.label(isBn),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -349,22 +341,30 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
                       ),
                       selectedColor: const Color(0xFFEC4899),
                       backgroundColor: const Color(0xFFF8FAFC),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      checkmarkColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                          color: isSelected ? const Color(0xFFEC4899) : Colors.grey.shade200,
+                        ),
+                      ),
+                      showCheckmark: false,
                       onSelected: (val) {
                         AppFeedback.playLight();
                         setState(() {
                           if (val) {
-                            _selectedSymptoms.add(symptom);
+                            _selectedSymptoms.add(item.id);
                           } else {
-                            _selectedSymptoms.remove(symptom);
+                            _selectedSymptoms.remove(item.id);
+                            _selectedSymptoms.remove(item.nameBn);
+                            _selectedSymptoms.remove(item.nameEn);
                           }
                         });
                       },
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 20),
+
+                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -372,18 +372,18 @@ class _SymptomLoggerSheetState extends ConsumerState<SymptomLoggerSheet> {
           // Save Button
           SizedBox(
             width: double.infinity,
-            height: 48,
             child: ElevatedButton(
-              onPressed: _save,
+              onPressed: () => _save(isBn),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFF43F5E),
-                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
+                elevation: 0,
               ),
               child: Text(
-                isBn ? 'রেকর্ড সংরক্ষণ করুন' : 'Save Today\'s Entry',
+                isBn ? 'লক্ষণ ও মুড সেভ করুন' : 'Save Symptoms & Mood',
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,

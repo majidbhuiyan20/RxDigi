@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../models/menstrual_cycle_model.dart';
 import '../provider/women_health_provider.dart';
+import '../utils/women_health_formatters.dart';
 import '../../../core/utils/app_feedback.dart';
 
 class CycleSettingsSheet extends ConsumerStatefulWidget {
@@ -64,7 +64,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
     }
   }
 
-  void _save() {
+  void _save(bool isBn) {
     AppFeedback.playSuccess();
     ref.read(womenCycleProvider.notifier).updateCycleSettings(
           cycleLength: _cycleLength,
@@ -73,10 +73,10 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
         );
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('সাইকেল সেটিংস আপডেট করা হয়েছে'),
-        backgroundColor: Color(0xFF10B981),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(isBn ? 'সাইকেল সেটিংস আপডেট করা হয়েছে' : 'Cycle settings updated successfully'),
+        backgroundColor: const Color(0xFF10B981),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -84,7 +84,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
   @override
   Widget build(BuildContext context) {
     final isBn = Localizations.localeOf(context).languageCode == 'bn';
-    final dateFormatted = DateFormat('d MMMM, yyyy').format(_lastPeriodDate);
+    final dateFormatted = WomenHealthFormatters.formatFullDate(_lastPeriodDate, isBn: isBn);
 
     return Container(
       padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(context).padding.bottom + 16),
@@ -292,7 +292,7 @@ class _CycleSettingsSheetState extends ConsumerState<CycleSettingsSheet> {
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
-              onPressed: _save,
+              onPressed: () => _save(isBn),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFF43F5E),
                 elevation: 0,
